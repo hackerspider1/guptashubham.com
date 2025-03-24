@@ -18,7 +18,7 @@ const Header = () => {
     const width = useTransform(
         scrollY,
         [0, 100],
-        ["15%", "15%"]
+        ["10%", "10%"]
     );
 
     return (
