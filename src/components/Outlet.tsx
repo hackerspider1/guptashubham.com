@@ -55,9 +55,9 @@ const Outlet = ({ children }: { children: React.ReactNode }) => {
             <div className='fixed bottom-6 left-0 right-0 flex items-center justify-center'>
                 <FloatingDock items={MenuItems} />
             </div>
-            <div className='fixed bottom-0 left-0 right-0 flex items-center justify-center'>
+            {/* <div className='fixed bottom-0 left-0 right-0 flex items-center justify-center'>
                 <Copyright />
-            </div>
+            </div> */}
         </div>
     )
 }

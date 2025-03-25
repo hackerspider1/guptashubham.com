@@ -11,6 +11,9 @@
   "dependencies": {
     "@tabler/icons-react": "^3.31.0",
     "clsx": "^2.1.1",
+    "cobe": "^0.6.3",
+    "lucide-react": "^0.484.0",
+    "moment": "^2.30.1",
     "motion": "^12.5.0",
     "next": "15.2.3",
     "phosphor-react": "^1.4.1",
