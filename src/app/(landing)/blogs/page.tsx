@@ -5,14 +5,14 @@ import Link from "next/link";
 import { Calendar, BookOpen, FileText, ArrowRight } from "lucide-react";
 
 const AnimatedBackground = () => (
-  <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-blue-900 opacity-75 z-0"></div>
+  <div className="fixed inset-0 bg-gradient-to-br from-black via-gray-900 to-blue-900 opacity-75 z-0"></div>
 );
 
-const GlassCard = ({ children, className = "" }) => (
+const GlassCard = ({ children, className = "" }:any) => (
   <div
     className={`
-      bg-white bg-opacity-10 backdrop-blur-lg 
-      border border-white border-opacity-20 
+      bg-black bg-opacity-10 backdrop-blur-lg 
+      border border-gray-800 border-opacity-20 
       rounded-2xl shadow-2xl 
       transition-all duration-300 
       hover:bg-opacity-15 hover:shadow-3xl 
@@ -46,12 +46,12 @@ const blogs = [
 
 export default function BlogHome() {
   return (
-    <div className="relative min-h-screen w-full flex flex-col items-center justify-center bg-black overflow-hidden text-white">
+    <div className="relative min-h-screen w-full flex flex-col items-center justify-center bg-black overflow-hidden text-white pb-20">
       <AnimatedBackground />
       
       <div className="relative z-10 max-w-6xl w-full px-6">
         <div className="text-center mb-16">
-          <h1 className="text-6xl font-bold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white via-blue-200 to-white">
+          <h1 className="text-6xl font-bold tracking-tight mb-4 bg-clip-text leading-20 text-transparent bg-gradient-to-r from-white via-blue-200 to-white">
             Blog & Insights
           </h1>
           <p className="text-2xl text-gray-300">

@@ -15,11 +15,11 @@ const AnimatedBackground = () => (
   <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-blue-900 opacity-75 z-0"></div>
 );
 
-const GlassCard = ({ children, className = '' }) => (
+const GlassCard = ({ children, className = '' }:any) => (
   <div 
     className={`
-      bg-white bg-opacity-10 backdrop-blur-lg 
-      border border-white border-opacity-20 
+      bg-black bg-opacity-10 backdrop-blur-lg 
+      border border-border-800 border-opacity-20 
       rounded-2xl shadow-2xl 
       transition-all duration-300 
       hover:bg-opacity-15 hover:shadow-3xl 
@@ -57,14 +57,14 @@ const About = () => {
 
   return (
     <div className="relative min-h-screen w-full flex flex-col items-center justify-center bg-black overflow-hidden text-white">
-      <AnimatedBackground />
+      {/* <AnimatedBackground /> */}
       
       <div className="relative z-10 max-w-6xl w-full px-6">
         <div className="grid md:grid-cols-2 gap-12">
           {/* Left Column - Personal Introduction */}
           <div className="space-y-8">
             <div className="text-center md:text-left">
-              <h1 className="text-5xl font-bold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white via-blue-200 to-white">
+              <h1 className="text-5xl font-bold tracking-tight mb-4 text-white">
                 Hey there! 👋
               </h1>
               <p className="text-2xl text-gray-300 mb-8">
@@ -86,11 +86,13 @@ const About = () => {
             <div className="flex justify-center md:justify-start">
               <Link 
                 href="/resume.pdf" 
-                className="inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-lg border border-white/20 text-white rounded-xl hover:bg-white/20 transition-all"
+                className="inline-flex items-center  bg-gradient-to-r from-purple-500 to-pink-500 backdrop-blur-lg border border-white/20 text-white rounded-xl hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 transition-all"
                 download
               >
-                <Download className="w-5 h-5 mr-2" />
-                Download Resume
+                <div className='flex items-center px-6 py-3 bg-black rounded-xl'>
+                  <Download className="w-5 h-5 mr-2" />
+                  Download Resume
+                </div>
               </Link>
             </div>
           </div>

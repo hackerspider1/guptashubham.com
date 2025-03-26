@@ -35,7 +35,7 @@ interface MarqueeProps extends ComponentPropsWithoutRef<"div"> {
 export function Marquee({
   className,
   reverse = false,
-  pauseOnHover = false,
+  pauseOnHover = true,
   children,
   vertical = false,
   repeat = 4,
@@ -45,7 +45,7 @@ export function Marquee({
     <div
       {...props}
       className={cn(
-        "group flex overflow-hidden p-2 [--duration:40s] [--gap:1rem] [gap:var(--gap)]",
+        "group flex items-center overflow-hidden p-2 [--duration:40s] [--gap:1rem] [gap:var(--gap)]",
         {
           "flex-row": !vertical,
           "flex-col": vertical,

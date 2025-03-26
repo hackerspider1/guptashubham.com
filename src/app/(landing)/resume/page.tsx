@@ -40,9 +40,9 @@ export default function Experience() {
   return (
     <div className="container mx-auto p-8 text-white">
       <motion.h2 className="text-4xl font-bold text-center mb-8 text-blue-400" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>My Experience</motion.h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {experiences.map((exp, index) => (
-          <motion.div key={index} className="flex flex-col items-start bg-gray-900 p-6 rounded-lg shadow-md" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.2 }}>
+          <motion.div key={index} className="flex flex-col items-start bg-black border border-gray-800 p-6 rounded-lg shadow-md" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.2 }}>
             <FaBriefcase className="text-blue-400 mb-2" size={28} />
             <h3 className="text-xl font-semibold text-white">{exp.title}</h3>
             <p className="text-gray-400">{exp.company}</p>
@@ -54,9 +54,10 @@ export default function Experience() {
       <motion.h2 className="text-4xl font-bold text-center mt-12 mb-8 text-purple-400" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>My Skills</motion.h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {skills.map((skill, index) => (
-          <Card key={index} className="bg-gray-900 p-4 rounded-lg shadow-md">
+          <Card key={index} className="!bg-black border-gray-800 p-4 rounded-lg shadow-md">
             <CardContent>
               <h3 className="text-lg font-semibold text-white">{skill.name}</h3>
+              {/* @ts-ignore */}
               <Progress value={skill.value} className="mt-2 text-blue-400" />
             </CardContent>
           </Card>

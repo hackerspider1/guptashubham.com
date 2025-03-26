@@ -6,6 +6,8 @@ import {
   Shield, Terminal, Code2, Flag, Award, 
   BugIcon, Briefcase, Quote 
 } from 'lucide-react';
+import { Marquee } from '@/components/ui/marquee';
+import Link from 'next/link';
 
 const AnimatedBackground = () => (
   <div className="absolute inset-0 bg-black"></div>
@@ -14,11 +16,11 @@ const AnimatedBackground = () => (
 const GlassCard = ({ children, className = '' }) => (
   <div 
     className={`
-      bg-gray-900/50 backdrop-blur-lg
+      bg-black backdrop-blur-lg
       border border-white/20 
       rounded-2xl shadow-2xl 
       transition-all duration-300 
-      hover:bg-gray-900/70 hover:shadow-3xl 
+      hover:shadow-3xl 
       ${className}
     `}
   >
@@ -84,23 +86,29 @@ export default function HomePage() {
 
   const testimonials = [
     {
-      quote: "Shubham's security insights are game-changing. His penetration testing revealed critical vulnerabilities we hadn't even considered.",
-      name: "Alex Rodriguez",
-      company: "TechSecure Solutions",
-      avatar: "https://randomuser.me/api/portraits/men/1.jpg"
+      message: 'Being a rookie by age and education he might just amaze you with the technical knowledge he owns about Pentest. He is a great resource to a team a good team player and a quick learner. I am sure he will be an asset to any team.',
+      avatar: "/testimonials/rajeev_verma.jfif",
+      name: 'Rajeev Verma',
+      position: 'Information Security Leader @ SRF Limited'
     },
     {
-      quote: "An exceptional bug hunter with an incredible eye for detail. Shubham's work has significantly improved our application's security posture.",
-      name: "Emily Chang",
-      company: "CyberGuard Technologies",
-      avatar: "https://randomuser.me/api/portraits/women/2.jpg"
+      message: 'In a very young age he is having very good technical knowledge in Penetration Testing especially, he is good in web application. He is passionate about his work and dedicated for his work. His bug bounty skills makes him different from others and his dedication.',
+      avatar: "/testimonials/manish.jfif",
+      name: 'Manish Rohilla',
+      position: 'Senior SecurityConsultant @ NotSoSecure'
     },
     {
-      quote: "His CTF performance and security research are truly impressive. Shubham brings a unique perspective to cybersecurity challenges.",
-      name: "Michael Kim",
-      company: "InnovateX Security",
-      avatar: "https://randomuser.me/api/portraits/men/3.jpg"
-    }
+      message: "I've known Shubham for more than 2 years. His vast experience and clear understanding of the concepts makes him an outstanding InfoSec professional. His sound knowledge on domains such as web application security assessments marks him as a key resource anywhere he is placed. Highly recommended as a professional and a friend.",
+      avatar: "/testimonials/lalit.jfif",
+      name: 'Lalit Mohan Sharma',
+      position: 'Application Security @ Zynga'
+    },
+    {
+      message: "He is one of the best hands in Bug Bounties and Pen testing. We’ve joined our hands on several projects, and Shubham is one of the best people I had as a partner. I highly recommend his expertise to any person looking for an ethical hacker (Pentest, Bug Bounty etc). He is the most profound person I have met, and his ability to tackle any problem is remarkable and with a warm smile. Shubham would become an appreciated member of any team.",
+      avatar: "/testimonials/devender.jfif",
+      name: 'Devender Kumar',
+      position: 'Jr. Solution Architect @ Deloitte'
+    },
   ];
 
   return (
@@ -109,12 +117,19 @@ export default function HomePage() {
       
       <div className="relative z-10 max-w-6xl w-full px-6">
         <div className="text-center mb-16">
-          <h1 className="text-6xl font-bold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white via-blue-200 to-white">
+          <h1 className="text-6xl font-bold tracking-tight mb-4  text-white ">
             Shubham Gupta
           </h1>
           <p className="text-2xl text-gray-300">
             Security Researcher & Bug Hunter
           </p>
+          <div className="text-center mt-12">
+            <Link href="/what-is-hacking">
+              <div className="text-white text-lg font-semibold underline decoration-4 decoration-blue-400">
+                What is Hacking?
+              </div>
+            </Link>
+          </div>
         </div>
 
         <GlassCard className="p-8 mb-12">
@@ -153,14 +168,14 @@ export default function HomePage() {
 
         <GlassCard className="p-8">
           <h2 className="text-3xl font-semibold text-center mb-12">Testimonials</h2>
-          <div className="grid md:grid-cols-3 gap-8">
+          <Marquee pauseOnHover={true}>
             {testimonials.map((testimonial, index) => (
               <div 
                 key={index} 
-                className="flex flex-col items-center text-center bg-gray-800/30 p-6 rounded-2xl border border-white/10"
+                className="flex flex-col items-center h-fit text-center max-w-lg bg-gray-800/30 p-6 rounded-2xl border border-white/10"
               >
                 <Quote className="w-10 h-10 text-blue-400 mb-4" />
-                <p className="text-gray-300 italic mb-6 text-sm">"{testimonial.quote}"</p>
+                <p className="text-gray-300 italic mb-6 text-sm">"{testimonial.message}"</p>
                 <div className="flex items-center">
                   <img 
                     src={testimonial.avatar} 
@@ -169,13 +184,14 @@ export default function HomePage() {
                   />
                   <div>
                     <h4 className="font-semibold text-white">{testimonial.name}</h4>
-                    <p className="text-gray-400 text-sm">{testimonial.company}</p>
+                    <p className="text-gray-400 text-sm">{testimonial.position}</p>
                   </div>
                 </div>
               </div>
             ))}
-          </div>
+          </Marquee>
         </GlassCard>
+
       </div>
     </div>
   );

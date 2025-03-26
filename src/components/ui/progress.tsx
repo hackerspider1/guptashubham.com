@@ -5,7 +5,7 @@ interface ProgressProps {
   max?: number;
 }
 
-const Progress: React.FC<ProgressProps> = ({ value, max = 100 }) => {
+const Progress: React.FC<ProgressProps> = ({ value, max = 100 }:any) => {
   return (
     <div className="relative w-full h-2 bg-gray-200 rounded-lg overflow-hidden">
       <div

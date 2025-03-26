@@ -36,6 +36,7 @@ const Page = () => {
       ]);
 
       setRequestResponse({
+        // @ts-ignore
         request: {
           url,
           method: "GET",
@@ -51,13 +52,14 @@ const Page = () => {
       });
     } catch (error) {
       setHistory((prev) => [...prev, "➜ CORS scan failed."]);
+      {/* @ts-ignore */}
       setRequestResponse({ error: `Failed to fetch: ${error.message}` });
     }
     setIsProcessing(false);
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 h-full flex flex-col items-center justify-center">
+    <div className="max-w-4xl w-full mx-auto p-6 h-full flex flex-col items-center justify-center">
       {/* Terminal */}
       <div className="bg-[#181a1b] w-full rounded-xl overflow-hidden shadow-xl border border-[#2d2f31]">
         <div className="bg-[#2d2f31] px-4 py-2 flex items-center gap-2">

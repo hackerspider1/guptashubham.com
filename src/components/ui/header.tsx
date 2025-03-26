@@ -95,6 +95,7 @@ const Header = () => {
             ...prev,
             isPlaying: !prev.isPlaying
         }));
+        // @ts-ignore
         setActiveInteraction('music');
     };
 
@@ -221,7 +222,7 @@ const Header = () => {
                     </motion.div>
                 </motion.div>
             </div>
-            <div className="fixed top-0 left-0 right-0 z-10">
+            <div className="fixed top-0 left-0 right-0 z-20">
                 <div className="bg-black/40 text-white flex justify-between items-center px-4 py-1 relative">
                     <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/40 w-44 h-16 rounded-b-lg' />
                     {/* Left side - App Menu */}

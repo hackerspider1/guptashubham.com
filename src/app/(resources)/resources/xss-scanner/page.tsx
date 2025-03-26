@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import * as SelectPrimitive from "@radix-ui/react-select";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { Check, ChevronDown } from "lucide-react";
 
 const xssPayloads = {
@@ -24,7 +24,7 @@ const Page = () => {
     setLogs((prev) => [...prev, `➜ Scanning ${url} with ${selectedList}...`]);
     setResults([]);
 
-    const payloads = xssPayloads[selectedList];
+    const payloads = xssPayloads[selectedList as keyof typeof xssPayloads];
 
     for (const payload of payloads) {
       const testUrl = url.replace("XSS_TEST", encodeURIComponent(payload));
@@ -48,7 +48,7 @@ const Page = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6 h-full flex flex-col items-center justify-center">
+    <div className="max-w-3xl w-full mx-auto p-6 h-full flex flex-col items-center justify-center">
       {/* Terminal UI */}
       <div className="bg-[#181a1b] w-full rounded-xl overflow-hidden shadow-xl border border-[#2d2f31]">
         <div className="bg-[#2d2f31] px-4 py-2 flex items-center gap-2">
@@ -81,28 +81,33 @@ const Page = () => {
 
       {/* Payload Selection */}
       <div className="mt-4 w-full">
-        <SelectPrimitive.Root value={selectedList} onValueChange={setSelectedList}>
-          <SelectPrimitive.Trigger className="flex justify-between items-center p-2 bg-[#2d2f31] text-[#98c379] rounded-md w-full">
-            <SelectPrimitive.Value placeholder="Select a payload list" />
+        <DropdownMenu.Root>
+          <DropdownMenu.Trigger className="flex justify-between items-center p-2 bg-[#2d2f31] text-[#98c379] rounded-md w-full">
+            {selectedList}
             <ChevronDown className="w-4 h-4 text-[#98c379]" />
-          </SelectPrimitive.Trigger>
-          <SelectPrimitive.Content className="bg-[#181a1b] text-white rounded-md p-1 shadow-md">
-            <SelectPrimitive.Viewport>
+          </DropdownMenu.Trigger>
+          <DropdownMenu.Portal>
+            <DropdownMenu.Content 
+              className="bg-[#181a1b] text-white rounded-md p-1 shadow-md z-50 w-full"
+              sideOffset={5}
+            >
               {Object.keys(xssPayloads).map((option) => (
-                <SelectPrimitive.Item
+                <DropdownMenu.Item
                   key={option}
-                  value={option}
-                  className="px-3 py-2 cursor-pointer hover:bg-[#2d2f31] rounded-md"
+                  onSelect={() => setSelectedList(option)}
+                  className="px-3 py-2 cursor-pointer hover:bg-[#2d2f31] w-full rounded-md relative flex items-center"
                 >
-                  <SelectPrimitive.ItemText>{option}</SelectPrimitive.ItemText>
-                  <SelectPrimitive.ItemIndicator>
-                    <Check className="w-4 h-4 text-[#98c379]" />
-                  </SelectPrimitive.ItemIndicator>
-                </SelectPrimitive.Item>
+                  <span>{option}</span>
+                  {selectedList === option && (
+                    <DropdownMenu.ItemIndicator className="absolute right-2">
+                      <Check className="w-4 h-4 text-[#98c379]" />
+                    </DropdownMenu.ItemIndicator>
+                  )}
+                </DropdownMenu.Item>
               ))}
-            </SelectPrimitive.Viewport>
-          </SelectPrimitive.Content>
-        </SelectPrimitive.Root>
+            </DropdownMenu.Content>
+          </DropdownMenu.Portal>
+        </DropdownMenu.Root>
       </div>
 
       {/* Results */}

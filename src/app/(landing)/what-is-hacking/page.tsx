@@ -7,7 +7,7 @@ import { SiTorproject, SiKalilinux, SiWireshark, SiMetasploit } from 'react-icon
 
 const HackingGuide = () => {
   return (
-    <div className="bg-[#0D0D0D] min-h-screen flex items-center justify-center text-gray-100 p-6">
+    <div className="min-h-screen flex items-center justify-center text-gray-100 p-6">
       <motion.div 
         className="macos-window w-full max-w-4xl p-6 rounded-xl shadow-2xl bg-opacity-90 backdrop-blur-xl border border-gray-800"
         initial={{ opacity: 0, y: -20 }}
@@ -27,13 +27,13 @@ const HackingGuide = () => {
 
         {/* Blog Content */}
         <motion.div 
-          className="bg-[#0D0D0D] bg-opacity-90 p-6 rounded-b-xl space-y-8 shadow-lg"
+          className=" bg-opacity-90 p-6 rounded-b-xl space-y-8 shadow-lg"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6 }}
         >
           {/* Step 1: Learn the Basics */}
-          <section className="p-4 bg-gray-800 bg-opacity-60 rounded-lg border border-gray-600 shadow-md">
+          <section className="p-4 bg-opacity-60 rounded-lg border border-gray-600 shadow-md">
             <h2 className="font-mono text-lg text-green-400 flex items-center"><FaBook className="mr-2" /> Step 1: Learn the Basics</h2>
             <p className="text-sm text-gray-300 mt-2">
               Before diving into hacking, it’s crucial to understand how computers and networks work. Study:
@@ -46,7 +46,7 @@ const HackingGuide = () => {
           </section>
 
           {/* Step 2: Learn Networking & Security */}
-          <section className="p-4 bg-gray-800 bg-opacity-60 rounded-lg border border-gray-600 shadow-md">
+          <section className="p-4 rounded-lg border border-gray-600 shadow-md">
             <h2 className="font-mono text-lg text-blue-400 flex items-center"><FaNetworkWired className="mr-2" /> Step 2: Understand Networking & Security</h2>
             <p className="text-sm text-gray-300 mt-2">
               A hacker needs a strong foundation in networking. Learn about:
@@ -59,7 +59,7 @@ const HackingGuide = () => {
           </section>
 
           {/* Step 3: Master Ethical Hacking Tools */}
-          <section className="p-4 bg-gray-800 bg-opacity-60 rounded-lg border border-gray-600 shadow-md">
+          <section className="p-4 rounded-lg border border-gray-600 shadow-md">
             <h2 className="font-mono text-lg text-red-400 flex items-center"><FaLaptopCode className="mr-2" /> Step 3: Master Ethical Hacking Tools</h2>
             <p className="text-sm text-gray-300 mt-2">
               Ethical hackers use specialized tools for penetration testing and security analysis. Popular tools include:
@@ -73,7 +73,7 @@ const HackingGuide = () => {
           </section>
 
           {/* Step 4: Practice & Build Skills */}
-          <section className="p-4 bg-gray-800 bg-opacity-60 rounded-lg border border-gray-600 shadow-md">
+          <section className="p-4 rounded-lg border border-gray-600 shadow-md">
             <h2 className="font-mono text-lg text-yellow-400 flex items-center"><FaServer className="mr-2" /> Step 4: Practice with CTF & Labs</h2>
             <p className="text-sm text-gray-300 mt-2">
               Practice your skills in safe environments using:
@@ -86,7 +86,7 @@ const HackingGuide = () => {
           </section>
 
           {/* Step 5: Stay Ethical & Legal */}
-          <section className="p-4 bg-gray-800 bg-opacity-60 rounded-lg border border-gray-600 shadow-md">
+          <section className="p-4 rounded-lg border border-gray-600 shadow-md">
             <h2 className="font-mono text-lg text-green-400 flex items-center"><FaShieldAlt className="mr-2" /> Step 5: Stay Ethical & Legal</h2>
             <p className="text-sm text-gray-300 mt-2">
               Always follow ethical hacking principles. Never test systems without permission. Learn about:

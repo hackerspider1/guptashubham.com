@@ -1,6 +1,7 @@
 /**
  * Floating Dock: Now includes XSS & CORS tools
  **/
+"use client";
 
 import { cn } from "@/lib/utils";
 import { IconLayoutNavbarCollapse, IconShieldX, IconGlobe } from "@tabler/icons-react";
@@ -13,11 +14,11 @@ import {
   useTransform,
 } from "motion/react";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
 const dockItems = [
-  { title: "XSS Scanner", icon: <IconShieldX />, href: "/xss" },
-  { title: "CORS Checker", icon: <IconGlobe />, href: "/cors-checker" },
+  { title: "XSS Scanner", icon: <IconShieldX />, href: "/resources/xss-scanner" },
 ];
 
 export const FloatingDock = ({
@@ -31,9 +32,10 @@ export const FloatingDock = ({
 }) => {
   const mergedItems = [...items, ...dockItems];
 
+  const path = usePathname();
   return (
     <>
-      <FloatingDockDesktop items={mergedItems} className={desktopClassName} />
+      <FloatingDockDesktop items={mergedItems} className={desktopClassName} path={path} />
       <FloatingDockMobile items={mergedItems} className={mobileClassName} />
     </>
   );
@@ -73,7 +75,7 @@ const FloatingDockMobile = ({
                 <Link
                   href={item.href}
                   key={item.title}
-                  className="h-6 w-6 rounded-full bg-gray-50 dark:bg-neutral-900 flex items-center justify-center"
+                  className={cn("h-6 w-6 rounded-full flex items-center justify-center")}
                 >
                   <div className="h-3 w-3">{item.icon}</div>
                 </Link>
@@ -95,12 +97,16 @@ const FloatingDockMobile = ({
 const FloatingDockDesktop = ({
   items,
   className,
+  path
 }: {
   items: { title: string; icon: React.ReactNode; href: string }[];
   className?: string;
+  path?: string;
+
 }) => {
   let mouseX = useMotionValue(Infinity);
   
+  {console.log(path, "rdf")}
   return (
     <motion.div
       onMouseMove={(e) => mouseX.set(e.pageX)}
@@ -111,7 +117,7 @@ const FloatingDockDesktop = ({
       )}
     >
       {items.map((item) => (
-        <IconContainer mouseX={mouseX} key={item.title} {...item} />
+        <IconContainer mouseX={mouseX} key={item.title} {...item} path={path || ""} />
       ))}
     </motion.div>
   );
@@ -122,11 +128,13 @@ function IconContainer({
   title,
   icon,
   href,
+  path
 }: {
   mouseX: MotionValue;
   title: string;
   icon: React.ReactNode;
   href: string;
+  path: string;
 }) {
   let ref = useRef<HTMLDivElement>(null);
 
@@ -165,6 +173,8 @@ function IconContainer({
 
   const [hovered, setHovered] = useState(false);
 
+  
+
   return (
     <Link href={href}>
       <motion.div
@@ -172,7 +182,11 @@ function IconContainer({
         style={{ width, height }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        className="aspect-square rounded-full bg-gray-200 dark:bg-neutral-800 flex items-center justify-center relative"
+        className={cn("aspect-square rounded-full bg-gray-200 dark:bg-neutral-800 flex items-center justify-center relative", 
+          {
+            "bg-gray-50 dark:bg-neutral-900": path !== href,
+            "bg-blue-500 dark:bg-blue-900": path === href,
+          })}
       >
         <AnimatePresence>
           {hovered && (
