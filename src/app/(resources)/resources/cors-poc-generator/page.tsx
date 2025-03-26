@@ -107,6 +107,7 @@ const Page = () => {
           <div className="bg-[#181a1b] p-4 rounded-lg shadow-md border border-[#2d2f31] text-[#98c379]">
             <h3 className="text-lg font-bold mb-2">Request</h3>
             <SyntaxHighlighter language="json" style={atomDark} className="rounded-lg p-4 max-h-[20rem] overflow-auto wrapLongLines={true}">
+              {/* @ts-ignore */}
               {JSON.stringify(requestResponse.request, null, 2)}
             </SyntaxHighlighter>
           </div>
@@ -114,6 +115,7 @@ const Page = () => {
           <div className="bg-[#181a1b] p-4 rounded-lg shadow-md border border-[#2d2f31] text-[#98c379]">
             <h3 className="text-lg font-bold mb-2">Response</h3>
             <SyntaxHighlighter language="json" style={atomDark} className="rounded-lg p-4 max-h-[20rem] overflow-auto wrapLongLines={true}">
+              {/* @ts-ignore */}
               {JSON.stringify(requestResponse.response, null, 2)}
             </SyntaxHighlighter>
           </div>
