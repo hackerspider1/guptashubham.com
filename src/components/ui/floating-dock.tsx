@@ -1,11 +1,9 @@
 /**
- * Note: Use position fixed according to your needs
- * Desktop navbar is better positioned at the bottom
- * Mobile navbar is better positioned at bottom right.
+ * Floating Dock: Now includes XSS & CORS tools
  **/
 
 import { cn } from "@/lib/utils";
-import { IconLayoutNavbarCollapse } from "@tabler/icons-react";
+import { IconLayoutNavbarCollapse, IconShieldX, IconGlobe } from "@tabler/icons-react";
 import {
   AnimatePresence,
   MotionValue,
@@ -17,6 +15,11 @@ import {
 import Link from "next/link";
 import { useRef, useState } from "react";
 
+const dockItems = [
+  { title: "XSS Scanner", icon: <IconShieldX />, href: "/xss" },
+  { title: "CORS Checker", icon: <IconGlobe />, href: "/cors-checker" },
+];
+
 export const FloatingDock = ({
   items,
   desktopClassName,
@@ -26,10 +29,12 @@ export const FloatingDock = ({
   desktopClassName?: string;
   mobileClassName?: string;
 }) => {
+  const mergedItems = [...items, ...dockItems];
+
   return (
     <>
-      <FloatingDockDesktop items={items} className={desktopClassName} />
-      <FloatingDockMobile items={items} className={mobileClassName} />
+      <FloatingDockDesktop items={mergedItems} className={desktopClassName} />
+      <FloatingDockMobile items={mergedItems} className={mobileClassName} />
     </>
   );
 };
@@ -42,6 +47,7 @@ const FloatingDockMobile = ({
   className?: string;
 }) => {
   const [open, setOpen] = useState(false);
+
   return (
     <div className={cn("relative block md:hidden", className)}>
       <AnimatePresence>
@@ -54,10 +60,7 @@ const FloatingDockMobile = ({
               <motion.div
                 key={item.title}
                 initial={{ opacity: 0, y: 10 }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                }}
+                animate={{ opacity: 1, y: 0 }}
                 exit={{
                   opacity: 0,
                   y: 10,
@@ -97,12 +100,13 @@ const FloatingDockDesktop = ({
   className?: string;
 }) => {
   let mouseX = useMotionValue(Infinity);
+  
   return (
     <motion.div
       onMouseMove={(e) => mouseX.set(e.pageX)}
       onMouseLeave={() => mouseX.set(Infinity)}
       className={cn(
-        "mx-auto hidden md:flex h-12 gap-4 items-end  rounded-2xl bg-gray-50 dark:bg-neutral-900 px-4 pb-2",
+        "mx-auto hidden md:flex h-12 gap-4 items-end rounded-2xl bg-gray-50 dark:bg-neutral-900 px-4 pb-2",
         className
       )}
     >
@@ -128,7 +132,6 @@ function IconContainer({
 
   let distance = useTransform(mouseX, (val) => {
     let bounds = ref.current?.getBoundingClientRect() ?? { x: 0, width: 0 };
-
     return val - bounds.x - bounds.width / 2;
   });
 
@@ -136,11 +139,7 @@ function IconContainer({
   let heightTransform = useTransform(distance, [-150, 0, 150], [30, 80, 30]);
 
   let widthTransformIcon = useTransform(distance, [-150, 0, 150], [16, 20, 16]);
-  let heightTransformIcon = useTransform(
-    distance,
-    [-150, 0, 150],
-    [20, 40, 20]
-  );
+  let heightTransformIcon = useTransform(distance, [-150, 0, 150], [20, 40, 20]);
 
   let width = useSpring(widthTransform, {
     mass: 0.1,

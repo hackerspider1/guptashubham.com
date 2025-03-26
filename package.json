@@ -9,6 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@radix-ui/react-select": "^2.1.6",
+    "@react-three/drei": "^10.0.5",
+    "@react-three/fiber": "^9.1.0",
     "@tabler/icons-react": "^3.31.0",
     "clsx": "^2.1.1",
     "cobe": "^0.6.3",
@@ -18,8 +21,12 @@
     "next": "15.2.3",
     "phosphor-react": "^1.4.1",
     "react": "^19.0.0",
+    "react-circular-progressbar": "^2.2.0",
     "react-dom": "^19.0.0",
-    "tailwind-merge": "^3.0.2"
+    "react-icons": "^5.5.0",
+    "react-syntax-highlighter": "^15.6.1",
+    "tailwind-merge": "^3.0.2",
+    "three": "^0.174.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

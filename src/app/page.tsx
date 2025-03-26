@@ -1,188 +1,181 @@
 "use client";
-import { Globe } from '@/components/ui/globe';
-import { Meteors } from '@/components/ui/meteors';
-import { useEffect, useState } from 'react';
-import { Laptop, Edit, Flag, Bug, Award, BugIcon, Briefcase } from 'lucide-react';
-import { Marquee3D } from '@/components/ui/marquee3D';
-import { Marquee } from '@/components/ui/marquee';
-import { cn } from '@/lib/utils';
 
-export default function Home() {
+import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import { 
+  Shield, Terminal, Code2, Flag, Award, 
+  BugIcon, Briefcase, Quote 
+} from 'lucide-react';
+
+const AnimatedBackground = () => (
+  <div className="absolute inset-0 bg-black"></div>
+);
+
+const GlassCard = ({ children, className = '' }) => (
+  <div 
+    className={`
+      bg-gray-900/50 backdrop-blur-lg
+      border border-white/20 
+      rounded-2xl shadow-2xl 
+      transition-all duration-300 
+      hover:bg-gray-900/70 hover:shadow-3xl 
+      ${className}
+    `}
+  >
+    {children}
+  </div>
+);
+
+const AnimatedCounter = ({ target }) => {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const increment = Math.ceil(target / 50);
+      const interval = setInterval(() => {
+        setCount((prevCount) => {
+          const nextCount = prevCount + increment;
+          return nextCount >= target ? target : nextCount;
+        });
+      }, 20);
+
+      return () => clearInterval(interval);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [target]);
+
+  return count;
+};
+
+export default function HomePage() {
   const activities = [
-    {
-      icon: Laptop,
-      title: "Penetration Testing",
-      description: "Doing web/mobile application security assessments and network security testings"
+    { 
+      icon: Shield, 
+      title: "Penetration Testing", 
+      description: "Comprehensive security assessments for web/mobile applications and networks",
+      color: "text-blue-400"
     },
-    {
-      icon: Edit,
-      title: "Blogging",
-      description: "I write blogs on topics related to cybersecurity for clients and for my own blog."
+    { 
+      icon: Terminal, 
+      title: "Bug Bounty Hunting", 
+      description: "Ranked bug bounty hunter with proven track record",
+      color: "text-green-400"
     },
-    {
-      icon: Bug,
-      title: "Bug Bounty Hunting",
-      description: "Doing bug bounty hunting currently ranked..."
+    { 
+      icon: Code2, 
+      title: "Security Research", 
+      description: "Deep dive into application security and vulnerability research",
+      color: "text-purple-400"
     },
-    {
-      icon: Flag,
-      title: "CTF Player",
-      description: "I actively take part in web and mobile based CTF (Capture the flag) challenges to learn new things and sharpen my skills"
+    { 
+      icon: Flag, 
+      title: "CTF Player", 
+      description: "Active participant in web and mobile CTF challenges",
+      color: "text-red-400"
     }
   ];
 
-  const reviews = [
-    {
-      name: "Jack",
-      username: "@jack",
-      body: "I've never seen anything like this before. It's amazing. I love it.",
-      img: "https://avatar.vercel.sh/jack",
-    },
-    {
-      name: "Jill",
-      username: "@jill",
-      body: "I don't know what to say. I'm speechless. This is amazing.",
-      img: "https://avatar.vercel.sh/jill",
-    },
-    {
-      name: "John",
-      username: "@john",
-      body: "I'm at a loss for words. This is amazing. I love it.",
-      img: "https://avatar.vercel.sh/john",
-    },
-    {
-      name: "Jane",
-      username: "@jane",
-      body: "I'm at a loss for words. This is amazing. I love it.",
-      img: "https://avatar.vercel.sh/jane",
-    },
-    {
-      name: "Jenny",
-      username: "@jenny",
-      body: "I'm at a loss for words. This is amazing. I love it.",
-      img: "https://avatar.vercel.sh/jenny",
-    },
-    {
-      name: "James",
-      username: "@james",
-      body: "I'm at a loss for words. This is amazing. I love it.",
-      img: "https://avatar.vercel.sh/james",
-    },
+  const achievements = [
+    { icon: Award, label: "Hall of Fame", target: 600 },
+    { icon: BugIcon, label: "Bugs Reported", target: 1337 },
+    { icon: Briefcase, label: "Projects", target: 50 }
   ];
- 
-  const ReviewCard = ({
-    img,
-    name,
-    username,
-    body,
-  }: {
-    img: string;
-    name: string;
-    username: string;
-    body: string;
-  }) => {
-    return (
-      <figure
-        className={cn(
-          "relative h-full w-64 cursor-pointer overflow-hidden rounded-xl border p-4",
-          // light styles
-          "border-gray-950/[.1] bg-gray-950/[.01] hover:bg-gray-950/[.05]",
-          // dark styles
-          "dark:border-gray-50/[.1] dark:bg-gray-50/[.10] dark:hover:bg-gray-50/[.15]",
-        )}
-      >
-        <div className="flex flex-row items-center gap-2">
-          <img className="rounded-full" width="32" height="32" alt="" src={img} />
-          <div className="flex flex-col">
-            <figcaption className="text-sm font-medium dark:text-white">
-              {name}
-            </figcaption>
-            <p className="text-xs font-medium dark:text-white/40">{username}</p>
-          </div>
-        </div>
-        <blockquote className="mt-2 text-sm">{body}</blockquote>
-      </figure>
-    );
-  };
 
-  const AchievementCard = ({ icon: Icon, value, label }: { icon: any, value: string, label: string }) => {
-    return (
-      <div className="bg-black/10 dark:bg-white/10 p-6 rounded-xl border border-green-500/30 
-                      flex flex-col items-center text-center space-y-4 
-                      hover:scale-105 transition-transform duration-300 
-                      animate-fade-in-up">
-        <div className='w-16 h-16 rounded-full border-2 border-green-500 
-                        flex items-center justify-center'>
-          <Icon className='w-8 h-8 text-green-500' />
-        </div>
-        <h3 className='text-3xl font-bold text-green-600'>{value}</h3>
-        <p className='text-sm opacity-70'>{label}</p>
-      </div>
-    );
-  };
+  const testimonials = [
+    {
+      quote: "Shubham's security insights are game-changing. His penetration testing revealed critical vulnerabilities we hadn't even considered.",
+      name: "Alex Rodriguez",
+      company: "TechSecure Solutions",
+      avatar: "https://randomuser.me/api/portraits/men/1.jpg"
+    },
+    {
+      quote: "An exceptional bug hunter with an incredible eye for detail. Shubham's work has significantly improved our application's security posture.",
+      name: "Emily Chang",
+      company: "CyberGuard Technologies",
+      avatar: "https://randomuser.me/api/portraits/women/2.jpg"
+    },
+    {
+      quote: "His CTF performance and security research are truly impressive. Shubham brings a unique perspective to cybersecurity challenges.",
+      name: "Michael Kim",
+      company: "InnovateX Security",
+      avatar: "https://randomuser.me/api/portraits/men/3.jpg"
+    }
+  ];
 
   return (
-    <div className='flex flex-col min-h-screen w-full relative pb-20'>
-      <div className='w-full flex flex-col items-center pt-16 space-y-4'>
-        {/* Title */}
-        <h1 className='text-5xl font-bold text-center mb-4'>Shubham Gupta</h1>
+    <div className="relative min-h-screen w-full flex flex-col items-center justify-center bg-black overflow-hidden text-white">
+      <AnimatedBackground />
+      
+      <div className="relative z-10 max-w-6xl w-full px-6">
+        <div className="text-center mb-16">
+          <h1 className="text-6xl font-bold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white via-blue-200 to-white">
+            Shubham Gupta
+          </h1>
+          <p className="text-2xl text-gray-300">
+            Security Researcher & Bug Hunter
+          </p>
+        </div>
 
-        {/* Description */}
-        <p className='text-3xl font-semibold text-center'>Penetration Tester, Bug Hunter, Traveller</p>
-
-        {/* What I Do Section */}
-        <div className='w-full max-w-4xl px-4 py-12'>
-          <h2 className='text-4xl font-bold text-center mb-10'>What I Do</h2>
-
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+        <GlassCard className="p-8 mb-12">
+          <h2 className="text-3xl font-semibold text-center mb-8">What I Do</h2>
+          <div className="grid md:grid-cols-2 gap-6">
             {activities.map((activity, index) => (
               <div
                 key={index}
-                className='bg-black/10 dark:bg-white/10 p-6 rounded-xl border border-green-500/30 
-                           flex flex-col items-center text-center space-y-4 hover:scale-105 transition-transform'
+                className="flex flex-col items-center text-center"
               >
-                <div className='w-16 h-16 rounded-full border-2 border-green-500 
-                                flex items-center justify-center'>
-                  <activity.icon className='w-8 h-8 text-green-500' />
-                </div>
-                <h3 className='text-2xl font-semibold'>{activity.title}</h3>
-                <p className='text-sm opacity-70'>{activity.description}</p>
+                <activity.icon className={`w-12 h-12 ${activity.color} mb-4`} />
+                <h3 className="text-xl font-semibold mb-2">{activity.title}</h3>
+                <p className="text-gray-300 text-sm">{activity.description}</p>
               </div>
             ))}
           </div>
-        </div>
+        </GlassCard>
 
-        {/* Achievements Section */}
-        <div className='w-full max-w-4xl px-4 py-12'>
-          <h2 className='text-4xl font-bold text-center mb-10'>Achievements</h2>
-          <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
-            <AchievementCard 
-              icon={Award} 
-              value="600+" 
-              label="Hall of Fame" 
-            />
-            <AchievementCard 
-              icon={BugIcon} 
-              value="1337+" 
-              label="Bugs Reported" 
-            />
-            <AchievementCard 
-              icon={Briefcase} 
-              value="50+" 
-              label="Projects" 
-            />
+        <GlassCard className="p-8 mb-12">
+          <h2 className="text-3xl font-semibold text-center mb-8">Achievements</h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {achievements.map((achievement, index) => (
+              <div
+                key={index}
+                className="flex flex-col items-center text-center"
+              >
+                <achievement.icon className="w-12 h-12 text-white mb-4" />
+                <h3 className="text-4xl font-bold mb-2">
+                  <AnimatedCounter target={achievement.target} />+
+                </h3>
+                <p className="text-gray-300">{achievement.label}</p>
+              </div>
+            ))}
           </div>
-        </div>
+        </GlassCard>
 
-        {/* Testimonials */}
-        <div className=''>
-          <h2 className='text-4xl font-bold text-center'>Testimonials</h2>
-        </div>
-        <Marquee pauseOnHover className="[--duration:20s]">
-          {reviews.map((review) => (
-            <ReviewCard key={review.username} {...review} />
-          ))}
-        </Marquee>
+        <GlassCard className="p-8">
+          <h2 className="text-3xl font-semibold text-center mb-12">Testimonials</h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <div 
+                key={index} 
+                className="flex flex-col items-center text-center bg-gray-800/30 p-6 rounded-2xl border border-white/10"
+              >
+                <Quote className="w-10 h-10 text-blue-400 mb-4" />
+                <p className="text-gray-300 italic mb-6 text-sm">"{testimonial.quote}"</p>
+                <div className="flex items-center">
+                  <img 
+                    src={testimonial.avatar} 
+                    alt={testimonial.name} 
+                    className="w-12 h-12 rounded-full mr-4 object-cover"
+                  />
+                  <div>
+                    <h4 className="font-semibold text-white">{testimonial.name}</h4>
+                    <p className="text-gray-400 text-sm">{testimonial.company}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </GlassCard>
       </div>
     </div>
   );
