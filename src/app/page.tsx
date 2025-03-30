@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { Marquee } from '@/components/ui/marquee';
 import Link from 'next/link';
+import HeroLogos from '@/components/ui/hero-logo';
 
 const AnimatedBackground = () => (
   <div className="absolute inset-0 bg-black"></div>
@@ -113,24 +114,176 @@ export default function HomePage() {
     },
   ];
 
+  const logos = [
+    {
+      src: "/logos/android-studio-icon.png",
+      alt: "Android Testing",
+      width: 80,
+      height: 80,
+      darkShadow: {
+        hex: "",
+      }
+    },
+    {
+      src: "/logos/ios.png",
+      alt: "IOS",
+      width: 60,
+      height: 60,
+      darkShadow: {
+        hex: "",
+      }
+    },
+    {
+      src: "/logos/burp.png",
+      alt: "Burp Suite",
+      width: 50,
+      height: 50,
+      darkShadow: {
+        hex: "",
+      }
+    },
+    {
+      src: "/logos/nmap.jpeg",
+      alt: "Nmap",
+      width: 80,
+      height: 80,
+      darkShadow: {
+        hex: "",
+      }
+    },
+    {
+      src: "/logos/metasploit.png",
+      alt: "Metasploit",
+      width: 80,
+      height: 80,
+      darkShadow: {
+        hex: "",
+      }
+    },
+    {
+      src: "/logos/wireshark.png",
+      alt: "Wireshark",
+      width: 60,
+      height: 60,
+      darkShadow: {
+        hex: "",
+      }
+    },
+    {
+      src: "/logos/postman.png",
+      alt: "Postman",
+      width: 60,
+      height: 60,
+      darkShadow: {
+        hex: "",
+      }
+    },
+    {
+      src: "/logos/terminal.png",
+      alt: "Terminal",
+      width: 60,
+      height: 60,
+      darkShadow: {
+        hex: "",
+      }
+    },
+    {
+      src: "/logos/python.png",
+      alt: "Python",
+      width: 80,
+      height: 80,
+      darkShadow: {
+        hex: "",
+      }
+    },
+    {
+      src: "/logos/github.png",
+      alt: "Github",
+      width: 80,
+      height: 80,
+      darkShadow: {
+        hex: "",
+      }
+    },
+    {
+      src: "/logos/js.webp",
+      alt: "Javascript",
+      width: 80,
+      height: 80,
+      darkShadow: {
+        hex: "",
+      }
+    },
+    {
+      src: "/logos/aws.png",
+      alt: "Aws",
+      width: 60,
+      height: 60,
+      darkShadow: {
+        hex: "",
+      }
+    },
+    {
+      src: "/logos/xcode.png",
+      alt: "Xcode",
+      width: 80,
+      height: 80,
+      darkShadow: {
+        hex: "",
+      }
+    },
+    {
+      src: "/logos/kali.png",
+      alt: "Kali Linux",
+      width: 120,
+      height: 120,
+      darkShadow: {
+        hex: "",
+      }
+    },
+    {
+      src: "/logos/fortify.png",
+      alt: "Fortify",
+      width: 60,
+      height: 60,
+      darkShadow: {
+        hex: "",
+      }
+    },
+    {
+      src: "/logos/openvas.png",
+      alt: "Openvas",
+      width: 100,
+      height: 100,
+      darkShadow: {
+        hex: "",
+      }
+    },
+  ];
+
   return (
     <div className="relative min-h-screen w-full flex flex-col items-center justify-center bg-black overflow-hidden text-white">
       <AnimatedBackground />
       
-      <div className="relative z-10 max-w-6xl w-full px-6">
-        <div className="text-center mb-16">
-          <h1 className="text-6xl font-bold tracking-tight mb-4  text-white ">
-            Shubham Gupta
-          </h1>
-          <p className="text-2xl text-gray-300">
-            Security Researcher & Bug Hunter
-          </p>
-          <div className="text-center mt-12">
-            <Link href="/what-is-hacking">
-              <div className="text-white text-lg font-semibold underline decoration-4 decoration-blue-400">
-                What is Hacking?
-              </div>
-            </Link>
+      <div className="relative z-10 max-w-6xl w-full px-6 ">
+        <div className="text-center mb-16 relative h-[90vh] flex flex-col justify-center items-center">
+          <div className='max-w-lg w-full  relative flex flex-col justify-center items-center'>
+          <HeroLogos logos={[...logos]} />
+          <img className='w-[320px] ' src="/shubham_gupta.png" alt="" />
+            <h1 className="relative text-5xl font-semibold tracking-tight mb-4  text-white ">
+              Shubham Gupta
+            </h1>
+            <div className="text-lg text-gray-300">
+              Security Researcher & Bug Hunter
+            </div>
+            <div className="text-center mt-12">
+              <Link href="/what-is-hacking">
+                <div className="text-white text-lg font-semibold underline decoration-4 decoration-blue-400">
+                  What is Hacking?
+                </div>
+              </Link>
+            </div>
+
           </div>
         </div>
 
