@@ -9,6 +9,7 @@ import {
 import { Marquee } from '@/components/ui/marquee';
 import Link from 'next/link';
 import HeroLogos from '@/components/ui/hero-logo';
+import CookieConsent from '@/components/CookieConsent';
 
 const AnimatedBackground = () => (
   <div className="absolute inset-0 bg-black"></div>
@@ -118,8 +119,8 @@ export default function HomePage() {
     {
       src: "/logos/android-studio-icon.png",
       alt: "Android Testing",
-      width: 80,
-      height: 80,
+      width: 70,
+      height: 70,
       darkShadow: {
         hex: "",
       }
@@ -127,8 +128,8 @@ export default function HomePage() {
     {
       src: "/logos/ios.png",
       alt: "IOS",
-      width: 60,
-      height: 60,
+      width: 50,
+      height: 50,
       darkShadow: {
         hex: "",
       }
@@ -145,8 +146,8 @@ export default function HomePage() {
     {
       src: "/logos/nmap.jpeg",
       alt: "Nmap",
-      width: 80,
-      height: 80,
+      width: 70,
+      height: 70,
       darkShadow: {
         hex: "",
       }
@@ -154,8 +155,8 @@ export default function HomePage() {
     {
       src: "/logos/metasploit.png",
       alt: "Metasploit",
-      width: 80,
-      height: 80,
+      width: 70,
+      height: 70,
       darkShadow: {
         hex: "",
       }
@@ -163,8 +164,8 @@ export default function HomePage() {
     {
       src: "/logos/wireshark.png",
       alt: "Wireshark",
-      width: 60,
-      height: 60,
+      width: 55,
+      height: 55,
       darkShadow: {
         hex: "",
       }
@@ -181,8 +182,8 @@ export default function HomePage() {
     {
       src: "/logos/terminal.png",
       alt: "Terminal",
-      width: 60,
-      height: 60,
+      width: 55,
+      height: 55,
       darkShadow: {
         hex: "",
       }
@@ -190,8 +191,8 @@ export default function HomePage() {
     {
       src: "/logos/python.png",
       alt: "Python",
-      width: 80,
-      height: 80,
+      width: 70,
+      height: 70,
       darkShadow: {
         hex: "",
       }
@@ -199,8 +200,8 @@ export default function HomePage() {
     {
       src: "/logos/github.png",
       alt: "Github",
-      width: 80,
-      height: 80,
+      width: 70,
+      height: 70,
       darkShadow: {
         hex: "",
       }
@@ -226,8 +227,8 @@ export default function HomePage() {
     {
       src: "/logos/xcode.png",
       alt: "Xcode",
-      width: 80,
-      height: 80,
+      width: 70,
+      height: 70,
       darkShadow: {
         hex: "",
       }
@@ -235,8 +236,8 @@ export default function HomePage() {
     {
       src: "/logos/kali.png",
       alt: "Kali Linux",
-      width: 120,
-      height: 120,
+      width: 100,
+      height: 100,
       darkShadow: {
         hex: "",
       }
@@ -244,8 +245,8 @@ export default function HomePage() {
     {
       src: "/logos/fortify.png",
       alt: "Fortify",
-      width: 60,
-      height: 60,
+      width: 50,
+      height: 50,
       darkShadow: {
         hex: "",
       }
@@ -348,6 +349,7 @@ export default function HomePage() {
         </GlassCard>
 
       </div>
+      <CookieConsent />
     </div>
   );
 }
