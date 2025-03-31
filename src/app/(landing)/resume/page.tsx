@@ -2,11 +2,13 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Github, ExternalLink } from 'lucide-react';
 import { FaGraduationCap, FaBriefcase, FaCertificate } from "react-icons/fa";
-import { Card, CardContent } from "@/components/ui/card";
-import Progress from "@/components/ui/progress";
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
+import { easeQuadInOut } from "d3-ease";
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 20 },
@@ -27,6 +29,14 @@ const staggerContainer = {
   }
 };
 
+const timelineAnimation = {
+  hidden: { width: 0 },
+  visible: { 
+    width: "100%",
+    transition: { duration: 0.5, ease: "easeInOut" }
+  }
+};
+
 const ProjectCard = ({ project, index }) => (
   <motion.div
     custom={index}
@@ -41,8 +51,8 @@ const ProjectCard = ({ project, index }) => (
         transition: {
           delay: i * 0.1,
           duration: 0.5,
-        },
-      }),
+        }
+      })
     }}
     whileHover={{ y: -5 }}
     className="bg-neutral-900/50 rounded-xl overflow-hidden border border-neutral-800"
@@ -87,19 +97,29 @@ const ProjectCard = ({ project, index }) => (
 const ExperienceCard = ({ exp, index }) => (
   <motion.div
     variants={fadeInUp}
-    className="relative bg-zinc-900/30 backdrop-blur-sm border border-zinc-800/50 rounded-xl p-6 hover:border-zinc-700/50 transition-all duration-300"
+    className="flex flex-col md:flex-row w-full items-center md:items-start relative"
   >
-    <div className="flex items-start gap-4">
-      <div className="p-2 bg-blue-500/10 rounded-lg">
-        <FaBriefcase className="text-blue-400" size={24} />
-      </div>
-      <div className="space-y-2">
-        <h3 className="text-lg font-semibold text-zinc-100">{exp.title}</h3>
+    {/* Timeline center line */}
+    <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-[2px] -translate-x-1/2 bg-gradient-to-b from-blue-500/20 to-purple-500/20" />
+    
+    {/* Timeline dot */}
+    <div className="w-4 h-4 rounded-full bg-blue-500 border-4 border-zinc-900 relative z-10 md:absolute md:left-1/2 md:-translate-x-1/2 md:top-10 shrink-0" />
+
+    {/* Content container */}
+    <div className={`w-full md:w-5/12 ${index % 2 === 0 ? 'md:pr-16' : 'md:pl-16 md:ml-auto'}`}>
+      <motion.div
+        className="mt-4 md:mt-0 bg-zinc-900/50 backdrop-blur-sm border border-zinc-800/50 rounded-xl p-6 hover:border-zinc-700/50 transition-all duration-300"
+        whileHover={{ y: -5 }}
+        transition={{ duration: 0.2 }}
+      >
+        <div className="flex items-center gap-2 mb-3">
+          <span className="px-3 py-1 text-xs bg-blue-500/10 text-blue-400 rounded-full">
+            {exp.year}
+          </span>
+        </div>
+        <h3 className="text-lg font-semibold text-zinc-100 mb-2">{exp.title}</h3>
         <p className="text-sm text-zinc-400">{exp.company}</p>
-        <span className="inline-block px-3 py-1 text-xs bg-blue-500/10 text-blue-400 rounded-full">
-          {exp.year}
-        </span>
-      </div>
+      </motion.div>
     </div>
   </motion.div>
 );
@@ -107,18 +127,22 @@ const ExperienceCard = ({ exp, index }) => (
 const SkillCard = ({ skill }) => (
   <motion.div
     variants={fadeInUp}
-    className="bg-zinc-900/30 backdrop-blur-sm border border-zinc-800/50 rounded-xl p-6 hover:border-zinc-700/50 transition-all duration-300"
+    className="flex flex-col items-center p-4 bg-gradient-to-br from-blue-500/5 to-purple-500/5 rounded-xl"
   >
-    <h3 className="text-lg font-semibold text-zinc-100 mb-4">{skill.name}</h3>
-    <div className="relative h-2 bg-zinc-800 rounded-full overflow-hidden">
-      <motion.div
-        initial={{ width: 0 }}
-        whileInView={{ width: `${skill.value}%` }}
-        transition={{ duration: 1, ease: "easeOut" }}
-        className="absolute top-0 left-0 h-full bg-blue-500 rounded-full"
+    <div className="w-20 h-20 mb-3">
+      <CircularProgressbar
+        value={skill.value}
+        text={`${skill.value}%`}
+        styles={buildStyles({
+          pathColor: `rgba(59, 130, 246, ${skill.value / 100})`,
+          textColor: '#fff',
+          trailColor: '#1f2937',
+          pathTransitionDuration: 1.4,
+          textSize: '22px',
+        })}
       />
     </div>
-    <span className="text-sm text-zinc-400 mt-2">{skill.value}%</span>
+    <h3 className="text-sm font-medium text-zinc-300 text-center">{skill.name}</h3>
   </motion.div>
 );
 
@@ -135,23 +159,44 @@ const Resume = () => {
 
   const skills = [
     { name: "Web Application Security Testing", value: 90 },
-    { name: "Mobile Application Security Testing", value: 80 },
-    { name: "API Security Testing", value: 85 },
+    { name: "Mobile Application Security Testing", value: 70 },
+    { name: "API Security Testing", value: 70 },
     { name: "Network Security Testing", value: 80 },
-    { name: "Red Teaming", value: 75 }
+    { name: "Red Teaming", value: 70 }
   ];
 
   const certifications = [
     { name: "OSCP" },
-    { name: "EWPTX" }
+    { name: "EWPTX" },
+    { name: "eCPPT" }
   ];
 
   const interviews = [
-    { name: "Amar Ujala" },
-    { name: "News Chant" },
-    { name: "Digital Gyan" },
-    { name: "Gadgets World" },
-    { name: "HackerOne" }
+    {
+      name: "Amar Ujala",
+      image: "/interviews/amar-ujala.png",
+      link: "https://www.amarujala.com/amp/delhi-ncr/bashindey/ethical-hacker-shubham-gupta-know-all-about-him"
+    },
+    {
+      name: "News Chant",
+      image: "/interviews/news-chant.png",
+      link: "https://newschant.com/technology/indian-ethical-hacker-shubham-gupta-shares-his-career-journey-and-life-story/"
+    },
+    {
+      name: "Digital Gyan",
+      image: "/interviews/digital_gurujii.jpg",
+      link: "https://www.digitalgurujii.com/interview-with-indian-ethical-hacker-shubham-gupta/"
+    },
+    {
+      name: "Gadgets World",
+      image: "/interviews/igadgetsworld.png",
+      link: "https://www.igadgetsworld.com/interview-with-yahoo-hall-of-fame-mr-shubham-gupta/"
+    },
+    {
+      name: "HackerOne",
+      image: "/interviews/hackerone.png",
+      link: "https://www.hackerone.com/blog/Hacker-QA-Shubham-gupta-Patience-and-Passion"
+    }
   ];
 
   const projects = [
@@ -178,25 +223,28 @@ const Resume = () => {
   ];
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-black to-zinc-900 text-white py-20">
-      <div className="max-w-7xl mx-auto px-6 space-y-40">
+    <div className="min-h-screen w-full bg-gradient-to-b from-black to-zinc-900 text-white py-12">
+      <div className="max-w-6xl mx-auto px-4 space-y-24">
         {/* Experience Section */}
         <motion.section
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
           variants={staggerContainer}
+          className="relative"
         >
           <motion.h2 
             variants={fadeInUp}
-            className="text-4xl font-bold text-center mb-16"
+            className="text-3xl font-bold text-center mb-16"
           >
             Experience
           </motion.h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {experiences.map((exp, index) => (
-              <ExperienceCard key={index} exp={exp} index={index} />
-            ))}
+          <div className="relative max-w-4xl mx-auto">
+            <div className="space-y-12">
+              {experiences.map((exp, index) => (
+                <ExperienceCard key={index} exp={exp} index={index} />
+              ))}
+            </div>
           </div>
         </motion.section>
 
@@ -209,11 +257,11 @@ const Resume = () => {
         >
           <motion.h2 
             variants={fadeInUp}
-            className="text-4xl font-bold text-center mb-16"
+            className="text-3xl font-bold text-center mb-12"
           >
             Skills
           </motion.h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {skills.map((skill, index) => (
               <SkillCard key={index} skill={skill} />
             ))}
@@ -221,60 +269,71 @@ const Resume = () => {
         </motion.section>
 
         {/* Certifications & Interviews Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-20">
-          <motion.section
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
+        <motion.section
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={staggerContainer}
+          className="relative"
+        >
+          <motion.h2 
+            variants={fadeInUp}
+            className="text-3xl font-bold text-center mb-16"
           >
-            <motion.h2 
-              variants={fadeInUp}
-              className="text-4xl font-bold mb-8"
-            >
-              Certifications
-            </motion.h2>
-            <div className="grid gap-4">
-              {certifications.map((cert, index) => (
-                <motion.div
-                  key={index}
-                  variants={fadeInUp}
-                  className="bg-zinc-900/30 backdrop-blur-sm border border-zinc-800/50 rounded-xl p-6 hover:border-zinc-700/50 transition-all duration-300"
-                >
-                  <div className="flex items-center gap-4">
+            Achievements
+          </motion.h2>
+          <div className="max-w-4xl mx-auto space-y-12">
+            {/* Certifications */}
+            <motion.div variants={fadeInUp}>
+              <h3 className="text-xl font-semibold mb-6 text-center text-zinc-100">
+                Certifications
+              </h3>
+              <div className="flex flex-wrap justify-center gap-4">
+                {certifications.map((cert, index) => (
+                  <motion.div
+                    key={index}
+                    variants={fadeInUp}
+                    className="flex items-center gap-3 px-6 py-3 rounded-lg bg-gradient-to-r from-blue-500/10 to-purple-500/10 hover:from-blue-500/20 hover:to-purple-500/20 transition-all duration-300"
+                  >
                     <FaCertificate className="text-blue-400" size={24} />
-                    <span className="text-lg text-zinc-100">{cert.name}</span>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.section>
+                    <span className="text-lg text-zinc-200">{cert.name}</span>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
 
-          <motion.section
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-          >
-            <motion.h2 
-              variants={fadeInUp}
-              className="text-4xl font-bold mb-8"
-            >
-              Interviews
-            </motion.h2>
-            <div className="grid gap-4">
-              {interviews.map((interview, index) => (
-                <motion.div
-                  key={index}
-                  variants={fadeInUp}
-                  className="bg-zinc-900/30 backdrop-blur-sm border border-zinc-800/50 rounded-xl p-6 hover:border-zinc-700/50 transition-all duration-300"
-                >
-                  <span className="text-lg text-zinc-100">{interview.name}</span>
-                </motion.div>
-              ))}
-            </div>
-          </motion.section>
-        </div>
+            {/* Interviews */}
+            <motion.div variants={fadeInUp}>
+              <h3 className="text-xl font-semibold mb-6 text-center text-zinc-100">
+                Featured In
+              </h3>
+              <div className="flex flex-wrap justify-center items-center gap-6">
+                {interviews.map((interview, index) => (
+                  <motion.div
+                    key={index}
+                    variants={fadeInUp}
+                    className="relative group w-[140px]"
+                  >
+                    <Link href={interview.link} target="_blank">
+                      <div className="bg-zinc-900/50 rounded-lg p-4 hover:bg-zinc-900/70 transition-colors h-[60px] flex items-center justify-center">
+                        <Image 
+                          src={interview.image}
+                          alt={interview.name}
+                          width={100}
+                          height={30}
+                          className={`object-contain transition-transform duration-300 group-hover:scale-110 max-h-[30px] ${
+                            interview.name === "HackerOne" ? "w-[80px]" : "w-[100px]"
+                          }`}
+                          unoptimized
+                        />
+                      </div>
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </motion.section>
 
         {/* Projects Section */}
         <motion.section
@@ -282,10 +341,11 @@ const Resume = () => {
           whileInView="visible"
           viewport={{ once: true }}
           variants={staggerContainer}
+          className="pt-8"
         >
           <motion.h2 
             variants={fadeInUp}
-            className="text-4xl font-bold text-center mb-16"
+            className="text-3xl font-bold text-center mb-12"
           >
             Featured Projects
           </motion.h2>
