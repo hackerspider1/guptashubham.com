@@ -142,3 +142,15 @@ body {
 .followPath {
   animation: animateLogo 5s linear infinite;
 }
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.swiper-button-prev:after, .swiper-button-next:after {
+  font-size: 24px !important;
+}
+
+.swiper-button-prev {
+  /* left: -20px !important; */
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
@@ -8,7 +8,6 @@ import { Github, ExternalLink } from 'lucide-react';
 import { FaGraduationCap, FaBriefcase, FaCertificate } from "react-icons/fa";
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-import { easeQuadInOut } from "d3-ease";
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 20 },
@@ -37,6 +36,7 @@ const timelineAnimation = {
   }
 };
 
+// @ts-ignore
 const ProjectCard = ({ project, index }) => (
   <motion.div
     custom={index}
@@ -84,6 +84,7 @@ const ProjectCard = ({ project, index }) => (
       </div>
       <p className="text-neutral-400 text-sm">{project.description}</p>
       <div className="flex flex-wrap gap-2">
+        {/* @ts-ignore */}
         {project.technologies.map((tech, i) => (
           <span key={i} className="px-2 py-1 text-xs rounded-full bg-neutral-800 text-neutral-400">
             {tech}
@@ -94,6 +95,7 @@ const ProjectCard = ({ project, index }) => (
   </motion.div>
 );
 
+// @ts-ignore
 const ExperienceCard = ({ exp, index }) => (
   <motion.div
     variants={fadeInUp}
@@ -124,21 +126,22 @@ const ExperienceCard = ({ exp, index }) => (
   </motion.div>
 );
 
-const SkillCard = ({ skill }) => (
+// @ts-ignore
+const SkillCard = ({ skill, isVisible }) => (
   <motion.div
     variants={fadeInUp}
-    className="flex flex-col items-center p-4 bg-gradient-to-br from-blue-500/5 to-purple-500/5 rounded-xl"
+    className="flex flex-col items-center "
   >
     <div className="w-20 h-20 mb-3">
       <CircularProgressbar
-        value={skill.value}
-        text={`${skill.value}%`}
+        value={isVisible ? skill.value : 0}
+        text={isVisible ? `${skill.value}%` : ''}
         styles={buildStyles({
-          pathColor: `rgba(59, 130, 246, ${skill.value / 100})`,
-          textColor: '#fff',
-          trailColor: '#1f2937',
-          pathTransitionDuration: 1.4,
-          textSize: '22px',
+          pathColor: isVisible ? `rgba(59, 130, 246, ${skill.value / 100})` : 'rgba(0, 0, 0, 0)',
+          textColor: isVisible ? '#fff' : 'rgba(0, 0, 0, 0)',
+          trailColor: isVisible ? '#1f2937' : 'rgba(0, 0, 0, 0)',
+          pathTransitionDuration: isVisible ? 1.4 : 0,
+          textSize: isVisible ? '22px' : '0',
         })}
       />
     </div>
@@ -147,6 +150,24 @@ const SkillCard = ({ skill }) => (
 );
 
 const Resume = () => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 1000) {
+        setIsVisible(true);
+      } else {
+        setIsVisible(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   const experiences = [
     { year: "2012", title: "High School", company: "MP Board Govt. Boys School, MP India" },
     { year: "2015", title: "Bachelor of Computer Application", company: "Jiwaji University, Gwalior, MP India" },
@@ -201,25 +222,25 @@ const Resume = () => {
 
   const projects = [
     {
-      title: "Security Scanner",
-      description: "A comprehensive automated vulnerability scanner for web applications with advanced detection capabilities and detailed reporting features.",
-      technologies: ["Python", "Docker", "React", "TypeScript"],
-      github: "https://github.com/example/scanner",
-      demo: "https://example.com/demo"
+      title: "EchoPwn",
+      description: "Recon Automation for hackers by hackers.",
+      technologies: ["Python", "Shell"],
+      github: "https://github.com/hackerspider1/EchoPwn",
+      demo: "https://github.com/hackerspider1/EchoPwn"
     },
     {
-      title: "Threat Modeling Tool",
-      description: "Interactive platform for creating and analyzing security threat models, supporting STRIDE methodology and automated report generation.",
-      technologies: ["Next.js", "Node.js", "PostgreSQL", "WebSocket"],
-      github: "https://github.com/example/threat-model",
-      demo: "https://example.com/threat-model"
+      title: "Hacker Portfolio",
+      description: "A showcase of my projects and experiences, highlighting my skills and accomplishments in the field of cybersecurity.",
+      technologies: ["Next.js", "JavaScript"],
+      github: "https://github.com/hackerspider1/Personal-Portfolio",
+      demo: "https://guptashubham.com/v1"
     },
-    {
-      title: "Secure Code Analyzer",
-      description: "Static code analysis tool that detects security vulnerabilities and provides remediation guidance for multiple programming languages.",
-      technologies: ["Go", "GraphQL", "React", "Redis"],
-      github: "https://github.com/example/code-analyzer"
-    }
+    // {
+    //   title: "Secure Code Analyzer",
+    //   description: "Static code analysis tool that detects security vulnerabilities and provides remediation guidance for multiple programming languages.",
+    //   technologies: ["Go", "GraphQL", "React", "Redis"],
+    //   github: "https://github.com/example/code-analyzer"
+    // }
   ];
 
   return (
@@ -240,7 +261,7 @@ const Resume = () => {
             Experience
           </motion.h2>
           <div className="relative max-w-4xl mx-auto">
-            <div className="space-y-12">
+            <div className="">
               {experiences.map((exp, index) => (
                 <ExperienceCard key={index} exp={exp} index={index} />
               ))}
@@ -263,7 +284,7 @@ const Resume = () => {
           </motion.h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {skills.map((skill, index) => (
-              <SkillCard key={index} skill={skill} />
+              <SkillCard key={index} skill={skill} isVisible={isVisible} />
             ))}
           </div>
         </motion.section>
@@ -278,7 +299,7 @@ const Resume = () => {
         >
           <motion.h2 
             variants={fadeInUp}
-            className="text-3xl font-bold text-center mb-16"
+            className="text-3xl font-bold text-center mb-6"
           >
             Achievements
           </motion.h2>

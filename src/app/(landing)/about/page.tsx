@@ -81,7 +81,7 @@ const About = () => {
 
             <div className="flex justify-center md:justify-start">
               <Link 
-                href="/resume.pdf" 
+                href="/assets/resume/shubham.pdf" 
                 className="inline-flex items-center  bg-gradient-to-r from-purple-500 to-pink-500 backdrop-blur-lg border border-white/20 text-white rounded-xl hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 transition-all"
                 download
               >
@@ -128,9 +128,9 @@ const About = () => {
               
               {/* Animated CISM certification */}
               <motion.div
-                initial={{ x: 200, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
+                // initial={{ x: 200, opacity: 0 }}
+                // animate={{ x: 0, opacity: 1 }}
+                // transition={{ duration: 0.8, ease: "easeOut" }}
                 className="mt-4 bg-white/10 backdrop-blur-lg border-2 border-yellow-500/50 rounded-xl p-4 text-center"
               >
                 <div className="flex items-center justify-center space-x-2">

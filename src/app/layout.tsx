@@ -26,6 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-91KCWFBS21"></script>
       <body>
         <Outlet>
           {children}

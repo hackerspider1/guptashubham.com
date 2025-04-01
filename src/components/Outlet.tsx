@@ -1,10 +1,11 @@
 import React from 'react'
 import { FloatingDock } from './ui/floating-dock'
 
-import { House, Info, Article, Briefcase, Book, Phone, Terminal } from "phosphor-react"
+import { House, Info, Article, Briefcase, Book, Phone, Terminal, GithubLogo } from "phosphor-react"
 import Copyright from './ui/copyright'
 import Header from './ui/header'
 import LoadingScreen from './ui/loading'
+import { Mail, Twitter, User } from 'lucide-react'
 
 const MenuItems = [
     {
@@ -14,7 +15,7 @@ const MenuItems = [
     },
     {
         title: 'About Me',
-        icon: <Info size={24} />,
+        icon: <User size={24} />,
         href: '/about'
     },
     {
@@ -27,20 +28,33 @@ const MenuItems = [
         icon: <Briefcase size={24} />,
         href: '/resume'
     },
+    // {
+    //     title: 'Resources',
+    //     icon: <Book size={24} />,
+    //     href: '/resources'
+    // },
     {
-        title: 'Resources',
-        icon: <Book size={24} />,
-        href: '/resources'
-    },
-    {
-        title: 'POC Generator',
-        icon: <Terminal size={24} />,
+        title: 'Cors POC Generator',
+        icon: <div className='flex flex-col items-center '>
+            <span className='text-[6px] uppercase'>Cors</span>
+            <Terminal size={14} />
+        </div>,
         href: '/resources/cors-poc-generator'
     },
     {
         title: 'Contact',
-        icon: <Phone size={24} />,
+        icon: <Mail size={24} />,
         href: '/contact'
+    },
+    {
+        title: 'Github',
+        icon: <GithubLogo size={24} />,
+        href: 'https://github.com/hackerspider1'
+    },
+    {
+        title: 'Twitter',
+        icon: <Twitter size={24} />,
+        href: 'https://twitter.com/hackerspider1'
     }
 ]
 
@@ -52,6 +66,7 @@ const Outlet = ({ children }: { children: React.ReactNode }) => {
                 <Header />
             </div>
             {children}
+            <div className='pb-20' />
             <div className='fixed bottom-6 left-0 right-0 flex items-center justify-center z-20'>
                 <FloatingDock items={MenuItems} />
             </div>

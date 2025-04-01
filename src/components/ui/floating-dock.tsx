@@ -15,10 +15,16 @@ import {
 } from "motion/react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { GithubLogo } from "phosphor-react";
 import { useRef, useState } from "react";
 
 const dockItems = [
-  { title: "XSS Scanner", icon: <IconShieldX />, href: "/resources/xss-scanner" },
+  {
+    title: 'Github',
+    icon: <GithubLogo size={24} />,
+    href: 'https://github.com/hackerspider1'
+}
+  // { title: "XSS Scanner", icon: <IconShieldX />, href: "/resources/xss-scanner" },
 ];
 
 export const FloatingDock = ({
@@ -30,7 +36,7 @@ export const FloatingDock = ({
   desktopClassName?: string;
   mobileClassName?: string;
 }) => {
-  const mergedItems = [...items, ...dockItems];
+  const mergedItems = [...items];
 
   const path = usePathname();
   return (
@@ -59,27 +65,32 @@ const FloatingDockMobile = ({
             className="absolute bottom-full mb-2 inset-x-0 flex flex-col gap-2"
           >
             {items.map((item, idx) => (
-              <motion.div
-                key={item.title}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{
-                  opacity: 0,
-                  y: 10,
-                  transition: {
-                    delay: idx * 0.05,
-                  },
-                }}
-                transition={{ delay: (items.length - 1 - idx) * 0.05 }}
-              >
-                <Link
-                  href={item.href}
+              <>
+                <motion.div
                   key={item.title}
-                  className={cn("h-6 w-6 rounded-full flex items-center justify-center")}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{
+                    opacity: 0,
+                    y: 10,
+                    transition: {
+                      delay: idx * 0.05,
+                    },
+                  }}
+                  transition={{ delay: (items.length - 1 - idx) * 0.05 }}
                 >
-                  <div className="h-3 w-3">{item.icon}</div>
-                </Link>
-              </motion.div>
+                  <Link
+                    href={item.href}
+                    key={item.title}
+                    className={cn("h-6 w-6 rounded-full flex items-center justify-center")}
+                  >
+                    <div className="h-3 w-3">{item.icon}</div>
+                  </Link>
+                </motion.div>
+                {
+                  item.title == "Contact" && <div className="h-4 w-2 bg-gray-600" />
+                }
+              </>
             ))}
           </motion.div>
         )}

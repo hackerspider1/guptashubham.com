@@ -59,7 +59,7 @@ export default function BlogHome() {
         {/* Featured Blog */}
         <div className="mb-12">
           <h2 className="text-3xl font-semibold text-center mb-8">Latest Posts</h2>
-          <div className="w-full bg-white/5 p-6 rounded-xl border border-white/10 group">
+          <Link href={`/blogs/${posts?.[0]?.slug?.current || ""}`} className="w-full bg-white/5 p-6 rounded-xl border border-white/10 group">
             <div className="text-center md:text-left">
               <img className="w-full group-hover:scale-105 transition-all duration-200 ease-in-out" src={posts?.[0]?.mainImage?.asset?.url} alt="" />
               <div className="flex items-center gap-4">
@@ -70,20 +70,20 @@ export default function BlogHome() {
                   <p className="text-gray-400 text-xs flex items-center justify-center md:justify-start">
                     <Calendar className="w-4 h-4 mr-2" /> {moment(posts?.[0]?.publishedAt).format("Do MMMM YYYY")}
                   </p>
-                  <Link href={`/blogs/${posts?.[0]?.slug?.current || ""}`} className="text-blue-400 hover:underline flex items-center mt-4">
+                  <div className="text-blue-400 hover:underline flex items-center mt-4">
                     Read More <ArrowRight className="w-4 h-4 ml-2" />
-                  </Link>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          </Link>
         </div>
 
         {/* Blog Grid */}
         <div className="">
           <div className="grid md:grid-cols-3 gap-8">
             {posts.slice(1).map((blog, index) => (
-              <div key={index} className="flex flex-col justify-between bg-white/5 p-6 rounded-xl border border-white/10 group">
+              <Link href={`/blogs/${blog?.slug?.current || ""}`} key={index} className="flex flex-col justify-between bg-white/5 p-6 rounded-xl border border-white/10 group">
                 <img className="h-32 w-full object-contain group-hover:scale-105 transition-all duration-200 ease-in-out" src={blog?.mainImage?.asset?.url} alt="" />
                 <div className="pt-4">
                   <h3 className="text-xl font-semibold mb-2">{blog?.title}</h3>
@@ -91,11 +91,11 @@ export default function BlogHome() {
                   <p className="text-gray-400 text-xs flex items-center">
                     <Calendar className="w-4 h-4 mr-2" /> {moment(blog?.publishedAt).format("Do MMMM YYYY")}
                   </p>
-                  <Link href={`/blogs/${blog?.slug?.current || ""}`} className="text-blue-400 hover:underline flex items-center mt-4">
+                  <div className="text-blue-400 hover:underline flex items-center mt-4">
                     Read More <ArrowRight className="w-4 h-4 ml-2" />
-                  </Link>
+                  </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>

@@ -9,6 +9,7 @@ import {
     Send as TelegramIcon,
     MessageCircle as DiscordIcon,
 } from 'lucide-react';
+import Link from 'next/link';
 
 const Header = () => {
     const [isHovered, setIsHovered] = useState(false);
@@ -76,13 +77,13 @@ const Header = () => {
 
     return (
         <>
-            <div className="w-full flex justify-center fixed top-4 z-20">
+            {/* <div className="w-full flex justify-center fixed top-4 z-20">
                 <motion.div
                     variants={islandVariants}
                     animate={isHovered ? "expanded" : "default"}
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
-                    className="bg-neutral-900/80 backdrop-blur-md rounded-3xl flex items-center justify-between px-6 transition-all duration-300 ease-in-out overflow-hidden"
+                    className="bg-neutral-900/80 z-[50000] fixed backdrop-blur-md rounded-3xl flex items-center justify-between px-6 transition-all duration-300 ease-in-out overflow-hidden"
                 >
                     <motion.div
                         initial={{ opacity: 1, x: 0 }}
@@ -160,21 +161,21 @@ const Header = () => {
                         </div>
                     </motion.div>
                 </motion.div>
-            </div>
+            </div> */}
             
             <div className="fixed top-0 left-0 right-0 z-20">
-                <div className="bg-black/40 text-white flex justify-between items-center px-4 py-1 relative">
+                <div className="bg-black/40 text-white flex justify-between items-start px-4 py-1 relative">
                     <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black/40 w-44 h-16 rounded-b-lg' />
                     
                     {/* Signature Logo */}
                     <div className="flex items-center">
-                        <a href="#" className="hover:bg-white/20 rounded-lg p-1 transition-all">
+                        <Link href="/" className="p-1">
                             <img 
                                 src="/signature.png" 
                                 alt="Shubham Gupta Signature" 
-                                className="h-6 w-32 filter brightness-0 invert"
+                                className="h-12 w-auto filter -rotate-12 brightness-0 invert"
                             />
-                        </a>
+                        </Link>
                     </div>
 
                     {/* Social Icons and Date */}

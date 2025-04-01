@@ -35,7 +35,7 @@ interface MarqueeProps extends ComponentPropsWithoutRef<"div"> {
 export function Marquee({
   className,
   reverse = false,
-  pauseOnHover = true,
+  pauseOnHover = false,
   children,
   vertical = false,
   repeat = 4,
@@ -45,7 +45,7 @@ export function Marquee({
     <div
       {...props}
       className={cn(
-        "group flex items-center overflow-hidden p-2 [--duration:40s] [--gap:1rem] [gap:var(--gap)]",
+        "group flex overflow-hidden p-2 [--duration:40s] [--gap:1rem] [gap:var(--gap)]",
         {
           "flex-row": !vertical,
           "flex-col": vertical,
@@ -61,7 +61,7 @@ export function Marquee({
             className={cn("flex shrink-0 justify-around [gap:var(--gap)]", {
               "animate-marquee flex-row": !vertical,
               "animate-marquee-vertical flex-col": vertical,
-              "group-hover:[animation-play-state:paused]": pauseOnHover,
+              "group-hover:animate-none": pauseOnHover,
               "[animation-direction:reverse]": reverse,
             })}
           >
