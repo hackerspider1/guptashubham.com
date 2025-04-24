@@ -60,7 +60,13 @@ const HeroLogos = ({ logos }: HeroLogoProps) => {
             <div
               className={cn("opacity-100 transition-opacity", "")}
             >
-              <img {...imageProps} alt={imageProps.alt} className={`${imageProps.className} followPath`} />
+              <img 
+                {...imageProps} 
+                alt={imageProps.alt} 
+                className={`${imageProps.className} followPath`} 
+                loading={index < 5 ? "eager" : "lazy"}
+                fetchPriority={index < 5 ? "high" : "auto"}
+              />
             </div>
             <div
               className={cn("opacity-0 transition-opacity", "")}

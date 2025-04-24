@@ -41,7 +41,7 @@ export const FloatingDock = ({
   const path = usePathname();
   return (
     <>
-      <FloatingDockDesktop items={mergedItems} className={desktopClassName} path={path} />
+      <FloatingDockDesktop items={mergedItems} className={desktopClassName} path={path || undefined} />
       <FloatingDockMobile items={mergedItems} className={mobileClassName} />
     </>
   );

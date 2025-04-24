@@ -171,7 +171,10 @@ export const Lid = ({
           src={src as string}
           alt="Coming Soon"
           fill
-          className="absolute inset-0 h-full w-full rounded-lg object-contain "
+          sizes="(max-width: 768px) 100vw, 800px"
+          priority
+          unoptimized={src?.startsWith('http')}
+          className="absolute inset-0 h-full w-full rounded-lg object-contain"
         />
       </motion.div>
     </div>

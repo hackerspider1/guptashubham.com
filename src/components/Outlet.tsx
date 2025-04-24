@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react'
 import { FloatingDock } from './ui/floating-dock'
 
@@ -19,9 +21,9 @@ const MenuItems = [
         href: '/about'
     },
     {
-        title: 'Blogs',
+        title: 'Blog',
         icon: <Article size={24} />,
-        href: '/blogs'
+        href: '/blog'
     },
     {
         title: 'Resume',

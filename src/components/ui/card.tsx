@@ -1,16 +1,96 @@
 "use client";
-import * as React from "react";
 
-const Card = ({ children, className }: { children: React.ReactNode, className?:string }) => {
+import { cn } from "@/lib/utils";
+import React from "react";
+
+interface CardProps {
+  children: React.ReactNode;
+  className?: string;
+  variant?: "default" | "outline" | "glass";
+  hover?: boolean;
+}
+
+export const Card = ({
+  children,
+  className = "",
+  variant = "default",
+  hover = true,
+}: CardProps) => {
+  const baseStyles = "rounded-lg p-6 transition-all";
+  
+  const variantStyles = {
+    default: "bg-zinc-900 border border-zinc-800",
+    outline: "bg-transparent border border-zinc-800",
+    glass: "bg-zinc-900/30 backdrop-blur-md border border-zinc-800/50"
+  };
+  
+  const hoverStyles = hover ? "hover:shadow-lg hover:-translate-y-1" : "";
+  
   return (
-    <div className={`border rounded-lg shadow-sm p-4 bg-white ${className}`}>
+    <div className={cn(baseStyles, variantStyles[variant], hoverStyles, className)}>
       {children}
     </div>
   );
 };
 
-const CardContent = ({ children }: { children: React.ReactNode }) => {
-  return <div className="p-4">{children}</div>;
+export const CardHeader = ({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => {
+  return <div className={cn("mb-4", className)}>{children}</div>;
 };
 
-export { Card, CardContent };
+export const CardTitle = ({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => {
+  return (
+    <h3 className={cn("text-xl font-semibold text-white", className)}>
+      {children}
+    </h3>
+  );
+};
+
+export const CardDescription = ({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => {
+  return (
+    <p className={cn("text-sm text-zinc-400 mt-1", className)}>
+      {children}
+    </p>
+  );
+};
+
+export const CardContent = ({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => {
+  return <div className={cn("", className)}>{children}</div>;
+};
+
+export const CardFooter = ({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => {
+  return (
+    <div className={cn("mt-4 flex items-center justify-between", className)}>
+      {children}
+    </div>
+  );
+};
