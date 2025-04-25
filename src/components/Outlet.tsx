@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { FloatingDock } from './ui/floating-dock'
 
 import { House, Info, Article, Briefcase, Book, Phone, Terminal, GithubLogo } from "phosphor-react"
@@ -61,15 +61,29 @@ const MenuItems = [
 ]
 
 const Outlet = ({ children }: { children: React.ReactNode }) => {
+    const [showLoader, setShowLoader] = useState(true);
+    
+    useEffect(() => {
+        // Check if this is first visit
+        const hasVisited = localStorage.getItem('visited') === 'true';
+        if (hasVisited) {
+            setShowLoader(false);
+        } else {
+            // Set visited flag for future visits
+            localStorage.setItem('visited', 'true');
+        }
+    }, []);
+    
     return (
         <div className='min-h-screen pt-16 h-full flex flex-col flex-1'>
-            <LoadingScreen />
+            {showLoader && <LoadingScreen />}
             <div className='flex items-center justify-center'>
                 <Header />
             </div>
             {children}
             <div className='pb-20' />
-            <div className='fixed bottom-6 left-0 right-0 flex items-center justify-center z-20'>
+            {/* Floating dock - hidden on mobile, shown on desktop */}
+            <div className='hidden md:flex fixed bottom-6 left-0 right-0 items-center justify-center z-20'>
                 <FloatingDock items={MenuItems} />
             </div>
             {/* <div className='fixed bottom-0 left-0 right-0 flex items-center justify-center'>

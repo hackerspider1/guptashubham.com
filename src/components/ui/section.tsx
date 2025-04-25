@@ -27,10 +27,10 @@ export const Section = ({
 
   const paddingStyles = {
     none: "py-0",
-    sm: "py-8",
-    md: "py-12",
-    lg: "py-16",
-    xl: "py-24",
+    sm: "py-4 sm:py-6 md:py-8",
+    md: "py-6 sm:py-8 md:py-12",
+    lg: "py-8 sm:py-12 md:py-16",
+    xl: "py-12 sm:py-16 md:py-24",
   };
 
   return (
@@ -58,7 +58,7 @@ export const SectionHeader = ({
   className?: string;
 }) => {
   return (
-    <div className={cn("text-center mb-12", className)}>
+    <div className={cn("text-center mb-4 sm:mb-6 md:mb-8", className)}>
       {children}
     </div>
   );

@@ -43,11 +43,17 @@ export const MacbookScroll = ({
   });
 
   const [isMobile, setIsMobile] = useState(false);
+  const [isVerySmallScreen, setIsVerySmallScreen] = useState(false);
 
   useEffect(() => {
-    if (window && window.innerWidth < 768) {
-      setIsMobile(true);
-    }
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 768);
+      setIsVerySmallScreen(window.innerWidth < 380); // iPhone SE and similar sizes
+    };
+    
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
   console.log(scrollYProgress, "scrollYProgress")
@@ -62,22 +68,34 @@ export const MacbookScroll = ({
     [0, 1.3],
     [0.6, isMobile ? 1 : 1.5],
   );
-  const translate = useTransform(scrollYProgress, [0, 1], [0, 1500]);
-  const rotate = useTransform(scrollYProgress, [0.1, 0.12, 0.3], [-28, -28, 0]);
+  const translate = useTransform(
+    scrollYProgress, 
+    [0, 1], 
+    [0, isMobile ? 0 : 1500]
+  );
+  const rotate = useTransform(
+    scrollYProgress, 
+    [0.1, 0.12, 0.3], 
+    isMobile ? [0, 0, 0] : [-28, -28, 0]
+  );
   const textTransform = useTransform(scrollYProgress, [0, 0.3], [0, 100]);
   const textOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
 
   return (
     <div
       ref={ref}
-      className="flex shrink-0 scale-[0.35] transform flex-col items-center justify-start py-0 [perspective:800px] sm:scale-50 md:scale-100 md:pb-16"
+      className={`flex shrink-0 transform flex-col items-center justify-start py-0 [perspective:800px] ${
+        isVerySmallScreen 
+          ? 'scale-[0.3]' 
+          : 'scale-[0.35] xs:scale-[0.4] sm:scale-[0.45] md:scale-50 lg:scale-100'
+      } md:pb-16`}
     >
       <motion.h2
         style={{
           translateY: textTransform,
           opacity: textOpacity,
         }}
-        className="mb-20 text-center text-3xl font-bold text-neutral-800 dark:text-white"
+        className="mb-2 xs:mb-4 sm:mb-10 md:mb-20 text-center text-base xs:text-xl sm:text-2xl font-bold text-neutral-800 dark:text-white"
       >
         {title || (
           <span>

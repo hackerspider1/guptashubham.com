@@ -2,11 +2,11 @@ import { Metadata } from "next";
 import CorsClientWrapper from "./CorsClientWrapper";
 
 export const metadata: Metadata = {
-  title: "CORS PoC Generator | Shubham Gupta",
-  description: "Generate proof-of-concept code for CORS vulnerabilities - a security tool by Shubham Gupta",
+  title: "CORS Vulnerability PoC Generator | Interactive Security Tool",
+  description: "Generate proof-of-concept exploits for CORS vulnerabilities with our advanced interactive tool. Test if your web applications are protected against cross-origin attacks.",
   openGraph: {
-    title: "CORS PoC Generator | Shubham Gupta",
-    description: "Generate proof-of-concept code for CORS vulnerabilities - a security tool by Shubham Gupta",
+    title: "CORS Vulnerability PoC Generator | Interactive Security Tool",
+    description: "Generate proof-of-concept exploits for CORS vulnerabilities with our advanced interactive tool. Test if your web applications are protected against cross-origin attacks.",
     type: "website"
   }
 };

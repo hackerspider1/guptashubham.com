@@ -1,10 +1,125 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { PortableText } from '@portabletext/react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import Image from 'next/image';
 import imageUrlBuilder from "@sanity/image-url";
 import { client } from '@/sanity/client';
+
+// Use type any for prismjs to avoid type issues
+import Prism from "prismjs";
+import "prismjs/themes/prism-tomorrow.css";
+import "prismjs/components/prism-jsx";
+import "prismjs/components/prism-tsx";
+import "prismjs/components/prism-typescript";
+import "prismjs/components/prism-bash";
+import "prismjs/components/prism-python";
+import "prismjs/components/prism-json";
+import "prismjs/components/prism-php";
+import "prismjs/components/prism-java";
+import "prismjs/components/prism-go";
+import "prismjs/components/prism-ruby";
+
+// Image Zoom Component
+const ImageZoom = ({ src, alt, caption }: { src: string, alt: string, caption?: string }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [naturalWidth, setNaturalWidth] = useState(0);
+  const [naturalHeight, setNaturalHeight] = useState(0);
+
+  // Handle image load to get natural dimensions
+  const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    setNaturalWidth(img.naturalWidth);
+    setNaturalHeight(img.naturalHeight);
+    setIsLoaded(true);
+  };
+
+  return (
+    <>
+      <div className="my-6 mx-auto" style={{ maxWidth: '100%' }}>
+        <div 
+          className="relative cursor-zoom-in overflow-hidden rounded-lg border border-zinc-800 bg-transparent transition-all hover:shadow-lg"
+          onClick={() => setIsOpen(true)}
+          style={{ 
+            maxWidth: naturalWidth > 0 ? `${Math.min(naturalWidth, 800)}px` : '100%',
+            margin: '0 auto'
+          }}
+        >
+          {/* Image with natural dimensions */}
+          <div className="relative w-full">
+            <img
+              src={src}
+              alt={alt || ''}
+              className="w-full h-auto object-contain"
+              onLoad={handleImageLoad}
+              style={{ 
+                opacity: isLoaded ? 1 : 0,
+                transition: 'opacity 0.3s ease-in-out',
+                display: 'block'
+              }}
+            />
+            
+            {/* Show loading state while image loads */}
+            {!isLoaded && (
+              <div className="absolute inset-0 flex items-center justify-center bg-zinc-900/20">
+                <div className="w-8 h-8 border-2 border-zinc-500 border-t-zinc-300 rounded-full animate-spin"></div>
+              </div>
+            )}
+          </div>
+          
+          {/* Only show zoom indicator when image is loaded */}
+          {isLoaded && (
+            <div className="absolute bottom-2 right-2 rounded-full bg-zinc-800/80 p-1.5 text-xs text-zinc-300 backdrop-blur-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                <line x1="11" y1="8" x2="11" y2="14"></line>
+                <line x1="8" y1="11" x2="14" y2="11"></line>
+              </svg>
+            </div>
+          )}
+        </div>
+        {caption && (
+          <p className="mt-2 text-center text-sm text-zinc-400">{caption}</p>
+        )}
+      </div>
+
+      {/* Lightbox modal */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm"
+          onClick={() => setIsOpen(false)}
+        >
+          <div className="relative max-h-[90vh] max-w-[90vw]">
+            <img
+              src={src}
+              alt={alt || ''}
+              className="max-h-[90vh] max-w-[90vw] object-contain"
+            />
+            <button 
+              className="absolute -top-10 right-0 p-2 text-zinc-400 hover:text-white"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsOpen(false);
+              }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+          {caption && (
+            <p className="absolute bottom-4 left-1/2 max-w-lg -translate-x-1/2 text-center text-sm text-zinc-300 bg-black/60 p-2 rounded backdrop-blur-sm">
+              {caption}
+            </p>
+          )}
+        </div>
+      )}
+    </>
+  );
+};
 
 const builder = imageUrlBuilder(client);
 
@@ -15,9 +130,73 @@ const PortableTextComponents = {
         // Handle different block styles
         normal: ({ children }: { children: any }) => <p className="text-gray-300 my-4 leading-relaxed">{children}</p>,
         h1: ({ children }: { children: any }) => <h1 className="text-3xl font-bold mt-8 mb-4 text-white">{children}</h1>,
-        h2: ({ children }: { children: any }) => <h2 className="text-2xl font-bold mt-6 mb-3 text-white">{children}</h2>,
-        h3: ({ children }: { children: any }) => <h3 className="text-xl font-semibold mt-5 mb-2 text-white">{children}</h3>,
-        h4: ({ children }: { children: any }) => <h4 className="text-lg font-semibold mt-4 mb-2 text-white">{children}</h4>,
+        h2: ({ children }: { children: any }) => {
+            // Generate ID for table of contents
+            const id = children
+                ? children
+                    .join('')
+                    .toLowerCase()
+                    .replace(/[^\w\s]/g, '')
+                    .replace(/\s+/g, '-')
+                : '';
+            
+            return (
+                <h2 id={id} className="group flex items-center">
+                    {children}
+                    <a 
+                        href={`#${id}`} 
+                        className="ml-2 opacity-0 group-hover:opacity-100 text-zinc-500 hover:text-zinc-400 transition-opacity"
+                        aria-label={`Link to ${children}`}
+                    >
+                        #
+                    </a>
+                </h2>
+            );
+        },
+        h3: ({ children }: { children: any }) => {
+            const id = children
+                ? children
+                    .join('')
+                    .toLowerCase()
+                    .replace(/[^\w\s]/g, '')
+                    .replace(/\s+/g, '-')
+                : '';
+            
+            return (
+                <h3 id={id} className="group flex items-center">
+                    {children}
+                    <a 
+                        href={`#${id}`} 
+                        className="ml-2 opacity-0 group-hover:opacity-100 text-zinc-500 hover:text-zinc-400 transition-opacity"
+                        aria-label={`Link to ${children}`}
+                    >
+                        #
+                    </a>
+                </h3>
+            );
+        },
+        h4: ({ children }: { children: any }) => {
+            const id = children
+                ? children
+                    .join('')
+                    .toLowerCase()
+                    .replace(/[^\w\s]/g, '')
+                    .replace(/\s+/g, '-')
+                : '';
+            
+            return (
+                <h4 id={id} className="group flex items-center">
+                    {children}
+                    <a 
+                        href={`#${id}`} 
+                        className="ml-2 opacity-0 group-hover:opacity-100 text-zinc-500 hover:text-zinc-400 transition-opacity"
+                        aria-label={`Link to ${children}`}
+                    >
+                        #
+                    </a>
+                </h4>
+            );
+        },
         blockquote: ({ children }: { children: any }) => (
             <div className="pl-4 italic my-6 text-gray-400 relative">
                 <div className="bg-gray-800 rounded px-4 w-fit">
@@ -94,18 +273,11 @@ const PortableTextComponents = {
             const imageUrl = builder.image(value).url();
 
             return (
-                <div className="my-6">
-                    <div className="relative overflow-hidden rounded-lg w-fit shadow-md border border-gray-700">
-                        <img
-                            src={imageUrl}
-                            alt={value.alt || ''}
-                            className="w-auto object-contain h-auto"
-                        />
-                    </div>
-                    {value.caption && (
-                        <p className="text-sm text-gray-400 mt-2 text-center italic">{value.caption}</p>
-                    )}
-                </div>
+                <ImageZoom
+                  src={imageUrl}
+                  alt={value.alt || ''}
+                  caption={value.caption}
+                />
             );
         },
         callout: ({ value }: { value: any }) => {
@@ -216,15 +388,141 @@ const PortableTextComponents = {
 };
 
 // Main component to use for rendering Portable Text content
-export const CustomPortableText = ({ value }: { value: any }) => {
+export const CustomPortableText = ({ value, isDarkMode = true }: { value: any, isDarkMode?: boolean }) => {
+    useEffect(() => {
+        // Initialize Prism
+        Prism.highlightAll();
+    }, [value]);
+
     if (!value) {
         return null;
     }
 
+    // Create a modified components object that adapts to dark/light mode
+    const adaptedComponents = {
+        ...PortableTextComponents,
+        // Adjust block styles for light mode
+        block: {
+            ...PortableTextComponents.block,
+            normal: ({ children }: { children: any }) => (
+                <p className={isDarkMode ? "text-gray-300 my-4 leading-relaxed" : "text-gray-700 my-4 leading-relaxed"}>
+                    {children}
+                </p>
+            ),
+            h1: ({ children }: { children: any }) => (
+                <h1 className={isDarkMode ? "text-3xl font-bold mt-8 mb-4 text-white" : "text-3xl font-bold mt-8 mb-4 text-gray-900"}>
+                    {children}
+                </h1>
+            ),
+            h2: ({ children }: { children: any }) => {
+                // Generate ID for table of contents
+                const id = children
+                    ? children
+                        .join('')
+                        .toLowerCase()
+                        .replace(/[^\w\s]/g, '')
+                        .replace(/\s+/g, '-')
+                    : '';
+                
+                return (
+                    <h2 id={id} className="group flex items-center">
+                        {children}
+                        <a 
+                            href={`#${id}`} 
+                            className="ml-2 opacity-0 group-hover:opacity-100 text-zinc-500 hover:text-zinc-400 transition-opacity"
+                            aria-label={`Link to ${children}`}
+                        >
+                            #
+                        </a>
+                    </h2>
+                );
+            },
+            h3: ({ children }: { children: any }) => {
+                const id = children
+                    ? children
+                        .join('')
+                        .toLowerCase()
+                        .replace(/[^\w\s]/g, '')
+                        .replace(/\s+/g, '-')
+                    : '';
+                
+                return (
+                    <h3 id={id} className="group flex items-center">
+                        {children}
+                        <a 
+                            href={`#${id}`} 
+                            className="ml-2 opacity-0 group-hover:opacity-100 text-zinc-500 hover:text-zinc-400 transition-opacity"
+                            aria-label={`Link to ${children}`}
+                        >
+                            #
+                        </a>
+                    </h3>
+                );
+            },
+            h4: ({ children }: { children: any }) => {
+                const id = children
+                    ? children
+                        .join('')
+                        .toLowerCase()
+                        .replace(/[^\w\s]/g, '')
+                        .replace(/\s+/g, '-')
+                    : '';
+                
+                return (
+                    <h4 id={id} className="group flex items-center">
+                        {children}
+                        <a 
+                            href={`#${id}`} 
+                            className="ml-2 opacity-0 group-hover:opacity-100 text-zinc-500 hover:text-zinc-400 transition-opacity"
+                            aria-label={`Link to ${children}`}
+                        >
+                            #
+                        </a>
+                    </h4>
+                );
+            },
+        },
+        // Adjust mark styles for light mode
+        marks: {
+            ...PortableTextComponents.marks,
+            strong: ({ children }: { children: any }) => (
+                <strong className={isDarkMode ? "font-bold text-white" : "font-bold text-gray-900"}>
+                    {children}
+                </strong>
+            ),
+            em: ({ children }: { children: any }) => (
+                <em className={isDarkMode ? "italic text-gray-300" : "italic text-gray-700"}>
+                    {children}
+                </em>
+            ),
+            code: ({ children }: { children: any }) => (
+                <code className={isDarkMode 
+                    ? "bg-gray-800 text-pink-400 px-1 py-0.5 rounded font-mono text-sm" 
+                    : "bg-gray-200 text-pink-600 px-1 py-0.5 rounded font-mono text-sm"
+                }>
+                    {children}
+                </code>
+            ),
+            link: ({ children, value }: any) => (
+                <a
+                    href={value?.href}
+                    className={isDarkMode 
+                        ? "text-purple-400 hover:text-purple-300 underline transition-colors" 
+                        : "text-purple-700 hover:text-purple-800 underline transition-colors"
+                    }
+                    target={value?.href?.startsWith('http') ? '_blank' : undefined}
+                    rel={value?.href?.startsWith('http') ? 'noopener noreferrer' : undefined}
+                >
+                    {children}
+                </a>
+            ),
+        }
+    };
+
     return (
         <div className="prose prose-invert prose-lg max-w-none">
         {/* @ts-ignore */}
-            <PortableText value={value} components={PortableTextComponents} />
+            <PortableText value={value} components={adaptedComponents} />
         </div>
     );
 };

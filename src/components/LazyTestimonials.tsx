@@ -59,69 +59,71 @@ const LazyTestimonials = ({ testimonials }: LazyTestimonialsProps) => {
 
   return (
     <div ref={containerRef}>
-      <Section paddingY="md">
-        <SectionHeader>
-          <SectionTitle>Testimonials</SectionTitle>
-        </SectionHeader>
-        
-        {isLoaded ? (
-          <div className='relative'>
-            <Swiper
-              modules={[Navigation, Autoplay]}
-              spaceBetween={30}
-              slidesPerView={1}
-              loop={true}
-              navigation={true}
-              speed={1000}
-              autoplay={{
-                delay: 5000,
-                disableOnInteraction: false,
-              }}
-              breakpoints={{
-                640: {
-                  slidesPerView: 1,
-                  spaceBetween: 20,
-                },
-                768: {
-                  slidesPerView: 2,
-                  spaceBetween: 30,
-                },
-                1024: {
-                  slidesPerView: 3,
-                  spaceBetween: 30,
-                },
-              }}
-              className='testimonials-swiper'
-            >
-              {testimonials.map((testimonial, index) => (
-                <SwiperSlide key={index}>
-                  <Card variant="glass" className="h-full">
-                    <div className="flex flex-col h-full">
-                      <p className="text-gray-300 italic mb-6 text-sm">{testimonial.message}</p>
-                      <div className="flex items-center mt-auto">
-                        <img
-                          src={testimonial.avatar}
-                          alt={testimonial.name}
-                          className="w-12 h-12 rounded-full mr-4 object-cover"
-                          loading="lazy"
-                        />
-                        <div>
-                          <h4 className="font-semibold text-white">{testimonial.name}</h4>
-                          <p className="text-gray-400 text-sm">{testimonial.position}</p>
+      <Section paddingY="none" className="mb-0">
+        <div className="py-2 pb-0 sm:pb-4 md:py-8">
+          <SectionHeader>
+            <SectionTitle>Testimonials</SectionTitle>
+          </SectionHeader>
+          
+          {isLoaded ? (
+            <div className='relative'>
+              <Swiper
+                modules={[Navigation, Autoplay]}
+                spaceBetween={30}
+                slidesPerView={1}
+                loop={true}
+                navigation={true}
+                speed={1000}
+                autoplay={{
+                  delay: 5000,
+                  disableOnInteraction: false,
+                }}
+                breakpoints={{
+                  640: {
+                    slidesPerView: 1,
+                    spaceBetween: 20,
+                  },
+                  768: {
+                    slidesPerView: 2,
+                    spaceBetween: 30,
+                  },
+                  1024: {
+                    slidesPerView: 3,
+                    spaceBetween: 30,
+                  },
+                }}
+                className='testimonials-swiper'
+              >
+                {testimonials.map((testimonial, index) => (
+                  <SwiperSlide key={index}>
+                    <Card variant="glass" className="h-auto sm:h-full max-h-[250px] sm:max-h-none overflow-y-auto">
+                      <div className="flex flex-col h-full">
+                        <p className="text-gray-300 italic mb-4 sm:mb-6 text-sm">{testimonial.message}</p>
+                        <div className="flex items-center mt-auto">
+                          <img
+                            src={testimonial.avatar}
+                            alt={testimonial.name}
+                            className="w-10 h-10 sm:w-12 sm:h-12 rounded-full mr-3 sm:mr-4 object-cover"
+                            loading="lazy"
+                          />
+                          <div>
+                            <h4 className="font-semibold text-white text-sm sm:text-base">{testimonial.name}</h4>
+                            <p className="text-gray-400 text-xs sm:text-sm">{testimonial.position}</p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </Card>
-                </SwiperSlide>
-              ))}
-            </Swiper>
-          </div>
-        ) : (
-          <div className="flex justify-center items-center h-[300px]">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
-            <p className="ml-2">Loading testimonials...</p>
-          </div>
-        )}
+                    </Card>
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            </div>
+          ) : (
+            <div className="flex justify-center items-center h-[200px] sm:h-[300px]">
+              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
+              <p className="ml-2">Loading testimonials...</p>
+            </div>
+          )}
+        </div>
       </Section>
     </div>
   );

@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Calendar, ArrowRight, Search } from "lucide-react";
+import { Calendar, ArrowRight, Search, BookOpen } from "lucide-react";
 import { client } from "@/sanity/client";
 import moment from "moment";
+import { motion } from "framer-motion";
 
 const BlogClientPage = () => {
   const [posts, setPosts] = useState<any[]>([]);
@@ -88,7 +89,7 @@ const BlogClientPage = () => {
           <p className="text-zinc-300 mb-6">{error}</p>
           <button 
             onClick={() => window.location.reload()} 
-            className="px-4 py-2 bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 rounded-md hover:opacity-90 transition-opacity"
           >
             Try Again
           </button>
@@ -109,116 +110,187 @@ const BlogClientPage = () => {
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-16">
-      {/* Header */}
-      <div className="mb-12">
-        <h1 className="text-4xl font-bold mb-4">Blog</h1>
-        <p className="text-zinc-400 max-w-2xl">
-          Explore articles on cybersecurity, ethical hacking, web development, and more.
-        </p>
-      </div>
-
-      {/* Search */}
-      <div className="mb-10 relative max-w-md">
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Search posts..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-black border border-zinc-800 rounded-lg py-2 pl-10 pr-4 text-zinc-300 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-          />
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-zinc-500" />
+    <div className="w-full bg-black min-h-screen">
+      <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(to_bottom,transparent,black)] opacity-20"></div>
+      
+      <div className="bg-gradient-to-b from-black to-zinc-900 w-full flex justify-center pb-8">
+        <div className="relative z-10 max-w-6xl w-full px-6">
+          <div className="text-center mb-16 relative pt-20 flex flex-col justify-center items-center">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.7, type: "spring" }}
+              className="relative mb-6" 
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-full blur-xl"></div>
+              <div className="relative w-20 h-20 flex items-center justify-center bg-zinc-900/80 backdrop-blur-sm rounded-full border border-zinc-800 shadow-lg">
+                <BookOpen className="w-8 h-8 text-blue-400" />
+              </div>
+            </motion.div>
+            
+            <motion.h1 
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-4xl md:text-5xl font-bold text-white"
+            >
+              Blog
+            </motion.h1>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="mt-4 text-lg md:text-xl text-zinc-400 max-w-2xl"
+            >
+              Explore articles on cybersecurity, ethical hacking, web development, and more.
+            </motion.p>
+          </div>
         </div>
       </div>
 
-      {filteredPosts.length === 0 ? (
-        <div className="text-center py-16">
-          <p className="text-xl text-zinc-400">No posts matching your search</p>
-          <button 
-            onClick={() => setSearchQuery("")} 
-            className="mt-4 text-blue-500 hover:text-blue-400"
+      <div className="relative z-10 max-w-6xl mx-auto px-6 pb-20 -mt-8">
+        {/* Search */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mb-12 relative max-w-md mx-auto"
+        >
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search posts..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-zinc-900/80 backdrop-blur-sm border border-zinc-800/60 rounded-lg py-3 pl-10 pr-4 text-zinc-300 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600/50 shadow-lg transition-all"
+            />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-zinc-500" />
+          </div>
+        </motion.div>
+
+        {filteredPosts.length === 0 ? (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-16 bg-zinc-900/30 backdrop-blur-sm border border-zinc-800/40 rounded-xl shadow-xl"
           >
-            Clear search
-          </button>
-        </div>
-      ) : (
-        <>
-          {/* Featured Blog */}
-          <div className="mb-16">
-            <h2 className="text-2xl font-semibold mb-6 pb-2 border-b border-zinc-800">Featured Post</h2>
-            {filteredPosts[0] && (
-              <div className="border border-zinc-800 rounded-lg overflow-hidden hover:border-zinc-700 transition-all group">
-                <div className="md:flex">
-                  {filteredPosts[0]?.mainImage?.asset?.url && (
-                    <div className="md:w-1/2 h-64 md:h-auto relative overflow-hidden flex items-center justify-center bg-black">
-                      <img 
-                        className="w-auto h-auto max-w-full max-h-full object-contain p-4" 
-                        src={filteredPosts[0].mainImage.asset.url} 
-                        alt={filteredPosts[0].mainImage.alt || filteredPosts[0].title} 
-                      />
+            <p className="text-xl text-zinc-400">No posts matching your search</p>
+            <button 
+              onClick={() => setSearchQuery("")} 
+              className="mt-4 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-md text-zinc-300 transition-colors"
+            >
+              Clear search
+            </button>
+          </motion.div>
+        ) : (
+          <>
+            {/* Featured Blog */}
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="mb-16"
+            >
+              <h2 className="text-2xl font-semibold mb-6 pb-2 border-b border-zinc-800/50 text-white flex items-center">
+                <span className="bg-gradient-to-r from-blue-500 to-purple-500 w-1.5 h-5 rounded mr-2 inline-block"></span>
+                Featured Post
+              </h2>
+              {filteredPosts[0] && (
+                <div className="relative group">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-blue-600/10 rounded-xl blur-md group-hover:blur-lg transition-all duration-300"></div>
+                  <div className="relative bg-zinc-900/80 backdrop-blur-sm rounded-xl overflow-hidden shadow-2xl border border-zinc-800/60">
+                    <div className="md:flex">
+                      {filteredPosts[0]?.mainImage?.asset?.url && (
+                        <div className="md:w-1/2 h-64 md:h-auto relative overflow-hidden flex items-center justify-center bg-zinc-900/50">
+                          <div className="absolute inset-0 bg-gradient-to-b from-zinc-900/10 to-black/20 z-0"></div>
+                          <img 
+                            className="w-auto h-auto max-w-full max-h-full object-contain p-4 z-10 transition-transform duration-700 group-hover:scale-105" 
+                            src={filteredPosts[0].mainImage.asset.url} 
+                            alt={filteredPosts[0].mainImage.alt || filteredPosts[0].title} 
+                          />
+                        </div>
+                      )}
+                      <div className="p-8 md:w-1/2 flex flex-col">
+                        <h3 className="text-2xl font-semibold mb-3 group-hover:text-white transition-colors text-zinc-100">{filteredPosts[0].title}</h3>
+                        <p className="text-zinc-400 text-sm mb-6 leading-relaxed">
+                          {filteredPosts[0].excerpt}
+                        </p>
+                        <div className="flex items-center text-zinc-500 text-xs mt-auto mb-4">
+                          <Calendar className="w-4 h-4 mr-2" /> 
+                          {moment(filteredPosts[0]?.publishedAt).format("MMMM D, YYYY")}
+                        </div>
+                        <Link 
+                          href={`/blog/${filteredPosts[0]?.slug?.current || ""}`} 
+                          className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg text-white font-medium hover:from-blue-700 hover:to-purple-700 transition-all shadow-md shadow-blue-500/10 hover:shadow-blue-500/20"
+                        >
+                          Read Post <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                        </Link>
+                      </div>
                     </div>
-                  )}
-                  <div className="p-8 md:w-1/2 flex flex-col bg-black">
-                    <h3 className="text-2xl font-semibold mb-3 group-hover:text-blue-400 transition-colors">{filteredPosts[0].title}</h3>
-                    <p className="text-zinc-400 text-sm mb-6 leading-relaxed">
-                      {filteredPosts[0].excerpt}
-                    </p>
-                    <div className="flex items-center text-zinc-400 text-xs mt-auto mb-4">
-                      <Calendar className="w-4 h-4 mr-2" /> 
-                      {moment(filteredPosts[0]?.publishedAt).format("MMMM D, YYYY")}
-                    </div>
-                    <Link 
-                      href={`/blog/${filteredPosts[0]?.slug?.current || ""}`} 
-                      className="inline-flex items-center text-blue-500 hover:text-blue-400 group-hover:translate-x-1 transition-all self-start"
-                    >
-                      Read Post <ArrowRight className="w-4 h-4 ml-2" />
-                    </Link>
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </motion.div>
 
-          {/* Recent Posts */}
-          {filteredPosts.length > 1 && (
-            <div>
-              <h2 className="text-2xl font-semibold mb-6 pb-2 border-b border-zinc-800">Recent Posts</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {filteredPosts.slice(1).map((blog, index) => (
-                  <Link 
-                    href={`/blog/${blog?.slug?.current || ""}`} 
-                    key={index} 
-                    className="border border-zinc-800 hover:border-zinc-700 rounded-lg overflow-hidden transition-all flex flex-col h-full group"
-                  >
-                    {blog?.mainImage?.asset?.url && (
-                      <div className="relative h-48 overflow-hidden flex items-center justify-center bg-black">
-                        <img 
-                          className="w-auto h-auto max-w-full max-h-full object-contain p-4" 
-                          src={blog.mainImage.asset.url} 
-                          alt={blog.mainImage.alt || blog.title} 
-                        />
-                      </div>
-                    )}
-                    <div className="p-6 flex-grow flex flex-col bg-black">
-                      <h3 className="text-lg font-semibold mb-3 line-clamp-2 group-hover:text-blue-400 transition-colors">{blog.title}</h3>
-                      <p className="text-zinc-400 text-sm line-clamp-3 mb-4">{blog.excerpt}</p>
-                      <div className="flex items-center justify-between mt-auto">
-                        <span className="text-xs text-zinc-400 flex items-center">
-                          <Calendar className="w-3 h-3 mr-1" /> {moment(blog?.publishedAt).format("MMM D, YYYY")}
-                        </span>
-                        <span className="text-xs text-blue-500 font-medium flex items-center group-hover:translate-x-1 transition-all">
-                          Read more <ArrowRight className="w-3 h-3 ml-1" />
-                        </span>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
-        </>
-      )}
+            {/* Recent Posts */}
+            {filteredPosts.length > 1 && (
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                <h2 className="text-2xl font-semibold mb-6 pb-2 border-b border-zinc-800/50 text-white flex items-center">
+                  <span className="bg-gradient-to-r from-blue-500 to-purple-500 w-1.5 h-5 rounded mr-2 inline-block"></span>
+                  Recent Posts
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  {filteredPosts.slice(1).map((blog, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: 0.1 * (index + 1) }}
+                      className="relative group h-full"
+                    >
+                      <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600/5 to-purple-600/5 rounded-xl blur-sm group-hover:blur opacity-75 group-hover:opacity-100 transition-all duration-300"></div>
+                      <Link 
+                        href={`/blog/${blog?.slug?.current || ""}`} 
+                        className="relative bg-zinc-900/80 backdrop-blur-sm rounded-xl overflow-hidden shadow-xl border border-zinc-800/60 flex flex-col h-full group-hover:-translate-y-1 transition-all duration-300"
+                      >
+                        {blog?.mainImage?.asset?.url && (
+                          <div className="relative h-48 overflow-hidden flex items-center justify-center bg-zinc-900/50">
+                            <div className="absolute inset-0 bg-gradient-to-b from-zinc-900/10 to-black/20 z-0"></div>
+                            <img 
+                              className="w-auto h-auto max-w-full max-h-full object-contain p-4 z-10 transition-transform duration-700 group-hover:scale-105" 
+                              src={blog.mainImage.asset.url} 
+                              alt={blog.mainImage.alt || blog.title} 
+                            />
+                          </div>
+                        )}
+                        <div className="p-6 flex flex-col flex-1">
+                          <h3 className="text-lg font-semibold mb-2 group-hover:text-white transition-colors text-zinc-100">{blog.title}</h3>
+                          <p className="text-zinc-400 text-sm mb-4 flex-1">
+                            {blog.excerpt}
+                          </p>
+                          <div className="flex items-center justify-between text-zinc-500 text-xs">
+                            <div className="flex items-center">
+                              <Calendar className="w-3 h-3 mr-1" /> 
+                              {moment(blog?.publishedAt).format("MMM D, YYYY")}
+                            </div>
+                            <div className="flex items-center text-blue-400 group-hover:translate-x-1 transition-all">
+                              Read more <ArrowRight className="w-3 h-3 ml-1" />
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 };

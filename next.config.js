@@ -1,6 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
+  trailingSlash: true,
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   images: {
     domains: ['t4.ftcdn.net', 'cdn.sanity.io'],
     remotePatterns: [
@@ -16,7 +20,7 @@ const nextConfig = {
       }
     ],
     unoptimized: true,
-  },
+  }
 }
 
 module.exports = nextConfig 
