@@ -12,7 +12,8 @@ import {
     X as CloseIcon,
     ShieldAlert,
     Globe,
-    Bug
+    Bug,
+    Terminal
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -225,6 +226,16 @@ const Header = () => {
                                                 >
                                                     <Bug size={14} className="text-blue-400" />
                                                     Clickjacking Tester
+                                                </Link>
+                                            </li>
+                                            <li>
+                                                <Link 
+                                                    href="/resources/red-team-cheatsheet" 
+                                                    className="text-white hover:text-blue-400 flex items-center gap-2 py-1 text-sm" 
+                                                    onClick={() => setMobileMenuOpen(false)}
+                                                >
+                                                    <Terminal size={14} className="text-blue-400" />
+                                                    Red Team Cheatsheet
                                                 </Link>
                                             </li>
                                         </ul>

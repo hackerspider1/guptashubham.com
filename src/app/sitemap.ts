@@ -14,6 +14,7 @@ const routes = [
   '/contact',
   '/resources/cors-poc-generator',
   '/resources/xss-scanner',
+  '/resources/red-team-cheatsheet',
   '/http-request',
   '/what-is-hacking',
   '/privacy-policy'

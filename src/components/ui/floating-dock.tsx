@@ -45,6 +45,7 @@ export const FloatingDock = ({
     { title: "XSS Scanner", icon: <IconShieldX size={20} />, href: "/resources/xss-scanner" },
     { title: "CORS POC Generator", icon: <IconGlobe size={20} />, href: "/resources/cors-poc-generator" },
     { title: "Clickjacking Tester", icon: <IconBug size={20} />, href: "/resources/clickjacking" },
+    { title: "Red Team Cheatsheet", icon: <IconTools size={20} />, href: "/resources/red-team-cheatsheet" },
   ];
   
   // Define dock items in the exact order specified
@@ -137,25 +138,45 @@ function IconContainer({
   pathname: string;
   children?: { title: string; icon: React.ReactNode; href: string }[];
 }) {
-  let ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
-  let distance = useTransform(mouseX, (val) => {
-    let bounds = ref.current?.getBoundingClientRect() ?? { x: 0, width: 0 };
-    return val - bounds.x - bounds.width / 2;
+  
+  // Define the transformation function directly in useTransform
+  const widthTransformIcon = useTransform(mouseX, (mouseX: number) => {
+    if (!ref.current) return 20;
+    const rect = ref.current.getBoundingClientRect();
+    const distFromRight = rect.right;
+    const distFromLeft = rect.left;
+    const max = distFromLeft > distFromRight ? distFromLeft : distFromRight;
+    return Math.min(Math.max(20, 20 + 25 * (1 - mouseX / max)), 40);
+  });
+  
+  const heightTransformIcon = widthTransformIcon;
+  
+  const widthTransform = useTransform(mouseX, (mouseX: number) => {
+    if (!ref.current) return 50;
+    const rect = ref.current.getBoundingClientRect();
+    const distFromRight = rect.right;
+    const distFromLeft = rect.left;
+    const max = distFromLeft > distFromRight ? distFromLeft : distFromRight;
+    return Math.min(Math.max(50, 50 + 25 * (1 - mouseX / max)), 90);
   });
 
-  let widthTransform = useTransform(distance, [-150, 0, 150], [40, 90, 40]);
-  let heightTransform = useTransform(distance, [-150, 0, 150], [40, 90, 40]);
-
-  let widthTransformIcon = useTransform(distance, [-150, 0, 150], [18, 24, 18]);
-  let heightTransformIcon = useTransform(distance, [-150, 0, 150], [22, 44, 22]);
+  const heightTransform = useTransform(mouseX, (mouseX: number) => {
+    if (!ref.current) return 50;
+    const rect = ref.current.getBoundingClientRect();
+    const distFromRight = rect.right;
+    const distFromLeft = rect.left;
+    const max = distFromLeft > distFromRight ? distFromLeft : distFromRight;
+    return Math.min(Math.max(50, 50 + 25 * (1 - mouseX / max)), 90);
+  });
 
   let width = useSpring(widthTransform, {
     mass: 0.1,
     stiffness: 170,
     damping: 14,
   });
+
   let height = useSpring(heightTransform, {
     mass: 0.1,
     stiffness: 170,
@@ -194,6 +215,23 @@ function IconContainer({
       return () => clearInterval(interval);
     }
   }, [isTools, isDropdownOpen, toolsPulse]);
+
+  // Add click-outside listener to close the dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (ref.current && !ref.current.contains(event.target as Node) && isDropdownOpen) {
+        setIsDropdownOpen(false);
+      }
+    }
+    
+    // Add event listener
+    document.addEventListener('mousedown', handleClickOutside);
+    
+    // Cleanup the event listener
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isDropdownOpen]);
 
   // Handle the dropdown toggle
   const handleClick = (e: React.MouseEvent) => {
