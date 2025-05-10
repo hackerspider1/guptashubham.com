@@ -796,9 +796,9 @@ const XssClientWrapper = () => {
       if (!targetUrl.startsWith("http")) {
         targetUrl = "https://" + targetUrl;
       }
-      
-      setIsScanning(true);
-      setResults([]);
+
+    setIsScanning(true);
+    setResults([]);
       setLogs([`➜ Starting auto-scan for ${targetUrl}`]);
       
       // Step 1: Crawl the website to discover URLs
@@ -881,7 +881,7 @@ const XssClientWrapper = () => {
           
           // Test each parameter with payloads
           for (const param of parameters) {
-            for (const payload of payloads) {
+    for (const payload of payloads) {
               // Apply delay between requests
               if (advancedOptions.requestDelay > 0) {
                 await new Promise(resolve => setTimeout(resolve, advancedOptions.requestDelay));
@@ -903,7 +903,7 @@ const XssClientWrapper = () => {
                     urlObj.pathname = '/' + pathSegments.join('/');
                     testUrl = urlObj.toString();
                   }
-                } else {
+        } else {
                   // For regular parameters
                   const urlObj = new URL(url);
                   
@@ -944,8 +944,8 @@ const XssClientWrapper = () => {
                   
                   // Break after finding vulnerability to avoid flooding the target
                   break;
-                }
-              } catch (error) {
+        }
+      } catch (error) {
                 setLogs(prev => [...prev, `⚠️ Error testing payload on parameter ${param} at ${url.substring(0, 30)}...: ${error}`]);
               }
             }
@@ -966,7 +966,7 @@ const XssClientWrapper = () => {
       setLogs(prev => [...prev, `⚠️ Error during auto-scan: ${error}`]);
       setCrawlStatus(prev => ({ ...prev, isCrawling: false }));
     }
-    
+
     setIsScanning(false);
   };
 
@@ -994,7 +994,7 @@ const XssClientWrapper = () => {
       if (scanMode === "auto") {
         autoScan();
       } else {
-        scanForXSS();
+        scanForXSS(url);
       }
     }
   };
@@ -1026,7 +1026,7 @@ const XssClientWrapper = () => {
           <div className="text-center mb-10">
             <h1 className="text-4xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
               Advanced XSS Vulnerability Scanner
-            </h1>
+                </h1>
             <p className="text-xl text-blue-300/80 max-w-3xl mx-auto">
               Automatically detect Cross-Site Scripting vulnerabilities with intelligent crawling and context-aware payloads
             </p>
@@ -1061,9 +1061,9 @@ const XssClientWrapper = () => {
                   Manual Mode
                 </span>
               </button>
-            </div>
-          </div>
-
+                        </div>
+                      </div>
+                      
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
             {/* Left Column - Scanner Controls */}
             <motion.div 
@@ -1101,11 +1101,11 @@ const XssClientWrapper = () => {
                       <label className="block text-sm font-medium text-blue-400 mb-2">
                         Target URL (with XSS_TEST placeholder)
                       </label>
-                      <input
-                        type="text"
-                        value={url}
-                        onChange={(e) => setUrl(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && !isScanning && scanForXSS()}
+                          <input
+                            type="text"
+                            value={url}
+                            onChange={(e) => setUrl(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && !isScanning && scanForXSS(url)}
                         placeholder="https://example.com/search?q=XSS_TEST"
                         className="w-full p-3 rounded-xl bg-zinc-800/70 border border-zinc-700/50 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/30 text-white placeholder-zinc-500 outline-none transition-colors"
                       />
@@ -1284,37 +1284,37 @@ const XssClientWrapper = () => {
                       )}
                     </div>
                   )}
-                </div>
-              </div>
-              
-              {/* Scan Button */}
-              <button
+                      </div>
+                    </div>
+                    
+                    {/* Scan Button */}
+                    <button
                 onClick={handleScanClick}
                 disabled={isScanning || (scanMode === "auto" ? !autoScanUrl : !url)}
-                className={`${
+                      className={`${
                   isScanning || (scanMode === "auto" ? !autoScanUrl : !url)
-                    ? "bg-zinc-700/80 cursor-not-allowed" 
-                    : "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 hover:shadow-[0_0_20px_rgba(37,99,235,0.3)]"
-                } text-white rounded-xl px-6 py-4 transition-all duration-300 ease-in-out w-full flex items-center justify-center gap-2 shadow-lg transform-gpu active:scale-95 font-medium`}
-              >
-                {isScanning ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/20 border-t-white"></div>
+                          ? "bg-zinc-700/80 cursor-not-allowed" 
+                          : "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 hover:shadow-[0_0_20px_rgba(37,99,235,0.3)]"
+                      } text-white rounded-xl px-6 py-4 transition-all duration-300 ease-in-out w-full flex items-center justify-center gap-2 shadow-lg transform-gpu active:scale-95 font-medium`}
+                    >
+                      {isScanning ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/20 border-t-white"></div>
                     <span>{scanMode === "auto" ? "Crawling & Scanning..." : "Scanning..."}</span>
-                  </>
-                ) : (
-                  <>
-                    <ArrowRight className="w-5 h-5" />
+                        </>
+                      ) : (
+                        <>
+                          <ArrowRight className="w-5 h-5" />
                     <span>{scanMode === "auto" ? "Start Auto-Crawl & Scan" : "Start XSS Scan"}</span>
-                  </>
-                )}
-              </button>
-            </motion.div>
-            
-            {/* Right Column - Terminal Console */}
-            <motion.div 
+                        </>
+                      )}
+                    </button>
+                  </motion.div>
+                  
+                  {/* Right Column - Terminal Console */}
+                  <motion.div
               initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+                    animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
               className="flex flex-col gap-6"
             >
@@ -1324,11 +1324,11 @@ const XssClientWrapper = () => {
                   Scan Log
                 </h2>
                 
-                <div 
-                  ref={terminalRef}
+                      <div 
+                        ref={terminalRef}
                   className="font-mono text-sm h-[375px] p-4 bg-black/50 rounded-lg overflow-y-auto border border-zinc-800/50 scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-black/20"
-                >
-                  {logs.length > 0 ? (
+                      >
+                        {logs.length > 0 ? (
                     logs.map((log, i) => (
                       <div key={i} className="py-0.5">
                         {log.includes("XSS Found") ? (
@@ -1343,20 +1343,20 @@ const XssClientWrapper = () => {
                           <span className="text-gray-300">{log}</span>
                         )}
                       </div>
-                    ))
-                  ) : (
+                          ))
+                        ) : (
                     <div className="flex flex-col items-center justify-center h-full text-zinc-500">
                       <Terminal className="w-8 h-8 mb-3 opacity-50" />
                       <p>Scan log will appear here</p>
                     </div>
-                  )}
-                </div>
-              </div>
-            </motion.div>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
           </div>
         </div>
       </div>
-
+      
       <div className="w-full bg-gradient-to-b from-indigo-950 via-indigo-950 to-blue-950/80 min-h-[30vh] relative overflow-hidden">
         {/* Background Elements for Section 2 */}
         <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-10"></div>
@@ -1449,7 +1449,7 @@ const XssClientWrapper = () => {
                 <p className="text-indigo-400/60 max-w-lg mx-auto">
                   The scan is complete and no XSS vulnerabilities were detected. Try with different payload types or check another URL.
                 </p>
-              </div>
+            </div>
             )
           )}
         </div>

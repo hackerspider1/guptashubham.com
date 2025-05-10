@@ -1,6 +1,141 @@
-# Shubham Gupta - Personal Website
+# Shubham Gupta Personal Website
 
-This is the personal website and blog for Shubham Gupta, Security Researcher and Bug Hunter.
+A modern, performance-optimized personal website built with Next.js, React, TailwindCSS and Framer Motion.
+
+## 🚀 Performance Optimizations
+
+This project has been optimized for performance with the following features:
+
+### ⚡️ Bundle Optimization
+- Code splitting and dynamic imports
+- Tree shaking to eliminate unused code
+- SWC minification for faster builds
+- React production mode optimizations
+
+### 🖼️ Image Optimization
+- WebP conversion for smaller file sizes
+- Responsive image generation with multiple sizes
+- Lazy loading for images below the fold
+- Image placeholders for faster perceived loading
+
+### 📦 CSS Optimization
+- PurgeCSS to remove unused styles
+- CSS minification with cssnano
+- Optimized critical CSS loading
+- Reduced TailwindCSS footprint
+
+### 🧪 Analysis Tools
+- Bundle size analysis with detailed reports
+- Performance monitoring scripts
+- Comprehensive build optimization
+
+## 🛠️ Getting Started
+
+### Prerequisites
+- Node.js (v18+)
+- npm or yarn
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/guptashubham.com.git
+cd guptashubham.com
+
+# Install dependencies
+npm install
+```
+
+### Development
+
+```bash
+# Start development server
+npm run dev
+```
+
+Visit `http://localhost:3000` to see the site.
+
+### Optimized Production Build
+
+```bash
+# Create an optimized production build
+npm run build:optimized
+```
+
+This runs a series of optimizations:
+1. Cleans previous build artifacts
+2. Runs linting for code quality
+3. Optimizes images with WebP conversion
+4. Builds with production settings
+5. Analyzes bundle size
+
+The optimized site will be available in the `out` directory.
+
+## 📋 Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Create a standard production build
+- `npm run build:optimized` - Create a fully optimized production build
+- `npm run start` - Start a production server
+- `npm run lint` - Run linting
+- `npm run analyze` - Analyze bundle with Next.js analyzer
+- `npm run analyze:bundle` - Custom bundle size analysis
+- `npm run optimize-images` - Optimize and resize images
+- `npm run clean` - Clean build artifacts
+
+## 📚 Optimization Documentation
+
+### Dynamic Imports
+
+Components are loaded only when needed:
+
+```javascript
+const DynamicComponent = dynamic(() => import('./components/Heavy'), {
+  ssr: false, // Only load on client
+  loading: () => <LoadingPlaceholder />
+});
+```
+
+### Responsive Images
+
+Optimized images are available in multiple sizes and formats:
+
+```jsx
+<Image
+  src="/optimized/image-md.webp" 
+  srcSet={`
+    /optimized/image-sm.webp 640w,
+    /optimized/image-md.webp 1024w,
+    /optimized/image-lg.webp 1920w
+  `}
+  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+  alt="Optimized responsive image"
+  loading="lazy"
+  width={800}
+  height={600}
+/>
+```
+
+### Analyzing Performance
+
+To analyze bundle size:
+
+```bash
+npm run analyze:bundle
+```
+
+This will generate a report in `scripts/analysis/` showing bundle sizes and helping identify optimization opportunities.
+
+## 🔄 Deployment
+
+The site is configured for static export. After building:
+
+1. Copy the `out` directory to your hosting provider
+2. Ensure `.htaccess` file is included for proper routing
+
+## 📝 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## 🚀 Deployment Instructions
 

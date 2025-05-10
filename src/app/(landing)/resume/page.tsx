@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { lazy, Suspense, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
@@ -8,7 +8,9 @@ import { FaGraduationCap, FaBriefcase, FaCertificate, FaExternalLinkAlt, FaGithu
 import { BiBookOpen } from "react-icons/bi";
 import { GoProject } from "react-icons/go";
 import { MdFeaturedPlayList } from "react-icons/md";
-import { Shield, Smartphone, Server, Laptop, Wifi, Users, BookOpen, Target } from "lucide-react";
+import { Shield, Smartphone, Server, Laptop, Wifi, Users, BookOpen, Target, Code, Database, Cpu, Globe, Lock, BrainCircuit, Network, HardDrive } from "lucide-react";
+import { Phone, Mail } from "lucide-react";
+import dynamic from 'next/dynamic';
 
 import { Section, SectionHeader, SectionTitle, SectionDescription } from '@/components/ui/section';
 import { TimelineItem } from '@/components/ui/timeline-item';
@@ -16,16 +18,24 @@ import { SkillProgress } from '@/components/ui/skill-progress';
 import { ProjectCard } from '@/components/ui/project-card';
 import { Card } from '@/components/ui/card';
 import { EducationCard } from '@/components/ui/education-card';
+import { Meteors } from '@/components/ui/meteors';
+import AnimatedPhone from '@/components/ui/animated-phone';
+
+// Simple loading component for suspense fallbacks
+const LoadingPlaceholder = () => (
+  <div className="w-full h-40 animate-pulse bg-zinc-800/50 rounded-lg"></div>
+);
+
+// Memoize static data
+const experiences = [
+  { year: "2016", title: "Pyramid Cyber Security & Forensic Pvt. Limited", company: "Conducting Web application penetration testing based on OWASP Top 10 flaws." },
+  { year: "2017", title: "ISYX Technologies", company: "Conducting Web application penetration testing based on OWASP Top 10 flaws. Code Review. Mobile Penetration Testing." },
+  { year: "2018", title: "Brocataon Fintech Group", company: "Conducting Web application penetration testing based on OWASP Top 10 flaws. Android Penetration Testing." },
+  { year: "2018", title: "Deloitte India", company: "Red Teaming, Web & Mobile App Security Testing, Source Code Review." },
+  { year: "Current", title: "Deloitte USI", company: "Red Teaming, Purple Teaming." }
+] as const;
 
 const Resume = () => {
-  const experiences = [
-    { year: "2016", title: "Pyramid Cyber Security & Forensic Pvt. Limited", company: "Conducting Web application penetration testing based on OWASP Top 10 flaws." },
-    { year: "2017", title: "ISYX Technologies", company: "Conducting Web application penetration testing based on OWASP Top 10 flaws. Code Review. Mobile Penetration Testing." },
-    { year: "2018", title: "Brocataon Fintech Group", company: "Conducting Web application penetration testing based on OWASP Top 10 flaws. Android Penetration Testing." },
-    { year: "2018", title: "Deloitte India", company: "Red Teaming, Web & Mobile App Security Testing, Source Code Review." },
-    { year: "Current", title: "Deloitte USI", company: "Red Teaming, Purple Teaming." }
-  ];
-
   const education = [
     {
       institution: "Jiwaji University",
@@ -115,22 +125,88 @@ const Resume = () => {
     },
   ];
 
-  const fadeInUp = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
-  };
+  // Use useMemo for computed values
+  const fadeInUp = useMemo(() => ({
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } }
+  }), []);
+
+  // Added expertise areas
+  const expertiseAreas = [
+    {
+      title: "Web Application Security",
+      icon: Globe,
+      description: "Specialized in identifying and exploiting web vulnerabilities including injection flaws, XSS, CSRF, and business logic issues.",
+      color: "blue"
+    },
+    {
+      title: "Mobile Application Security",
+      icon: Smartphone,
+      description: "Expert in Android and iOS security assessment, identifying issues in session management, data storage, and application logic.",
+      color: "green"
+    },
+    {
+      title: "Network Penetration Testing",
+      icon: Network,
+      description: "Skilled in identifying network vulnerabilities, open ports, and insecure configurations that could lead to unauthorized access.",
+      color: "purple"
+    },
+    {
+      title: "Red Team Operations",
+      icon: Target,
+      description: "Experienced in conducting comprehensive adversary simulations to test security controls and response capabilities.",
+      color: "red"
+    },
+    {
+      title: "Cloud Security",
+      icon: Database,
+      description: "Proficient in assessing AWS, Azure, and GCP environments for misconfigurations and security vulnerabilities.",
+      color: "cyan"
+    },
+    {
+      title: "API Security",
+      icon: Code,
+      description: "Specialized in testing REST and GraphQL APIs for authentication, authorization, and business logic flaws.",
+      color: "amber"
+    }
+  ];
+
+  // Added current focus areas
+  const focusAreas = [
+    {
+      title: "Zero Trust Architecture",
+      description: "Researching and implementing zero trust security models that verify every user and device before granting access to applications and data.",
+      progress: 85
+    },
+    {
+      title: "AI/ML Security",
+      description: "Exploring vulnerabilities in machine learning models and developing strategies to secure AI systems against adversarial attacks.",
+      progress: 70
+    },
+    {
+      title: "Supply Chain Security",
+      description: "Investigating methods to secure the software supply chain and protect against dependency-based vulnerabilities.",
+      progress: 75
+    }
+  ];
 
   return (
     <div className="relative min-h-screen w-full bg-black text-white">
-      {/* Hero Section */}
+      {/* Optimize background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[120px] translate-x-1/3 -translate-y-1/2" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-[120px] -translate-x-1/3 translate-y-1/2" />
+      </div>
+
+      {/* Hero Section - Critical content, load first */}
       <div className="relative bg-gradient-to-b from-black to-zinc-900 w-full overflow-hidden">
-        <div className="max-w-6xl mx-auto px-6 py-20 md:py-28">
+        <div className="max-w-6xl mx-auto px-6 py-16 md:py-24">
           <div className="grid md:grid-cols-5 gap-8 items-center">
-            <div className="md:col-span-3 space-y-6">
+            <div className="md:col-span-3 space-y-5">
               <motion.div 
                 initial={{ opacity: 0 }} 
                 animate={{ opacity: 1 }} 
-                transition={{ duration: 0.8 }}
+                transition={{ duration: 0.5 }}
                 className="inline-flex items-center px-3 py-1 rounded-full bg-zinc-800/50 border border-zinc-700/30 text-zinc-400 text-sm"
               >
                 <span className="animate-pulse mr-2 h-2 w-2 rounded-full bg-green-500"></span>
@@ -138,18 +214,18 @@ const Resume = () => {
               </motion.div>
               
               <motion.h1 
-                initial={{ opacity: 0, y: -20 }}
+                initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                className="text-5xl md:text-6xl font-bold"
+                transition={{ duration: 0.4 }}
+                className="text-4xl md:text-6xl font-bold"
               >
                 Shubham Gupta
               </motion.h1>
               
               <motion.p 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.4 }}
                 className="text-xl md:text-2xl text-zinc-400"
               >
                 Cybersecurity Professional & Ethical Hacker
@@ -158,98 +234,28 @@ const Resume = () => {
               <motion.p 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
+                transition={{ duration: 0.4 }}
                 className="text-zinc-500 max-w-lg"
               >
                 A passionate, enthusiastic cybersecurity professional with over 12 years of experience as an IT security consultant and researcher specializing in Red Teaming and Web Application Security.
               </motion.p>
               
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.6, delay: 0.35 }}
-                className="flex flex-col sm:flex-row gap-3 mb-4"
-              >
-                <motion.div
-                  className="flex items-center gap-2 text-zinc-400 bg-zinc-900/50 py-1.5 px-3 rounded-full border border-zinc-800/50 w-fit"
-                  whileHover={{ scale: 1.02 }}
-                >
-                  <span className="flex items-center gap-1.5">
-                    <motion.div
-                      animate={{ 
-                        scale: [1, 1.2, 1],
-                      }}
-                      transition={{
-                        repeat: Infinity,
-                        duration: 2,
-                        ease: "easeInOut",
-                      }}
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                      </svg>
-                    </motion.div>
-                    <span className="font-medium">+91 9999</span>
-                  </span>
-                  <div className="flex space-x-0.5">
-                    {[0, 1, 2, 3, 4, 5].map((index) => (
-                      <div key={index} className="w-2.5 h-5 overflow-hidden relative">
-                        <motion.div
-                          animate={{ 
-                            y: ["0%", "-91%", "0%"],
-                          }}
-                          transition={{
-                            repeat: Infinity,
-                            duration: 8,
-                            delay: index * 0.4,
-                            ease: "easeInOut",
-                            repeatDelay: 1
-                          }}
-                          className="absolute flex flex-col items-center"
-                        >
-                          {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map((digit, digitIndex) => (
-                            <div key={`${index}-${digitIndex}`} className="h-5 flex items-center justify-center font-mono">
-                              {digit}
-                            </div>
-                          ))}
-                        </motion.div>
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
+              <div className="flex flex-col sm:flex-row gap-3 mb-4 flex-wrap">
+                <div className="flex items-center gap-2 text-zinc-400 bg-zinc-900/50 py-1.5 px-3 rounded-full border border-zinc-800/50 w-fit">
+                  <Phone className="h-4 w-4 text-green-400" />
+                  <AnimatedPhone />
+                </div>
 
-                <motion.div
-                  className="flex items-center gap-2 text-zinc-400 bg-zinc-900/50 py-1.5 px-3 rounded-full border border-zinc-800/50 w-fit"
-                  whileHover={{ scale: 1.02 }}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.6, delay: 0.45 }}
-                >
-                  <span className="flex items-center gap-1.5">
-                    <motion.div
-                      animate={{ 
-                        scale: [1, 1.2, 1],
-                      }}
-                      transition={{
-                        repeat: Infinity,
-                        duration: 2,
-                        delay: 0.5,
-                        ease: "easeInOut",
-                      }}
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                      </svg>
-                    </motion.div>
-                    <span className="font-medium">shubhamgupta109.1995@live.com</span>
-                  </span>
-                </motion.div>
-              </motion.div>
+                <div className="flex items-center gap-2 text-zinc-400 bg-zinc-900/50 py-1.5 px-3 rounded-full border border-zinc-800/50 w-fit">
+                  <Mail className="h-4 w-4 text-blue-400" />
+                  <span className="font-medium">shubhamgupta109.1995@live.com</span>
+                </div>
+              </div>
               
               <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.4 }}
                 className="flex flex-wrap gap-4 pt-2"
               >
                 <a 
@@ -279,10 +285,10 @@ const Resume = () => {
             
             <div className="md:col-span-2 flex justify-center md:justify-end">
               <motion.div 
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8 }}
-                className="relative w-52 h-52 md:w-64 md:h-64"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+                className="relative w-48 h-48 md:w-64 md:h-64"
               >
                 <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-600/20 to-purple-600/20 blur-xl"></div>
                 <div className="relative h-full w-full overflow-hidden rounded-full border-2 border-zinc-800 p-1">
@@ -293,6 +299,8 @@ const Resume = () => {
                       fill 
                       className="object-cover"
                       priority
+                      sizes="(max-width: 768px) 192px, 256px"
+                      quality={90}
                     />
                   </div>
                 </div>
@@ -306,10 +314,10 @@ const Resume = () => {
       <div className="relative z-10 -mt-8">
         <div className="max-w-6xl mx-auto px-6">
           <motion.div 
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
+            transition={{ duration: 0.4 }}
+            viewport={{ once: true, margin: "-100px" }}
             className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-zinc-900/50 border border-zinc-800/50 backdrop-blur-sm rounded-xl p-6 shadow-xl"
           >
             <div className="text-center p-4">
@@ -332,71 +340,172 @@ const Resume = () => {
         </div>
       </div>
 
-        {/* Experience Section */}
+      {/* Areas of Expertise Section - Consistent Dark Theme */}
+      <Section paddingY="xl" id="expertise" className="relative z-10">
+        <SectionHeader>
+          <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={fadeInUp}
+            className="flex flex-col items-center justify-center gap-1 text-center"
+          >
+            <div className="bg-zinc-900 p-3 rounded-xl mb-1 border border-zinc-800">
+              <Shield className="text-zinc-400 w-6 h-6 md:w-8 md:h-8" />
+            </div>
+            <SectionTitle>Areas of Expertise</SectionTitle>
+          </motion.div>
+          <SectionDescription className="mx-auto text-center">
+            Specialized security domains where I excel
+          </SectionDescription>
+        </SectionHeader>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
+          {expertiseAreas.map((area, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              viewport={{ once: true, margin: "-50px" }}
+              className="group relative bg-zinc-900/30 backdrop-blur-sm border border-zinc-800/50 rounded-xl p-6 overflow-hidden hover:border-zinc-700/70 transition-all duration-300"
+            >              
+              <div className="mb-4 flex items-center gap-3">
+                <div className="p-2 rounded-md bg-zinc-800/50">
+                  <area.icon size={24} className="text-blue-400" />
+                </div>
+                <h3 className="text-lg font-semibold text-white group-hover:text-blue-400 transition-colors">{area.title}</h3>
+              </div>
+              <p className="text-sm text-zinc-400">{area.description}</p>
+            </motion.div>
+          ))}
+        </div>
+      </Section>
+
+      {/* Current Focus Section - Consistent Dark Theme */}
+      <Section paddingY="xl" id="focus" className="relative z-10">
+        <SectionHeader>
+          <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={fadeInUp}
+            className="flex flex-col items-center justify-center gap-1 text-center"
+          >
+            <div className="bg-zinc-900 p-3 rounded-xl mb-1 border border-zinc-800">
+              <BrainCircuit className="text-zinc-400 w-6 h-6 md:w-8 md:h-8" />
+            </div>
+            <SectionTitle>Current Focus Areas</SectionTitle>
+          </motion.div>
+          <SectionDescription className="mx-auto text-center">
+            Areas I'm actively researching and developing expertise in
+          </SectionDescription>
+        </SectionHeader>
+
+        <div className="mt-12 max-w-4xl mx-auto">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true, margin: "-50px" }}
+            className="relative bg-zinc-900/30 backdrop-blur-sm border border-zinc-800/50 rounded-xl p-8 overflow-hidden"
+          >            
+            <div className="space-y-8">
+              {focusAreas.map((area, index) => (
+                <motion.div 
+                  key={index}
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: index * 0.2 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  className="space-y-2"
+                >
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-lg font-semibold text-white">{area.title}</h3>
+                    <span className="text-sm font-medium text-blue-400">{area.progress}%</span>
+                  </div>
+                  <p className="text-sm text-zinc-400">{area.description}</p>
+                  <div className="h-2 w-full bg-zinc-800 rounded-full overflow-hidden">
+                    <motion.div 
+                      initial={{ width: 0 }}
+                      whileInView={{ width: `${area.progress}%` }}
+                      transition={{ duration: 1, ease: "easeOut" }}
+                      viewport={{ once: true }}
+                      className="h-full rounded-full bg-gradient-to-r from-blue-500 to-purple-500"
+                    ></motion.div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </Section>
+
+      {/* Experience Section - Consistent Dark Theme */}
       <Section paddingY="xl" id="experience" className="relative z-10">
         <SectionHeader>
           <motion.div 
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-100px" }}
             variants={fadeInUp}
-            transition={{ duration: 0.6 }}
             className="flex flex-col items-center justify-center gap-1 text-center"
           >
             <div className="bg-zinc-900 p-3 rounded-xl mb-1 border border-zinc-800">
-              <FaBriefcase className="text-zinc-400 w-6 h-6 md:w-8 md:h-8" />
+              <FaBriefcase className="text-zinc-400 w-5 h-5 md:w-6 md:h-6" />
             </div>
             <SectionTitle>Professional Experience</SectionTitle>
           </motion.div>
           <SectionDescription className="mx-auto text-center">
-            My journey in the world of cybersecurity
+            My journey through the cybersecurity industry
           </SectionDescription>
         </SectionHeader>
 
-        <div className="space-y-12 mt-12">
-              {experiences.map((exp, index) => (
-            <TimelineItem
-              key={index}
-              year={exp.year}
-              title={exp.title}
-              company={exp.company}
-              index={index}
-            />
-          ))}
+        <div className="max-w-4xl mx-auto mt-12">
+          <div className="space-y-8 relative before:absolute before:inset-0 before:h-full before:w-[1px] before:bg-gradient-to-b before:from-blue-500/50 before:via-purple-500/50 before:to-transparent before:left-[15px] md:before:left-1/2 before:-translate-x-1/2 before:z-0">
+            {experiences.map((exp, index) => (
+              <TimelineItem 
+                key={index}
+                year={exp.year}
+                title={exp.title}
+                company={exp.company}
+                index={index}
+              />
+            ))}
+          </div>
         </div>
       </Section>
 
-      {/* Education Section */}
-      <Section paddingY="xl" id="education" background="alt" className="relative z-10">
+      {/* Education Section - Consistent Dark Theme */}
+      <Section paddingY="xl" id="education" className="relative z-10">
         <SectionHeader>
           <motion.div 
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-100px" }}
             variants={fadeInUp}
-            transition={{ duration: 0.6 }}
             className="flex flex-col items-center justify-center gap-1 text-center"
           >
             <div className="bg-zinc-900 p-3 rounded-xl mb-1 border border-zinc-800">
-              <BiBookOpen className="text-zinc-400 w-6 h-6 md:w-8 md:h-8" />
+              <FaGraduationCap className="text-zinc-400 w-5 h-5 md:w-6 md:h-6" />
             </div>
             <SectionTitle>Education</SectionTitle>
           </motion.div>
           <SectionDescription className="mx-auto text-center">
-            My academic background and achievements
+            Academic background and qualifications
           </SectionDescription>
         </SectionHeader>
-           
-        <div className="grid md:grid-cols-2 gap-8 mt-12">
+
+        <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-5xl mx-auto">
           {education.map((edu, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+              transition={{ duration: 0.5 }}
               viewport={{ once: true }}
             >
-              <EducationCard
+              <EducationCard 
                 institution={edu.institution}
                 logo={edu.logo}
                 degree={edu.degree}
@@ -406,487 +515,268 @@ const Resume = () => {
                 gpa={edu.gpa}
                 courses={edu.courses}
                 achievements={edu.achievements}
-                className="backdrop-blur-sm h-full"
               />
             </motion.div>
           ))}
-          </div>
+        </div>
       </Section>
 
-        {/* Skills Section */}
+      {/* Technical Skills Section - Consistent Dark Theme */}
       <Section paddingY="xl" id="skills" className="relative z-10">
         <SectionHeader>
           <motion.div 
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-100px" }}
             variants={fadeInUp}
-            transition={{ duration: 0.6 }}
             className="flex flex-col items-center justify-center gap-1 text-center"
           >
             <div className="bg-zinc-900 p-3 rounded-xl mb-1 border border-zinc-800">
-              <FaGraduationCap className="text-zinc-400 w-6 h-6 md:w-8 md:h-8" />
+              <Lock className="text-zinc-400 w-6 h-6 md:w-8 md:h-8" />
             </div>
             <SectionTitle>Technical Skills</SectionTitle>
           </motion.div>
           <SectionDescription className="mx-auto text-center">
-            My expertise in cybersecurity
+            Core competencies and technical expertise
           </SectionDescription>
         </SectionHeader>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mt-16">
+        <div className="mt-12 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
             {skills.map((skill, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              className="flex flex-col items-center bg-zinc-900/30 backdrop-blur-sm border border-zinc-800/50 rounded-xl p-6 hover:transform hover:translate-y-[-5px] transition-all duration-300"
-            >
-              <div className="relative w-24 h-24 mb-4">
-                {/* Background circle */}
-                <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
-                  <circle
-                    cx="50"
-                    cy="50"
-                    r="45"
-                    fill="none"
-                    stroke="#27272a" // zinc-800
-                    strokeWidth="8"
-                  />
-                  {/* Progress circle */}
-                  <circle
-                    cx="50"
-                    cy="50"
-                    r="45"
-                    fill="none"
-                    stroke="url(#skillGradient)"
-                    strokeWidth="8"
-                    strokeDasharray={`${2 * Math.PI * 45}`}
-                    strokeDashoffset={`${2 * Math.PI * 45 * (1 - skill.value / 100)}`}
-                    strokeLinecap="round"
-                  />
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-lg font-bold text-white">{skill.value}%</span>
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true, margin: "-50px" }}
+                className="flex flex-col items-center bg-zinc-900/30 backdrop-blur-sm border border-zinc-800/50 rounded-xl p-6 hover:transform hover:translate-y-[-5px] transition-all duration-300"
+              >
+                <div className="relative w-20 h-20 mb-4">
+                  <svg className="w-24 h-24 absolute -left-2 -top-2 transform -rotate-90" viewBox="0 0 100 100">
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r="45"
+                      fill="none"
+                      stroke="#27272a" // zinc-800
+                      strokeWidth="8"
+                    />
+                    <motion.circle
+                      cx="50"
+                      cy="50"
+                      r="45"
+                      fill="none"
+                      stroke="url(#skillGradient)"
+                      strokeWidth="8"
+                      strokeDasharray={`${2 * Math.PI * 45}`}
+                      initial={{ strokeDashoffset: `${2 * Math.PI * 45}` }}
+                      whileInView={{ strokeDashoffset: `${2 * Math.PI * 45 * (1 - skill.value / 100)}` }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 1.5, ease: "easeOut" }}
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <motion.span 
+                      className="text-xl font-bold text-white"
+                      initial={{ opacity: 0 }}
+                      whileInView={{ opacity: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: 0.5 }}
+                    >
+                      {skill.value}%
+                    </motion.span>
+                  </div>
                 </div>
-              </div>
-              <p className="text-sm font-medium text-zinc-300 text-center tracking-wide">{skill.name}</p>
-            </motion.div>
+                <motion.p 
+                  className="text-sm font-medium text-zinc-300 text-center"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: 0.7 }}
+                >
+                  {skill.name}
+                </motion.p>
+              </motion.div>
             ))}
           </div>
           
-        {/* SVG gradient definition */}
-        <svg width="0" height="0" className="absolute">
-          <defs>
-            <linearGradient id="skillGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#3b82f6" /> {/* blue-500 */}
-              <stop offset="100%" stopColor="#8b5cf6" /> {/* purple-500 */}
-            </linearGradient>
-          </defs>
-        </svg>
+          {/* SVG gradient definition */}
+          <svg width="0" height="0" className="absolute">
+            <defs>
+              <linearGradient id="skillGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#3b82f6" /> {/* blue-500 */}
+                <stop offset="100%" stopColor="#8b5cf6" /> {/* purple-500 */}
+              </linearGradient>
+            </defs>
+          </svg>
+          
+          {/* Additional skills badges */}
+          <motion.div 
+            className="mt-12 bg-zinc-900/30 backdrop-blur-sm border border-zinc-800/50 rounded-xl p-8 overflow-hidden"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.5 }}
+          >
+            <h3 className="text-lg font-semibold text-white mb-6">Additional Technical Skills</h3>
+            
+            <div className="flex flex-wrap gap-3">
+              {['OWASP Top 10', 'Burp Suite', 'Metasploit', 'Nmap', 'Wireshark', 
+                'Python', 'JavaScript', 'Kali Linux', 'SAST/DAST', 'Web App Security',
+                'Network Security', 'Cloud Security', 'Mobile Security', 'API Security',
+                'Zero Day Research'].map((skill, index) => (
+                <motion.span
+                  key={index}
+                  className="px-3 py-1.5 bg-zinc-800/60 text-zinc-300 rounded-full text-sm border border-zinc-700/50 hover:border-blue-500/30 hover:bg-blue-900/20 transition-colors duration-300"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.3, delay: index * 0.03 }}
+                >
+                  {skill}
+                </motion.span>
+              ))}
+            </div>
+          </motion.div>
+        </div>
       </Section>
 
-      {/* Certifications Section */}
-      <Section paddingY="xl" id="certifications" background="alt" className="relative z-10">
+      {/* Certifications Section - Consistent Dark Theme */}
+      <Section paddingY="xl" id="certifications" className="relative z-10">
         <SectionHeader>
           <motion.div 
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-100px" }}
             variants={fadeInUp}
-            transition={{ duration: 0.6 }}
             className="flex flex-col items-center justify-center gap-1 text-center"
           >
             <div className="bg-zinc-900 p-3 rounded-xl mb-1 border border-zinc-800">
-              <FaCertificate className="text-zinc-400 w-6 h-6 md:w-8 md:h-8" />
+              <FaCertificate className="text-zinc-400 w-5 h-5 md:w-6 md:h-6" />
             </div>
             <SectionTitle>Certifications</SectionTitle>
           </motion.div>
           <SectionDescription className="mx-auto text-center">
-            Industry-recognized credentials
+            Professional certifications and qualifications
           </SectionDescription>
         </SectionHeader>
 
-        <div className="flex flex-wrap justify-center gap-6 mt-12">
-                {certifications.map((cert, index) => (
-                  <motion.div
-                    key={index}
-              initial={{ opacity: 0, scale: 0.8 }}
+        <div className="mt-12 flex flex-wrap justify-center gap-6 max-w-4xl mx-auto">
+          {certifications.map((cert, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              whileHover={{ y: -5, scale: 1.05 }}
-              className="bg-zinc-900/30 backdrop-blur-sm border border-zinc-800/50 rounded-xl px-10 py-6 text-center shadow-lg"
+              viewport={{ once: true, margin: "-50px" }}
+              className="px-6 py-4 bg-zinc-900/30 backdrop-blur-sm border border-zinc-800/50 rounded-xl hover:border-zinc-700/70 transition-all duration-300"
             >
-              <span className="text-2xl font-semibold text-white relative">
-                {cert.name}
-                <div className="absolute -bottom-2 left-0 right-0 h-[2px] bg-gradient-to-r from-blue-500/50 to-purple-500/50"></div>
-              </span>
-                  </motion.div>
-                ))}
-              </div>
+              <div className="text-lg font-semibold text-white">{cert.name}</div>
+            </motion.div>
+          ))}
+        </div>
       </Section>
 
-      {/* Featured In Section */}
+      {/* Featured In Section - Consistent Dark Theme */}
       <Section paddingY="xl" id="featured" className="relative z-10">
         <SectionHeader>
           <motion.div 
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-100px" }}
             variants={fadeInUp}
-            transition={{ duration: 0.6 }}
             className="flex flex-col items-center justify-center gap-1 text-center"
           >
             <div className="bg-zinc-900 p-3 rounded-xl mb-1 border border-zinc-800">
-              <MdFeaturedPlayList className="text-zinc-400 w-6 h-6 md:w-8 md:h-8" />
+              <MdFeaturedPlayList className="text-zinc-400 w-5 h-5 md:w-6 md:h-6" />
             </div>
             <SectionTitle>Featured In</SectionTitle>
-            </motion.div>
+          </motion.div>
           <SectionDescription className="mx-auto text-center">
-            Publications and interviews highlighting my work
+            Media features and interviews
           </SectionDescription>
         </SectionHeader>
 
-        <div className="mt-12 bg-zinc-900/30 backdrop-blur-sm border border-zinc-800/50 rounded-xl p-8 shadow-lg">
-          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12">
-                {interviews.map((interview, index) => (
-                  <motion.div
-                    key={index}
-                variants={{
-                  hidden: { opacity: 0, y: 20 },
-                  visible: { opacity: 1, y: 0 }
-                }}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="relative group"
-              >
-                <Link 
-                  href={interview.link} 
-                  target="_blank" 
-                  className="flex items-center justify-center px-6 py-4 bg-zinc-800/50 hover:bg-zinc-800 border border-zinc-700/50 hover:border-zinc-700 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 group-hover:scale-105 relative"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-purple-600/5 group-hover:from-blue-600/10 group-hover:to-purple-600/10 rounded-lg transition-all duration-300"></div>
-                  <Image 
-                    src={interview.image}
-                    alt={interview.name}
-                    width={120}
-                    height={40}
-                    className="object-contain h-10 opacity-80 group-hover:opacity-100 transition-opacity"
-                    unoptimized
-                  />
-                  <div className="absolute -bottom-2 right-2 bg-zinc-700/70 text-xs text-zinc-300 rounded-full px-2 py-0.5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center">
-                    <FaExternalLinkAlt className="w-2 h-2 mr-1" />
-                    <span>View</span>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
+        <div className="mt-12 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 max-w-4xl mx-auto">
+          {interviews.map((interview, index) => (
+            <motion.a
+              key={index}
+              href={interview.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              viewport={{ once: true, margin: "-50px" }}
+              className="flex flex-col items-center group"
+            >
+              <div className="h-16 w-full bg-zinc-900/30 backdrop-blur-sm border border-zinc-800/50 rounded-xl p-2 flex items-center justify-center overflow-hidden group-hover:border-zinc-700/70 transition-all duration-300">
+                <Image 
+                  src={interview.image} 
+                  alt={interview.name} 
+                  width={100} 
+                  height={60} 
+                  className="h-auto max-h-10 w-auto object-contain grayscale group-hover:grayscale-0 transition-all duration-300"
+                />
+              </div>
+              <span className="mt-2 text-xs text-zinc-500 group-hover:text-blue-400 transition-colors duration-300">{interview.name}</span>
+            </motion.a>
+          ))}
         </div>
       </Section>
 
-      {/* Projects Section */}
-      <Section paddingY="xl" id="projects" background="alt" className="relative z-10">
+      {/* Projects Section - Consistent Dark Theme */}
+      <Section paddingY="xl" id="projects" className="relative z-10">
         <SectionHeader>
           <motion.div 
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-100px" }}
             variants={fadeInUp}
-            transition={{ duration: 0.6 }}
             className="flex flex-col items-center justify-center gap-1 text-center"
           >
             <div className="bg-zinc-900 p-3 rounded-xl mb-1 border border-zinc-800">
-              <GoProject className="text-zinc-400 w-6 h-6 md:w-8 md:h-8" />
+              <GoProject className="text-zinc-400 w-5 h-5 md:w-6 md:h-6" />
             </div>
             <SectionTitle>Projects</SectionTitle>
           </motion.div>
           <SectionDescription className="mx-auto text-center">
-            My open-source and personal projects
+            Highlights of my open-source cybersecurity projects
           </SectionDescription>
         </SectionHeader>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
           {projects.map((project, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              className="bg-zinc-900/30 backdrop-blur-sm border border-zinc-800/50 rounded-xl overflow-hidden shadow-xl group hover:border-zinc-700/50 transition-all duration-300"
-            >
-              <div className="h-2 bg-gradient-to-r from-blue-600 to-purple-600"></div>
-              <div className="p-8">
-                <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors">{project.title}</h3>
-                <p className="text-zinc-400 mb-5">{project.description}</p>
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {project.technologies.map((tech, techIndex) => (
-                    <span
-                      key={techIndex}
-                      className="bg-zinc-800 px-3 py-1 rounded-full text-xs font-medium text-zinc-300"
-                    >
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-                <div className="flex gap-4">
-                  {project.demo && (
-                    <Link
-                      href={project.demo}
-                      target="_blank"
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm text-white transition-colors"
-                    >
-                      <FaExternalLinkAlt className="w-3 h-3" /> Demo
-                    </Link>
-                  )}
-                  {project.github && (
-                    <Link
-                      href={project.github}
-                      target="_blank"
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm text-white transition-colors"
-                    >
-                      <FaGithub className="w-3 h-3" /> GitHub
-                    </Link>
-                  )}
-                </div>
-              </div>
-            </motion.div>
+            <ProjectCard key={index} project={project} index={index} />
           ))}
-          </div>
-      </Section>
-
-      {/* Areas of Expertise */}
-      <Section paddingY="xl" id="expertise" className="relative z-10">
-        <SectionHeader>
-          <motion.div 
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUp}
-            transition={{ duration: 0.6 }}
-            className="flex flex-col items-center justify-center gap-1 text-center"
-          >
-            <div className="bg-zinc-900 p-3 rounded-xl mb-1 border border-zinc-800">
-              <Shield className="text-zinc-400 w-6 h-6 md:w-8 md:h-8" />
-            </div>
-            <SectionTitle>Areas of Expertise</SectionTitle>
-          </motion.div>
-          <SectionDescription className="mx-auto text-center">
-            Specialized security skills and services
-          </SectionDescription>
-        </SectionHeader>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            viewport={{ once: true }}
-            className="bg-zinc-900/30 backdrop-blur-sm border border-zinc-800/50 rounded-xl p-6 hover:border-zinc-700/50 transition-all duration-300"
-          >
-            <div className="flex items-start gap-4 mb-4">
-              <div className="mt-1 p-2 bg-zinc-800/50 rounded-lg">
-                <Shield className="w-5 h-5 text-blue-400" />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-white mb-2">Web Application Security Testing</h3>
-                <p className="text-sm text-zinc-400">Application would be tested for OWASP Top 10 flaws and other misconfigurations to ensure comprehensive security coverage.</p>
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            viewport={{ once: true }}
-            className="bg-zinc-900/30 backdrop-blur-sm border border-zinc-800/50 rounded-xl p-6 hover:border-zinc-700/50 transition-all duration-300"
-          >
-            <div className="flex items-start gap-4 mb-4">
-              <div className="mt-1 p-2 bg-zinc-800/50 rounded-lg">
-                <Smartphone className="w-5 h-5 text-green-400" />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-white mb-2">Mobile Application Security Testing</h3>
-                <p className="text-sm text-zinc-400">Testing for OWASP Mobile Top 10 vulnerabilities and security configurations in mobile applications.</p>
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            viewport={{ once: true }}
-            className="bg-zinc-900/30 backdrop-blur-sm border border-zinc-800/50 rounded-xl p-6 hover:border-zinc-700/50 transition-all duration-300"
-          >
-            <div className="flex items-start gap-4 mb-4">
-              <div className="mt-1 p-2 bg-zinc-800/50 rounded-lg">
-                <Server className="w-5 h-5 text-purple-400" />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-white mb-2">API Security Testing</h3>
-                <p className="text-sm text-zinc-400">Identifying vulnerabilities in APIs following OWASP API Top 10 guidelines and best practices.</p>
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            viewport={{ once: true }}
-            className="bg-zinc-900/30 backdrop-blur-sm border border-zinc-800/50 rounded-xl p-6 hover:border-zinc-700/50 transition-all duration-300"
-          >
-            <div className="flex items-start gap-4 mb-4">
-              <div className="mt-1 p-2 bg-zinc-800/50 rounded-lg">
-                <Laptop className="w-5 h-5 text-blue-400" />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-white mb-2">Thick Client Application Testing</h3>
-                <p className="text-sm text-zinc-400">Analyzing desktop applications for security vulnerabilities in both client and server communication.</p>
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-            viewport={{ once: true }}
-            className="bg-zinc-900/30 backdrop-blur-sm border border-zinc-800/50 rounded-xl p-6 hover:border-zinc-700/50 transition-all duration-300"
-          >
-            <div className="flex items-start gap-4 mb-4">
-              <div className="mt-1 p-2 bg-zinc-800/50 rounded-lg">
-                <Wifi className="w-5 h-5 text-green-400" />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-white mb-2">Network Security Testing</h3>
-                <p className="text-sm text-zinc-400">Identifying vulnerabilities in networks, systems, and network devices following NIST 800-35 guidelines.</p>
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.6 }}
-            viewport={{ once: true }}
-            className="bg-zinc-900/30 backdrop-blur-sm border border-zinc-800/50 rounded-xl p-6 hover:border-zinc-700/50 transition-all duration-300"
-          >
-            <div className="flex items-start gap-4 mb-4">
-              <div className="mt-1 p-2 bg-zinc-800/50 rounded-lg">
-                <Users className="w-5 h-5 text-purple-400" />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-white mb-2">Red Teaming</h3>
-                <p className="text-sm text-zinc-400">Time-bound assessments targeting organizational weaknesses through penetration testing, social engineering, and physical security testing.</p>
-              </div>
-            </div>
-          </motion.div>
         </div>
       </Section>
 
-      {/* Current Focus Areas */}
-      <Section paddingY="xl" id="focus" background="alt" className="relative z-10">
-        <SectionHeader>
+      {/* Call to Action */}
+      <div className="relative z-10 py-12 md:py-20">
+        <div className="max-w-4xl mx-auto px-6">
           <motion.div 
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUp}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6 }}
-            className="flex flex-col items-center justify-center gap-1 text-center"
+            className="bg-gradient-to-br from-blue-600/10 to-purple-600/10 backdrop-blur-sm border border-zinc-800/50 rounded-xl p-8 md:p-12 text-center"
           >
-            <div className="bg-zinc-900 p-3 rounded-xl mb-1 border border-zinc-800">
-              <Target className="text-zinc-400 w-6 h-6 md:w-8 md:h-8" />
-            </div>
-            <SectionTitle>Current Focus Areas</SectionTitle>
-          </motion.div>
-          <SectionDescription className="mx-auto text-center">
-            Expanding expertise in emerging security domains
-          </SectionDescription>
-        </SectionHeader>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-            viewport={{ once: true }}
-            className="bg-zinc-900/30 backdrop-blur-sm border border-zinc-800/50 rounded-xl p-6"
-          >
-            <div className="flex items-center gap-3">
-              <BookOpen className="w-5 h-5 text-purple-400" />
-              <h3 className="text-base font-medium text-white">Cloud Security & Infrastructure as Code</h3>
-            </div>
-          </motion.div>
-
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4, delay: 0.2 }}
-            viewport={{ once: true }}
-            className="bg-zinc-900/30 backdrop-blur-sm border border-zinc-800/50 rounded-xl p-6"
-          >
-            <div className="flex items-center gap-3">
-              <BookOpen className="w-5 h-5 text-purple-400" />
-              <h3 className="text-base font-medium text-white">Advanced Mobile Application Security</h3>
-            </div>
-          </motion.div>
-
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4, delay: 0.3 }}
-            viewport={{ once: true }}
-            className="bg-zinc-900/30 backdrop-blur-sm border border-zinc-800/50 rounded-xl p-6"
-          >
-            <div className="flex items-center gap-3">
-              <BookOpen className="w-5 h-5 text-purple-400" />
-              <h3 className="text-base font-medium text-white">IoT Security Methodologies</h3>
-            </div>
-          </motion.div>
-
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4, delay: 0.4 }}
-            viewport={{ once: true }}
-            className="bg-zinc-900/30 backdrop-blur-sm border border-zinc-800/50 rounded-xl p-6"
-          >
-            <div className="flex items-center gap-3">
-              <BookOpen className="w-5 h-5 text-purple-400" />
-              <h3 className="text-base font-medium text-white">Container Security & Orchestration</h3>
-            </div>
-          </motion.div>
-        </div>
-      </Section>
-
-      {/* Call to action */}
-      <div className="relative z-10 py-32 bg-gradient-to-b from-black to-zinc-900">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="max-w-6xl mx-auto px-6 flex flex-col items-center justify-center text-center"
-        >
-          <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mb-12 rounded-full"></div>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-8">Ready to collaborate?</h2>
-          <p className="text-zinc-400 max-w-2xl mb-10 text-lg">Let's discuss how my expertise in cybersecurity can help secure your applications and infrastructure.</p>
-          <Link href="/contact">
-            <div className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-lg shadow-md transition-all duration-300 hover:-translate-y-1">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to work together?</h2>
+            <p className="text-zinc-400 mb-8 md:text-lg">Let's connect and discuss how my security expertise can benefit your organization.</p>
+            <Link
+              href="/contact"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-8 py-3 rounded-lg transition-all duration-300 hover:-translate-y-1"
+            >
               Get in Touch
-          </div>
-          </Link>
-        </motion.div>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </Link>
+          </motion.div>
+        </div>
       </div>
     </div>
   );

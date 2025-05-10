@@ -11,7 +11,7 @@ import {
   IconTools, 
   IconHome, 
   IconFile, 
-  IconBrandTwitter,
+  IconBrandX,
   IconUser,
   IconNotes,
   IconMessage
@@ -23,7 +23,7 @@ import {
   useMotionValue,
   useSpring,
   useTransform,
-} from "motion/react";
+} from "framer-motion";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { GithubLogo } from "phosphor-react";
@@ -32,10 +32,8 @@ import { useRef, useState, useEffect } from "react";
 // Removed the hardcoded dockItems - now only using the items passed in as props
 
 export const FloatingDock = ({
-  items,
   className,
 }: {
-  items: { title: string; icon: React.ReactNode; href: string }[];
   className?: string;
 }) => {
   const pathname = usePathname() || "";
@@ -61,37 +59,130 @@ export const FloatingDock = ({
       children: toolsDropdownItems 
     },
     { title: "Contact", icon: <IconMessage size={24} />, href: "/contact" },
-    { title: "Twitter", icon: <IconBrandTwitter size={24} />, href: "https://twitter.com/hackerspider1" },
+    { title: "X", icon: <IconBrandX size={24} />, href: "https://twitter.com/hackerspider1" },
     { title: "Github", icon: <GithubLogo size={24} />, href: "https://github.com/hackerspider1" },
+  ];
+  
+  // Select a subset of items for the mobile dock
+  const mobileDockItems = [
+    dockItems[0], // Home
+    dockItems[1], // About Me
+    dockItems[3], // Blog
+    dockItems[4], // Tools
+    dockItems[5], // Contact
   ];
   
   return (
     <>
       <FloatingDockDesktop
         items={dockItems}
-        className={className}
+        className={cn("hidden md:flex fixed bottom-6 left-1/2 -translate-x-1/2 z-50", className)}
         pathname={pathname}
       />
-      {/* Mobile dock completely removed - using side menu instead */}
+      <FloatingDockMobile
+        items={mobileDockItems}
+        className="md:hidden fixed bottom-6 left-0 right-0 z-50"
+        pathname={pathname}
+      />
     </>
   );
 };
 
-// FloatingDockMobile component kept for reference but never used
+// FloatingDockMobile component updated for mobile use
 const FloatingDockMobile = ({
   items,
   className,
   pathname
 }: {
-  items: { title: string; icon: React.ReactNode; href: string }[];
+  items: { title: string; icon: React.ReactNode; href: string; children?: { title: string; icon: React.ReactNode; href: string }[] }[];
   className?: string;
   pathname?: string;
 }) => {
-  const [open, setOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  
+  const toggleDropdown = (title: string) => {
+    setActiveDropdown(prev => prev === title ? null : title);
+  };
+  
+  // Function to handle click for items with children
+  const handleItemClick = (e: React.MouseEvent, item: { title: string; icon: React.ReactNode; href: string; children?: { title: string; icon: React.ReactNode; href: string }[] }) => {
+    if (item.children) {
+      e.preventDefault();
+      toggleDropdown(item.title);
+    }
+  };
+  
+  // Check if an item or any of its children match the current path
+  const isActiveItem = (item: { title: string; icon: React.ReactNode; href: string; children?: { title: string; icon: React.ReactNode; href: string }[] }, pathName: string = "") => {
+    if (isActiveLink(pathName, item.href)) return true;
+    if (item.children && item.children.some((child) => isActiveLink(pathName, child.href))) return true;
+    return false;
+  };
 
   return (
-    <div className={cn("relative hidden", className)}>
-      {/* Content hidden - now using side menu from header component */}
+    <div className={cn(className)}>
+      <div className="max-w-[300px] mx-auto px-2">
+        <div className="bg-black/80 border border-zinc-800/80 backdrop-blur-md rounded-full shadow-lg">
+          <div className="flex justify-around items-center py-2.5 px-2">
+            {items.map((item) => (
+              <div key={item.title} className="relative">
+                <Link 
+                  href={item.href}
+                  onClick={(e) => handleItemClick(e, item)}
+                  className={cn(
+                    "flex flex-col items-center justify-center p-1.5 rounded-full w-12 h-12 transition-colors",
+                    isActiveItem(item, pathname) 
+                      ? "bg-blue-500/20 text-blue-400" 
+                      : "text-zinc-400 hover:text-white hover:bg-zinc-800/50"
+                  )}
+                >
+                  <div className="w-5 h-5">
+                    {item.icon}
+                  </div>
+                  <span className="text-[8px] mt-0.5 whitespace-nowrap">{item.title}</span>
+                  
+                  {/* Blue notification dot for tools */}
+                  {item.title === "Tools" && (
+                    <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-blue-500 rounded-full"></div>
+                  )}
+                </Link>
+                
+                {/* Dropdown for Tools - Make sure this works on mobile */}
+                {item.children && activeDropdown === item.title && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="absolute bottom-16 left-1/2 -translate-x-1/2 mb-2 rounded-xl bg-black/90 border border-zinc-800 shadow-xl backdrop-blur-md p-3 w-[280px]"
+                  >
+                    <div className="grid grid-cols-2 gap-3">
+                      {item.children.map((child, index) => (
+                        <Link
+                          key={index}
+                          href={child.href}
+                          className={cn(
+                            "flex items-center gap-2 p-2.5 rounded-lg text-zinc-300 hover:bg-zinc-800 transition-colors",
+                            isActiveLink(pathname || "", child.href) && "bg-blue-900/30 text-blue-400"
+                          )}
+                          onClick={() => setActiveDropdown(null)}
+                        >
+                          <div className="w-8 h-8 rounded-full bg-zinc-800/80 flex items-center justify-center">
+                            {child.icon}
+                          </div>
+                          <span className="text-xs">{child.title}</span>
+                        </Link>
+                      ))}
+                    </div>
+                    
+                    {/* Larger arrow pointing to the parent button */}
+                    <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[10px] border-t-zinc-800"></div>
+                  </motion.div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
@@ -112,7 +203,7 @@ const FloatingDockDesktop = ({
       onMouseMove={(e) => mouseX.set(e.pageX)}
       onMouseLeave={() => mouseX.set(Infinity)}
       className={cn(
-        "mx-auto hidden md:flex h-16 gap-6 items-end rounded-2xl bg-gray-50 dark:bg-neutral-900 px-6 py-3 shadow-md",
+        "h-16 gap-6 items-end rounded-2xl bg-black/80 backdrop-blur-md border border-zinc-800/80 px-6 py-3 shadow-lg",
         className
       )}
     >
@@ -148,7 +239,7 @@ function IconContainer({
     const distFromRight = rect.right;
     const distFromLeft = rect.left;
     const max = distFromLeft > distFromRight ? distFromLeft : distFromRight;
-    return Math.min(Math.max(20, 20 + 25 * (1 - mouseX / max)), 40);
+    return Math.min(Math.max(20, 20 + 25 * (1 - Math.min(mouseX, 10000) / max)), 40);
   });
   
   const heightTransformIcon = widthTransformIcon;
@@ -159,7 +250,7 @@ function IconContainer({
     const distFromRight = rect.right;
     const distFromLeft = rect.left;
     const max = distFromLeft > distFromRight ? distFromLeft : distFromRight;
-    return Math.min(Math.max(50, 50 + 25 * (1 - mouseX / max)), 90);
+    return Math.min(Math.max(50, 50 + 25 * (1 - Math.min(mouseX, 10000) / max)), 90);
   });
 
   const heightTransform = useTransform(mouseX, (mouseX: number) => {
@@ -168,7 +259,7 @@ function IconContainer({
     const distFromRight = rect.right;
     const distFromLeft = rect.left;
     const max = distFromLeft > distFromRight ? distFromLeft : distFromRight;
-    return Math.min(Math.max(50, 50 + 25 * (1 - mouseX / max)), 90);
+    return Math.min(Math.max(50, 50 + 25 * (1 - Math.min(mouseX, 10000) / max)), 90);
   });
 
   let width = useSpring(widthTransform, {
@@ -266,10 +357,10 @@ function IconContainer({
           className={cn(
             "aspect-square rounded-full flex items-center justify-center relative shadow-sm transition-colors duration-200", 
             isActive
-              ? "bg-blue-500 text-white dark:bg-blue-600"
+              ? "bg-blue-500 text-white"
               : isTools 
                 ? "bg-gradient-to-br from-blue-400 to-indigo-600 text-white shadow-lg hover:shadow-blue-500/30"
-                : "bg-gray-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-200 hover:bg-gray-200 dark:hover:bg-neutral-700"
+                : "bg-zinc-800 text-zinc-200 hover:bg-zinc-700"
           )}
         >
           {isTools && !isDropdownOpen && (
@@ -288,7 +379,7 @@ function IconContainer({
           
           {/* Notification dot for Tools */}
           {isTools && (
-            <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full border border-white dark:border-neutral-800"></div>
+            <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full border border-zinc-800"></div>
           )}
           
           <AnimatePresence>
@@ -297,7 +388,7 @@ function IconContainer({
                 initial={{ opacity: 0, y: 10, x: "-50%" }}
                 animate={{ opacity: 1, y: 0, x: "-50%" }}
                 exit={{ opacity: 0, y: 2, x: "-50%" }}
-                className="px-3 py-1 whitespace-pre rounded-md bg-gray-100 border dark:bg-neutral-800 dark:border-neutral-700 dark:text-white border-gray-200 text-neutral-700 absolute left-1/2 -translate-x-1/2 -top-10 w-fit text-sm font-medium z-20"
+                className="px-3 py-1 whitespace-pre rounded-md bg-zinc-800 border border-zinc-700 text-white absolute left-1/2 -translate-x-1/2 -top-10 w-fit text-sm font-medium z-20"
               >
                 {title}
               </motion.div>
@@ -333,10 +424,10 @@ function IconContainer({
             <div className="absolute bottom-[-8px] left-1/2 -translate-x-1/2 w-0 h-0 
               border-l-[8px] border-l-transparent 
               border-r-[8px] border-r-transparent 
-              border-t-[8px] border-t-gray-100 dark:border-t-neutral-800">
+              border-t-[8px] border-t-zinc-800">
             </div>
             
-            <div className="bg-gray-100 dark:bg-neutral-800 rounded-lg shadow-xl border border-gray-200 dark:border-neutral-700 p-3 backdrop-blur-lg">
+            <div className="bg-zinc-800 rounded-lg shadow-xl border border-zinc-700 p-3 backdrop-blur-lg">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-fit min-w-[280px]">
                 {children.map((child, index) => (
                   <motion.div
@@ -354,16 +445,16 @@ function IconContainer({
                     <Link 
                       href={child.href}
                       className={cn(
-                        "flex flex-col items-center gap-1 p-3 rounded-md transition-colors bg-white/80 dark:bg-neutral-700/50 backdrop-blur-sm hover:bg-white dark:hover:bg-neutral-700 border border-gray-200/50 dark:border-neutral-600/30",
+                        "flex flex-col items-center gap-1 p-3 rounded-md transition-colors bg-zinc-700/50 backdrop-blur-sm hover:bg-zinc-700 border border-zinc-600/30",
                         isActiveLink(pathname, child.href)
-                          ? "ring-2 ring-blue-400 dark:ring-blue-500"
+                          ? "ring-2 ring-blue-400"
                           : ""
                       )}
                     >
-                      <div className="w-12 h-12 flex items-center justify-center bg-gradient-to-b from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-full mb-1">
-                        <span className="text-blue-600 dark:text-blue-400">{child.icon}</span>
+                      <div className="w-12 h-12 flex items-center justify-center bg-gradient-to-b from-blue-900/20 to-blue-800/20 rounded-full mb-1">
+                        <span className="text-blue-400">{child.icon}</span>
                       </div>
-                      <span className="text-xs font-medium text-center text-neutral-700 dark:text-neutral-200">{child.title}</span>
+                      <span className="text-xs font-medium text-center text-zinc-200">{child.title}</span>
                     </Link>
                   </motion.div>
                 ))}

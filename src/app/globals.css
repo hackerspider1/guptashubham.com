@@ -62,14 +62,17 @@ body {
 
 @keyframes meteor {
   0% {
-    transform: rotate(var(--angle)) translateX(0);
+    transform: translateX(0) translateY(0);
     opacity: 1;
   }
-  70% {
+  30% {
     opacity: 1;
+  }
+  60% {
+    opacity: 0.5;
   }
   100% {
-    transform: rotate(var(--angle)) translateX(-500px);
+    transform: translateX(-500px) translateY(500px);
     opacity: 0;
   }
 }
@@ -82,7 +85,7 @@ body {
   animation: marquee-vertical var(--duration) linear infinite;
 }
 
-.animate-meteor {
+.meteor {
   animation: meteor 5s linear infinite;
 }
 
@@ -119,52 +122,88 @@ body {
 
 @keyframes animateLogo {
   0% {
-    transform: scale(0.5);
+    transform: scale(0.5) rotate(0deg);
     opacity: 0;
     top: -250px;
+    filter: blur(5px);
   }
   5% {
-    transform: scale(1);
+    transform: scale(1) rotate(5deg);
     opacity: 1;
+    filter: blur(0);
+  }
+  15% {
+    transform: scale(1.1) rotate(-5deg);
+    top: -180px;
   }
   20% {
-    transform: scale(1);
+    transform: scale(1) rotate(0deg);
     opacity: 1;
     top: -150px;
   }
   25% {
-    transform: scale(0);
+    transform: scale(0.8) rotate(0deg);
+    opacity: 0.8;
+    top: -50px;
+  }
+  30% {
+    transform: scale(0) rotate(-5deg);
     opacity: 0;
     top: 0px;
+  }
+  100% {
+    opacity: 0;
+    top: 0;
+    transform: scale(0) rotate(0deg);
   }
 }
 
 @media (max-width: 768px) {
   @keyframes animateLogo {
     0% {
-      transform: scale(0.5);
+      transform: scale(0.5) rotate(0deg);
       opacity: 0;
       top: -150px;
+      filter: blur(3px);
     }
     5% {
-      transform: scale(1);
+      transform: scale(1) rotate(5deg);
       opacity: 1;
+      filter: blur(0);
+    }
+    15% {
+      transform: scale(1.1) rotate(-5deg);
+      top: -120px;
     }
     20% {
-      transform: scale(1);
+      transform: scale(1) rotate(0deg);
       opacity: 1;
       top: -90px;
     }
     25% {
-      transform: scale(0);
+      transform: scale(0.8) rotate(0deg);
+      opacity: 0.8;
+      top: -40px;
+    }
+    30% {
+      transform: scale(0) rotate(-5deg);
       opacity: 0;
       top: 0px;
+    }
+    100% {
+      opacity: 0;
+      top: 0;
+      transform: scale(0) rotate(0deg);
     }
   }
 }
 
 .followPath {
-  animation: animateLogo 5s linear infinite;
+  animation: animateLogo 5s ease-in-out infinite;
+  animation-fill-mode: both;
+  will-change: transform, opacity, filter;
+  backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
 .hide-scrollbar::-webkit-scrollbar {
@@ -177,4 +216,380 @@ body {
 
 .swiper-button-prev {
   /* left: -20px !important; */
+}
+
+/* Add new twinkling animation */
+@keyframes twinkle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Add pulse animation for the profile image glow */
+@keyframes pulse-glow {
+  0%, 100% { 
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.5; 
+    transform: scale(1.05);
+  }
+}
+
+/* Apply the pulse animation to the profile image glow */
+.profile-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+/* Make sure the followPath animation is optimized */
+.followPath {
+  animation: animateLogo 5s ease-in-out infinite;
+  animation-fill-mode: both;
+  will-change: transform, opacity, filter;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+/* Apply twinkling to certain logos */
+.followPath.twinkle {
+  animation: animateLogo 5s ease-in-out infinite, twinkle 2s ease-in-out infinite;
+}
+
+/* CPU Architecture Animations */
+.cpu-architecture {
+  offset-anchor: 10px 0px;
+  animation: animation-path;
+  animation-iteration-count: infinite;
+  animation-timing-function: cubic-bezier(0.75, -0.01, 0, 0.99);
+}
+
+.cpu-line-1 {
+  offset-path: path("M 10 20 h 79.5 q 5 0 5 5 v 30");
+  animation: animation-path 3s ease-in-out infinite;
+  animation-delay: 0s;
+}
+
+.cpu-line-2 {
+  offset-path: path("M 180 10 h -69.7 q -5 0 -5 5 v 30");
+  animation: animation-path 3s ease-in-out infinite;
+  animation-delay: 0.2s;
+}
+
+.cpu-line-3 {
+  offset-path: path("M 130 20 v 21.8 q 0 5 -5 5 h -10");
+  animation: animation-path 3s ease-in-out infinite;
+  animation-delay: 0.4s;
+}
+
+.cpu-line-4 {
+  offset-path: path("M 170 80 v -21.8 q 0 -5 -5 -5 h -50");
+  animation: animation-path 3s ease-in-out infinite;
+  animation-delay: 0.6s;
+}
+
+.cpu-line-5 {
+  offset-path: path("M 135 65 h 15 q 5 0 5 5 v 10 q 0 5 -5 5 h -39.8 q -5 0 -5 -5 v -20");
+  animation: animation-path 3s ease-in-out infinite;
+  animation-delay: 0.8s;
+}
+
+.cpu-line-6 {
+  offset-path: path("M 94.8 95 v -36");
+  animation: animation-path 3s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+.cpu-line-7 {
+  offset-path: path("M 88 88 v -15 q 0 -5 -5 -5 h -10 q -5 0 -5 -5 v -5 q 0 -5 5 -5 h 14");
+  animation: animation-path 3s ease-in-out infinite;
+  animation-delay: 1.2s;
+}
+
+.cpu-line-8 {
+  offset-path: path("M 30 30 h 25 q 5 0 5 5 v 6.5 q 0 5 5 5 h 20");
+  animation: animation-path 3s ease-in-out infinite;
+  animation-delay: 1.4s;
+}
+
+@keyframes animation-path {
+  0% {
+    offset-distance: 0%;
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    offset-distance: 100%;
+    opacity: 1;
+  }
+}
+
+/* Pulse dot animation for CPU architecture data flow */
+@keyframes pulse-dot {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.8);
+  }
+}
+
+/* Loader animation for Spline Scene */
+.loader {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #ffffff30;
+  border-bottom-color: #ffffff;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Gradient styles */
+.bg-gradient-radial {
+  background-image: radial-gradient(var(--tw-gradient-stops));
+}
+
+.bg-gradient-conic {
+  background-image: conic-gradient(var(--tw-gradient-stops));
+}
+
+/* 3D card hover effects */
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(-10px) rotate(1deg); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.3)); }
+  50% { filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.6)); }
+}
+
+/* Enhanced testimonial styles */
+.testimonials-swiper .swiper-button-next,
+.testimonials-swiper .swiper-button-prev {
+  color: #60a5fa !important;
+  opacity: 0.7;
+  transition: all 0.3s ease;
+}
+
+.testimonials-swiper .swiper-button-next:hover,
+.testimonials-swiper .swiper-button-prev:hover {
+  color: #3b82f6 !important;
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.testimonials-swiper .swiper-pagination-bullet-active {
+  background: #3b82f6 !important;
+}
+
+/* 3D effects for cards */
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+/* Achievements card animation */
+@keyframes sweep-glow {
+  0% { left: -100%; }
+  50% { left: 100%; }
+  100% { left: 100%; }
+}
+
+.achievement-card:hover::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -100%;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+  animation: sweep-glow 2s ease-in-out infinite;
+}
+
+/* Hall of Fame Logo styles */
+.hof-logo {
+  filter: grayscale(100%);
+  transition: filter 0.3s ease;
+}
+
+.hof-logo:hover {
+  filter: grayscale(0%);
+}
+
+/* CPU Scan Effect Animation */
+.cpu-scan-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.cpu-scan-effect::before {
+  content: "";
+  position: absolute;
+  top: -100%;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(32, 196, 255, 0.1) 50%,
+    transparent 100%
+  );
+  animation: cpuScan 3s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 10;
+}
+
+@keyframes cpuScan {
+  0% {
+    top: -100%;
+  }
+  50% {
+    top: 100%;
+  }
+  100% {
+    top: -100%;
+  }
+}
+
+/* Hall of Fame logo styles */
+.hof-logo-container {
+  transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform-style: preserve-3d;
+  position: relative;
+  background-color: rgba(20, 20, 20, 0.3);
+  border-radius: 12px;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.hof-logo-container:hover {
+  transform: translateY(-6px) scale(1.08);
+  box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.5);
+  border-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(25, 25, 25, 0.5);
+}
+
+.hof-logo-container img {
+  transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  backface-visibility: hidden;
+  transform: translateZ(20px);
+}
+
+.hof-logo-container:hover img {
+  filter: grayscale(0%) !important;
+  opacity: 1 !important;
+}
+
+.hof-logo-brand-color {
+  position: absolute;
+  bottom: 0;
+  left: 5px;
+  right: 5px;
+  height: 2px;
+  transform: scaleX(0.3);
+  opacity: 0.4;
+  transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  border-radius: 1px;
+}
+
+.hof-logo-container:hover .hof-logo-brand-color {
+  transform: scaleX(1);
+  opacity: 0.9;
+  height: 3px;
+}
+
+/* Enhanced logo marquee styling */
+.logo-marquee-container {
+  position: relative;
+  overflow: hidden;
+  padding: 1.5rem 0;
+  perspective: 2000px;
+}
+
+.logo-marquee-container::before,
+.logo-marquee-container::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 150px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.logo-marquee-container::before {
+  left: 0;
+  background: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.2) 80%, transparent 100%);
+}
+
+.logo-marquee-container::after {
+  right: 0;
+  background: linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.2) 80%, transparent 100%);
+}
+
+/* Actual glow effect on hover */
+.hof-logo-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  opacity: 0;
+  transition: opacity 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  mix-blend-mode: screen;
+}
+
+.hof-logo-container:hover .hof-logo-glow {
+  opacity: 0.25;
+}
+
+/* Company-specific hover animations */
+.hof-logo-container[data-company="Spotify"]:hover,
+.hof-logo-container[data-company="Apple"]:hover,
+.hof-logo-container[data-company="Microsoft"]:hover,
+.hof-logo-container[data-company="Google"]:hover {
+  animation: slight-tilt 5s ease-in-out infinite alternate;
+}
+
+@keyframes slight-tilt {
+  0% { transform: translateY(-6px) perspective(500px) rotateX(2deg) rotateY(-1deg); }
+  100% { transform: translateY(-6px) perspective(500px) rotateX(-1deg) rotateY(2deg); }
+}
+
+/* Add special effects for specific companies */
+.hof-logo-pulse-glow {
+  position: absolute;
+  inset: 5px;
+  border-radius: 8px;
+  opacity: 0;
+  z-index: 1;
+  filter: blur(15px);
+  transition: opacity 0.3s ease;
+}
+
+.hof-logo-container:hover .hof-logo-pulse-glow {
+  opacity: 0.1;
+  animation: pulse-glow 2s infinite alternate;
+}
+
+@keyframes pulse-glow {
+  0% { opacity: 0.05; transform: scale(0.95); }
+  100% { opacity: 0.15; transform: scale(1.05); }
 }

@@ -25,6 +25,10 @@ export const metadata: Metadata = {
       follow: true,
     }
   },
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/icons/icon-192x192.png',
+  },
   openGraph: {
     type: 'website',
     locale: 'en_US',
@@ -34,7 +38,7 @@ export const metadata: Metadata = {
     description: 'Security Researcher and Bug Hunter with expertise in penetration testing, bug bounty hunting, and security research.',
     images: [
       {
-        url: 'https://guptashubham.com/og-image.png',
+        url: 'https://guptashubham.com/shubham_gupta.png',
         width: 1200,
         height: 630,
         alt: 'Shubham Gupta',
@@ -45,7 +49,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Shubham Gupta | Security Researcher & Bug Hunter',
     description: 'Security Researcher and Bug Hunter with expertise in penetration testing, bug bounty hunting, and security research.',
-    images: ['https://guptashubham.com/og-image.png'],
+    images: ['https://guptashubham.com/shubham_gupta.png'],
     creator: '@hackerspider1',
   },
   metadataBase: new URL("https://guptashubham.com"),
@@ -56,9 +60,6 @@ export const metadata: Metadata = {
     { name: 'Shubham Gupta', url: 'https://guptashubham.com' },
   ],
   category: 'Cybersecurity',
-  verification: {
-    google: 'add-your-verification-code',
-  },
 };
 
 export default function RootLayout({
@@ -118,8 +119,6 @@ export default function RootLayout({
         
         {/* PWA manifest */}
         <link rel="manifest" href="/manifest.json" />
-        <link rel="icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
       </head>
       <body>
         <Outlet>{children}</Outlet>

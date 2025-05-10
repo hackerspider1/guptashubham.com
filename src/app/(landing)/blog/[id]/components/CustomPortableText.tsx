@@ -9,6 +9,10 @@ import { client } from '@/sanity/client';
 // Use type any for prismjs to avoid type issues
 import Prism from "prismjs";
 import "prismjs/themes/prism-tomorrow.css";
+// Load markup-templating first as it's required by other components
+import "prismjs/components/prism-markup-templating";
+// Add markup/HTML support
+import "prismjs/components/prism-markup";
 import "prismjs/components/prism-jsx";
 import "prismjs/components/prism-tsx";
 import "prismjs/components/prism-typescript";
@@ -19,6 +23,10 @@ import "prismjs/components/prism-php";
 import "prismjs/components/prism-java";
 import "prismjs/components/prism-go";
 import "prismjs/components/prism-ruby";
+import "prismjs/components/prism-css";
+import "prismjs/components/prism-javascript";
+import "prismjs/components/prism-sql";
+import "prismjs/components/prism-yaml";
 
 // Image Zoom Component
 const ImageZoom = ({ src, alt, caption }: { src: string, alt: string, caption?: string }) => {

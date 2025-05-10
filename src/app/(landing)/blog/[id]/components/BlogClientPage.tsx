@@ -4,7 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import moment from "moment";
 import CustomPortableText from "./CustomPortableText";
-import { Facebook, Twitter, Linkedin, Copy, Check, ArrowLeft, Share2, Clock, Calendar, User, BookOpen, Sun, Moon, Hash } from "lucide-react";
+import { Facebook, X, Linkedin, Copy, Check, ArrowLeft, Share2, Clock, Calendar, User, BookOpen, Sun, Moon, Hash } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
 const BlogClientPage = () => {
@@ -244,7 +244,7 @@ const BlogClientPage = () => {
   const encodedTitle = encodeURIComponent(singlePost.title);
   
   const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
-  const twitterShareUrl = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
+  const xShareUrl = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
   const linkedinShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
 
   // Format date for better display
@@ -458,20 +458,21 @@ const BlogClientPage = () => {
                     </div>
                   </motion.div>
                   
-                  {/* Twitter */}
+                  {/* X (formerly Twitter) */}
                   <motion.div 
                     className="relative group"
                     whileHover={{ y: -2 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <a 
-                      href={twitterShareUrl}
+                    <a
+                      href={xShareUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-2.5 bg-zinc-900/90 backdrop-blur-sm border border-zinc-800/60 text-zinc-400 rounded-lg hover:bg-zinc-800/90 hover:text-zinc-300 transition-all shadow-lg flex items-center justify-center"
-                      aria-label="Share on Twitter"
+                      aria-label="Share on X"
+                      className="w-full flex items-center gap-2 p-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 transition-colors"
                     >
-                      <Twitter size={16} />
+                      <X size={16} />
+                      <span className="text-sm">X</span>
                     </a>
                     <motion.div 
                       className="absolute -inset-1 bg-zinc-800/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
@@ -479,7 +480,7 @@ const BlogClientPage = () => {
                       whileHover={{ scale: 1 }}
                     />
                     <div className="absolute right-full mr-2 opacity-0 group-hover:opacity-100 text-xs bg-zinc-900 text-zinc-400 py-1 px-2 rounded shadow-md border border-zinc-800/60 whitespace-nowrap z-20 pointer-events-none transition-opacity">
-                      Twitter
+                      X
                     </div>
                   </motion.div>
                   
@@ -606,14 +607,14 @@ const BlogClientPage = () => {
                 >
                   <Facebook size={16} />
                 </a>
-                <a 
-                  href={twitterShareUrl}
+                <a
+                  href={xShareUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2 bg-zinc-900/90 border border-zinc-800/60 text-zinc-400 rounded-lg hover:bg-zinc-800/90 transition-colors"
-                  aria-label="Share on Twitter"
+                  aria-label="Share on X"
+                  className="flex items-center justify-center p-2 hover:bg-zinc-800 rounded-full"
                 >
-                  <Twitter size={16} />
+                  <X size={16} />
                 </a>
                 <a 
                   href={linkedinShareUrl}

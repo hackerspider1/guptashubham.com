@@ -20,6 +20,22 @@ const nextConfig = {
       }
     ],
     unoptimized: true,
+  },
+  // Add performance optimizations
+  swcMinify: true,
+  reactStrictMode: true,
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  experimental: {
+    optimizeCss: true,
+    optimizePackageImports: [
+      'framer-motion',
+      'lucide-react',
+      'react-icons',
+      'phosphor-react',
+      '@tabler/icons-react'
+    ]
   }
 }
 
