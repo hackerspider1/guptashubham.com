@@ -61,7 +61,7 @@ const skillTypes = [
   }
 ];
 
-export function SplineSceneShowcase() {
+export default function SplineSceneShowcase() {
   // Animation state for typing effect
   const [typedText, setTypedText] = useState("");
   const fullText = "What I Do?";

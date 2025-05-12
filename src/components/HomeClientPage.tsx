@@ -26,7 +26,7 @@ import Button from '@/components/ui/button';
 import { Meteors } from '@/components/ui/meteors';
 import { AnimatedBackground } from '@/components/ui/animated-background';
 import { CpuArchitecture } from "@/components/ui/cpu-architecture";
-import { SplineSceneShowcase } from "@/components/ui/SplineSceneShowcase";
+const SplineSceneShowcase = React.lazy(() => import("@/components/ui/SplineSceneShowcase"));
 
 // @ts-ignore
 const GlassCard = ({ children, className = '' }) => (
