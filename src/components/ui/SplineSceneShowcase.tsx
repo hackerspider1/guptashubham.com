@@ -242,7 +242,7 @@ export default function SplineSceneShowcase() {
           >
             {/* Model container with more space for hand visibility */}
             <motion.div 
-              className="relative w-full h-full max-w-[700px] mx-auto"
+              className="relative w-full h-full max-w-[1200px] mx-auto"
               style={{ 
                 scale: robotScale,
                 rotateY: robotRotate

@@ -389,7 +389,7 @@ const HomeClientPage = () => {
         </div>
       </div>
 
-      <div className="relative z-10 max-w-6xl w-full px-6 pb-0 sm:pb-8 md:pb-12 lg:pb-16 pt-0 sm:pt-6 md:pt-8 lg:pt-10">
+      <div className="relative z-10 max-w-8xl w-full px-6 pb-0 sm:pb-8 md:pb-12 lg:pb-16 pt-0 sm:pt-6 md:pt-8 lg:pt-10">
         {/* 3D Interactive Showcase - Full width */}
         <div className="w-full my-8 sm:my-12 md:my-16 py-4 sm:py-8 md:py-12">
           <SplineSceneShowcase />
