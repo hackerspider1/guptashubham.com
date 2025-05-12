@@ -25,7 +25,7 @@ import { Card, CardTitle, CardDescription } from '@/components/ui/card';
 import Button from '@/components/ui/button';
 import { Meteors } from '@/components/ui/meteors';
 import { AnimatedBackground } from '@/components/ui/animated-background';
-import { CpuArchitecture } from "@/components/ui/cpu-architecture";
+const CpuArchitecture = React.lazy(() => import("@/components/ui/cpu-architecture"));
 const SplineSceneShowcase = React.lazy(() => import("@/components/ui/SplineSceneShowcase"));
 
 // @ts-ignore

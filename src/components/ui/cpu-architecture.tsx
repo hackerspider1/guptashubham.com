@@ -437,4 +437,4 @@ const CpuArchitecture = ({
   );
 };
 
-export { CpuArchitecture }; 
+export default CpuArchitecture; 
