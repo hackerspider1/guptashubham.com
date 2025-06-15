@@ -70,12 +70,12 @@ export const ProjectCard = ({ project, index }: ProjectCardProps) => {
           <h3 className="text-xl font-bold text-white">{project.title}</h3>
           <div className="flex gap-3">
             {project.github && (
-              <Link href={project.github} target="_blank" className="text-zinc-400 hover:text-blue-500 transition-colors">
+              <Link href={project.github} target="_blank" className="text-zinc-400 hover:text-white transition-colors">
                 <Github className="w-5 h-5" />
               </Link>
             )}
             {project.demo && (
-              <Link href={project.demo} target="_blank" className="text-zinc-400 hover:text-blue-500 transition-colors">
+              <Link href={project.demo} target="_blank" className="text-zinc-400 hover:text-white transition-colors">
                 <ExternalLink className="w-5 h-5" />
               </Link>
             )}

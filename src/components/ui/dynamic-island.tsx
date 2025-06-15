@@ -30,11 +30,11 @@ const AudioWaves = () => (
 const islandVariants = {
   expanded: {
     width: "auto",
-    transition: { duration: 0.3, ease: "easeOut" }
+    transition: { duration: 0.3, ease: "easeOut" as const }
   },
   collapsed: {
     width: "auto",
-    transition: { duration: 0.3, ease: "easeOut" }
+    transition: { duration: 0.3, ease: "easeOut" as const }
   }
 };
 

@@ -62,7 +62,7 @@ export default function Forbidden() {
       opacity: 1, 
       scale: 1,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         damping: 15,
         stiffness: 200
       }

@@ -21,9 +21,9 @@ const nextConfig = {
     ],
     unoptimized: true,
   },
-  // Add performance optimizations
-  swcMinify: true,
+  // Performance optimizations
   reactStrictMode: true,
+  poweredByHeader: false,
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
@@ -34,9 +34,34 @@ const nextConfig = {
       'lucide-react',
       'react-icons',
       'phosphor-react',
-      '@tabler/icons-react'
-    ]
-  }
+      '@tabler/icons-react',
+      '@splinetool/react-spline'
+    ],
+  },
+  turbopack: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
+      },
+    },
+  },
+  // Simplified webpack optimizations
+  webpack: (config, { dev, isServer }) => {
+    // Add buffer polyfill for Spline
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      buffer: require.resolve('buffer'),
+    };
+    
+    // Optimize imports
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': require('path').resolve(__dirname, 'src'),
+    };
+    
+    return config;
+  },
 }
 
 module.exports = nextConfig 

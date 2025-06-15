@@ -17,6 +17,7 @@ import {
     Award
 } from 'lucide-react';
 import Link from 'next/link';
+import LiquidGlass from './liquid-glass';
 
 const Header = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -33,7 +34,13 @@ const Header = () => {
     return (
         <>
             <div className="fixed top-0 left-0 right-0 z-20">
-                <div className="bg-black/70 backdrop-blur-sm text-white flex justify-between items-center px-6 py-2 relative border-b border-white/10">
+                <LiquidGlass 
+                    variant="header" 
+                    morphOnHover={false} 
+                    intensity="low" 
+                    rounded="none"
+                    className="text-white flex justify-between items-center px-6 py-2 relative border-b border-white/10"
+                >
                     {/* Signature Logo */}
                     <div className="flex items-center">
                         <Link href="/" className="p-1 hover:opacity-80 transition-opacity">
@@ -57,7 +64,12 @@ const Header = () => {
 
                     {/* Social Icons - Hidden on Mobile */}
                     <div className="hidden md:flex items-center">
-                        <div className="flex items-center gap-3 bg-white/5 rounded-full px-3 py-1.5 border border-white/10">
+                        <LiquidGlass 
+                            variant="button" 
+                            rounded="full" 
+                            intensity="low"
+                            className="flex items-center gap-3 px-3 py-1.5"
+                        >
                             <a href="https://github.com/hackerspider1" target="_blank" className="hover:bg-white/10 rounded-full p-1.5 transition-colors">
                                 <Github size={16} strokeWidth={1.5} className="text-white hover:text-blue-400 transition-colors" />
                             </a>
@@ -73,9 +85,9 @@ const Header = () => {
                             <a href="https://discord.gg/QTRjdpxFTE" target="_blank" className="hover:bg-white/10 rounded-full p-1.5 transition-colors">
                                 <DiscordIcon size={16} strokeWidth={1.5} className="text-white hover:text-blue-400 transition-colors" />
                             </a>
-                        </div>
+                        </LiquidGlass>
                     </div>
-                </div>
+                </LiquidGlass>
             </div>
 
             {/* Mobile Side Menu */}
@@ -92,8 +104,13 @@ const Header = () => {
                         />
                         
                         {/* Side Menu Panel */}
-                        <motion.div 
-                            className="fixed right-0 top-0 bottom-0 w-[70%] max-w-[250px] bg-zinc-900/95 backdrop-blur-md z-50 md:hidden border-l border-zinc-800/50 p-5"
+                        <LiquidGlass
+                            as={motion.div}
+                            variant="modal"
+                            morphOnHover={false}
+                            intensity="medium"
+                            rounded="none"
+                            className="fixed right-0 top-0 bottom-0 w-[70%] max-w-[250px] z-50 md:hidden border-l border-zinc-800/50 p-5"
                             initial={{ x: '100%' }}
                             animate={{ x: 0 }}
                             exit={{ x: '100%' }}
@@ -135,6 +152,11 @@ const Header = () => {
                                     <li>
                                         <Link href="/resources/cors-poc-generator" className="text-white hover:text-blue-400 block py-1 text-sm" onClick={() => setMobileMenuOpen(false)}>
                                             CORS POC Generator
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link href="/methodology" className="text-white hover:text-blue-400 block py-1 text-sm" onClick={() => setMobileMenuOpen(false)}>
+                                            Interactive Methodology
                                         </Link>
                                     </li>
                                     <li>
@@ -181,7 +203,7 @@ const Header = () => {
                                     </a>
                                 </div>
                             </div>
-                        </motion.div>
+                        </LiquidGlass>
                     </>
                 )}
             </AnimatePresence>

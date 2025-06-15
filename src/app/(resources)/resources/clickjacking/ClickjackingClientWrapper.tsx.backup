@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Terminal, Globe, Info, Bug, MousePointer, CheckCircle, XCircle, ShieldAlert } from "lucide-react";
+import { Terminal, Globe, ShieldAlert, ArrowRight, MousePointer, Info, CheckCircle, XCircle, Bug } from "lucide-react";
 import LiquidGlass from "@/components/ui/liquid-glass";
 
 const ClickjackingClientWrapper = () => {
@@ -14,6 +14,7 @@ const ClickjackingClientWrapper = () => {
   const [testComplete, setTestComplete] = useState(false);
   const [isVulnerable, setIsVulnerable] = useState<boolean | null>(null);
 
+  // Auto-scroll to bottom of terminal
   useEffect(() => {
     if (terminalRef.current) {
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
@@ -21,13 +22,15 @@ const ClickjackingClientWrapper = () => {
   }, [history]);
 
   const formatUrl = (input: string) => {
-    if (!input.startsWith('http://') && !input.startsWith('https://')) {
+    if (!input.startsWith("http://") && !input.startsWith("https://")) {
       return `https://${input}`;
     }
     return input;
   };
 
   const testClickjacking = () => {
+    if (!url) return;
+
     const formattedUrl = formatUrl(url);
     setIsTesting(true);
     setTestComplete(false);
@@ -35,7 +38,8 @@ const ClickjackingClientWrapper = () => {
     setHistory((prev) => [...prev, `➜ Testing Clickjacking on ${formattedUrl}...`]);
     setTestUrl(formattedUrl);
     setUrl("");
-
+    
+    // Simulate a test process
     setTimeout(() => {
       setHistory((prev) => [...prev, `➜ Checking X-Frame-Options header...`]);
       setTimeout(() => {
@@ -45,12 +49,14 @@ const ClickjackingClientWrapper = () => {
           setTimeout(() => {
             setIsTesting(false);
             setTestComplete(true);
+            // We'll determine vulnerability based on iframe load success which happens later
           }, 1000);
         }, 1000);
       }, 1000);
     }, 1000);
   };
 
+  // Handle iframe load success/failure
   const handleIframeLoad = () => {
     setIsVulnerable(true);
     setHistory((prev) => [...prev, `✅ Result: Target is VULNERABLE to clickjacking!`]);
@@ -62,7 +68,7 @@ const ClickjackingClientWrapper = () => {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !isTesting && url) {
+    if (e.key === "Enter" && !isTesting) {
       testClickjacking();
     }
   };
@@ -126,119 +132,120 @@ const ClickjackingClientWrapper = () => {
               rounded="xl"
               className="p-6 border-red-500/20"
             >
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-red-300">
-                <Globe className="w-5 h-5" />
-                Target URL
-              </h2>
-              
-              <div className="space-y-4">
-                <div className="flex items-center bg-zinc-950/50 rounded-lg border border-zinc-800/50 overflow-hidden">
-                  <input
-                    type="text"
-                    value={url}
-                    onChange={(e) => setUrl(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Enter website URL to test (e.g., example.com)"
-                    className="flex-1 bg-transparent border-none outline-none text-red-400 placeholder-zinc-600 p-3 font-mono text-sm"
-                  />
-                </div>
-                <p className="text-xs text-zinc-500">Example: facebook.com, twitter.com, etc.</p>
-              </div>
-            </LiquidGlass>
-                  
-            {/* Clickjacking Info Card */}
-            <LiquidGlass
-              variant="card"
-              intensity="medium"
-              rounded="xl"
-              className="p-6 border-orange-500/20"
-            >
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-orange-300">
-                <Info className="w-5 h-5" />
-                About Clickjacking
-              </h2>
-              
-              <div className="space-y-3">
-                <p className="text-zinc-400 text-sm">
-                  Clickjacking (UI redressing) is an attack where users are tricked into clicking on disguised elements. 
-                  This tool tests if a website can be loaded in an iframe, which is the first step towards vulnerability.
-                </p>
-                <p className="text-zinc-500 text-xs">
-                  Secure websites use X-Frame-Options or Content-Security-Policy headers to prevent being loaded in iframes.
-                </p>
-              </div>
-            </LiquidGlass>
-                  
-            {/* Test Button */}
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={testClickjacking}
-              disabled={isTesting || !url}
-              className={`${
-                isTesting || !url 
-                  ? "bg-zinc-700/80 cursor-not-allowed" 
-                  : "bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500"
-              } text-white rounded-xl px-6 py-4 transition-all duration-300 ease-in-out w-full flex items-center justify-center gap-2 shadow-lg font-medium backdrop-blur-sm border border-red-500/20`}
-            >
-              {isTesting ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/20 border-t-white"></div>
-                  <span>Testing...</span>
-                </>
-              ) : (
-                <>
-                  <ArrowRight className="w-5 h-5" />
-                  <span>Start Clickjacking Test</span>
-                </>
-              )}
-            </motion.button>
-          </motion.div>
+                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-red-300">
+                  <Globe className="w-5 h-5" />
+                  Target URL
+                </h2>
                 
-          {/* Right Column - Terminal Console */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="flex flex-col gap-6"
-          >
-            {/* Terminal Card */}
-            <LiquidGlass
-              variant="card"
-              intensity="medium"
-              rounded="xl"
-              className="p-6 h-full border-purple-500/20"
-            >
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-purple-300">
-                <Terminal className="w-5 h-5" />
-                Test Log
-              </h2>
-              
-              {/* Terminal Body */}
-              <div 
-                ref={terminalRef}
-                className="font-mono text-sm bg-zinc-950/50 rounded-lg p-4 h-[300px] overflow-y-auto border border-zinc-800/50"
-              >
-                {history.length > 0 ? (
-                  history.map((log, idx) => (
-                    <div key={idx} className={`mb-2 ${
-                      log.includes("✅") ? "text-green-400" : 
-                      log.includes("❌") ? "text-red-400" : 
-                      "text-orange-400"
-                    } drop-shadow-[0_0_2px_rgba(249,115,22,0.3)]`}>{log}</div>
-                  ))
-                ) : (
-                  <div className="text-zinc-500 italic">Test logs will appear here...</div>
-                )}
-                {!isTesting && !testComplete && history.length > 0 && (
-                  <div className="flex items-center text-orange-400">
-                    <span className="mr-2">➜</span>
-                    <span className="flex-1 text-zinc-500">Waiting for command...</span>
+                <div className="space-y-4">
+                  <div className="flex items-center bg-zinc-950/50 rounded-lg border border-zinc-800/50 overflow-hidden">
+                    <input
+                      type="text"
+                      value={url}
+                      onChange={(e) => setUrl(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      placeholder="Enter website URL to test (e.g., example.com)"
+                      className="flex-1 bg-transparent border-none outline-none text-red-400 placeholder-zinc-600 p-3 font-mono text-sm"
+                    />
                   </div>
-                )}
-              </div>
-            </LiquidGlass>
-          </motion.div>
+                  <p className="text-xs text-zinc-500">Example: facebook.com, twitter.com, etc.</p>
+                </div>
+              </LiquidGlass>
+                    
+              {/* Clickjacking Info Card */}
+              <LiquidGlass
+                variant="card"
+                intensity="medium"
+                rounded="xl"
+                className="p-6 border-orange-500/20"
+              >
+                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-orange-300">
+                  <Info className="w-5 h-5" />
+                  About Clickjacking
+                </h2>
+                
+                <div className="space-y-3">
+                  <p className="text-zinc-400 text-sm">
+                    Clickjacking (UI redressing) is an attack where users are tricked into clicking on disguised elements. 
+                    This tool tests if a website can be loaded in an iframe, which is the first step towards vulnerability.
+                  </p>
+                  <p className="text-zinc-500 text-xs">
+                    Secure websites use X-Frame-Options or Content-Security-Policy headers to prevent being loaded in iframes.
+                  </p>
+                </div>
+              </LiquidGlass>
+                    
+              {/* Test Button */}
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={testClickjacking}
+                disabled={isTesting || !url}
+                className={`${
+                  isTesting || !url 
+                    ? "bg-zinc-700/80 cursor-not-allowed" 
+                    : "bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500"
+                } text-white rounded-xl px-6 py-4 transition-all duration-300 ease-in-out w-full flex items-center justify-center gap-2 shadow-lg font-medium backdrop-blur-sm border border-red-500/20`}
+              >
+                      {isTesting ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/20 border-t-white"></div>
+                          <span>Testing...</span>
+                        </>
+                      ) : (
+                        <>
+                          <ArrowRight className="w-5 h-5" />
+                          <span>Start Clickjacking Test</span>
+                        </>
+                      )}
+                    </motion.button>
+                  </motion.div>
+                  
+            {/* Right Column - Terminal Console */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="flex flex-col gap-6"
+            >
+              {/* Terminal Card */}
+              <LiquidGlass
+                variant="card"
+                intensity="medium"
+                rounded="xl"
+                className="p-6 h-full border-purple-500/20"
+              >
+                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-purple-300">
+                  <Terminal className="w-5 h-5" />
+                  Test Log
+                </h2>
+                
+                {/* Terminal Body */}
+                <div 
+                  ref={terminalRef}
+                  className="font-mono text-sm bg-zinc-950/50 rounded-lg p-4 h-[300px] overflow-y-auto border border-zinc-800/50"
+                >
+                        {history.length > 0 ? (
+                          history.map((log, idx) => (
+                            <div key={idx} className={`mb-2 ${
+                              log.includes("✅") ? "text-green-400" : 
+                              log.includes("❌") ? "text-red-400" : 
+                              "text-orange-400"
+                            } drop-shadow-[0_0_2px_rgba(249,115,22,0.3)]`}>{log}</div>
+                          ))
+                        ) : (
+                          <div className="text-zinc-500 italic">Test logs will appear here...</div>
+                        )}
+                        {!isTesting && !testComplete && history.length > 0 && (
+                          <div className="flex items-center text-orange-400">
+                            <span className="mr-2">➜</span>
+                            <span className="flex-1 text-zinc-500">Waiting for command...</span>
+                          </div>
+                        )}
+                </div>
+              </LiquidGlass>
+            </motion.div>
+          </div>
         </div>
       </div>
       

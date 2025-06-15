@@ -16,7 +16,7 @@ interface SkillProgressProps {
 export const SkillProgress = ({
   name,
   value,
-  color = 'rgb(59, 130, 246)',
+  color = 'rgb(161, 161, 170)',
   size = 'md',
   className = '',
 }: SkillProgressProps) => {

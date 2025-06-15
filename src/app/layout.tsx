@@ -108,13 +108,23 @@ export default function RootLayout({
           `}
         </Script>
         
+        {/* Optimized resource loading */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://cdn.sanity.io" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
-        <link rel="dns-prefetch" href="https://cdn.sanity.io" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         
+        {/* Critical font loading - optimized */}
+        <link 
+          rel="stylesheet" 
+          href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" 
+        />
+        
+        {/* Critical images */}
         <link rel="preload" as="image" href="/shubham_gupta.png" />
+        <link rel="preload" as="image" href="/grid.svg" />
+        
+        {/* Critical fonts */}
         <link rel="preload" as="font" href="/fonts/inter.woff2" type="font/woff2" crossOrigin="anonymous" />
         
         {/* PWA manifest */}

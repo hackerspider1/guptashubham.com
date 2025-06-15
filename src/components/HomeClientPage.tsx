@@ -15,25 +15,45 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/autoplay';
 import 'swiper/css/bundle';
-import useOnScreen from '@/hooks/useOnScreen';
+
 import { MacbookScroll } from '@/components/ui/macbook-scroll';
 import { initPerformanceOptimizations } from '@/lib/performance';
-import LazyTestimonials from './LazyTestimonials';
+
 import LogoMarquee from '@/components/ui/logo-marquee';
 import { Section, SectionHeader, SectionTitle, SectionDescription } from '@/components/ui/section';
 import { Card, CardTitle, CardDescription } from '@/components/ui/card';
 import Button from '@/components/ui/button';
 import { Meteors } from '@/components/ui/meteors';
-import { AnimatedBackground } from '@/components/ui/animated-background';
-const CpuArchitecture = React.lazy(() => import("@/components/ui/cpu-architecture"));
-const SplineSceneShowcase = React.lazy(() => import("@/components/ui/SplineSceneShowcase"));
 
-// @ts-ignore
-const GlassCard = ({ children, className = '' }) => (
-  <div className={`${className}`}>
-    {children}
-  </div>
+import LiquidGlass from '@/components/ui/liquid-glass';
+
+// Optimized lazy loading with preloading
+const CpuArchitecture = React.lazy(() => 
+  import("@/components/ui/cpu-architecture").then(module => ({
+    default: module.default
+  }))
 );
+
+const SplineSceneShowcase = React.lazy(() => 
+  import("@/components/ui/SplineSceneShowcase").then(module => ({
+    default: module.default
+  }))
+);
+
+// Preload heavy components after initial render
+const preloadComponents = () => {
+  import("@/components/ui/cpu-architecture");
+  import("@/components/ui/SplineSceneShowcase");
+};
+
+// Lazy load testimonials component
+const LazyTestimonials = React.lazy(() => 
+  import('./LazyTestimonials').then(module => ({
+    default: module.default
+  }))
+);
+
+
 
 // @ts-ignore
 const AnimatedCounter = ({ target }) => {
@@ -83,6 +103,12 @@ const AnimatedCounter = ({ target }) => {
 };
 
 const HomeClientPage = () => {
+  // Preload heavy components after initial render
+  useEffect(() => {
+    const timer = setTimeout(preloadComponents, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
   const achievements = [
     { icon: Award, label: "Hall of Fame", target: 600 },
     { icon: BugIcon, label: "Bugs Reported", target: 1337 },
@@ -296,16 +322,12 @@ const HomeClientPage = () => {
               <HeroLogos logos={[...logos]} />
               <div className="-mt-64 sm:-mt-72 md:-mt-80 flex flex-col items-center">
                 <div className="relative group">
-                  <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full opacity-30 group-hover:opacity-50 blur-md transition duration-700 profile-glow"></div>
-                  <div className="relative overflow-hidden rounded-full border-2 border-zinc-800 shadow-xl mb-4 w-[180px] h-[180px] sm:w-[220px] sm:h-[220px] md:w-[240px] md:h-[240px]">
+                  <div className="relative overflow-hidden rounded-full border border-white/10 shadow-xl mb-4 w-[180px] h-[180px] sm:w-[220px] sm:h-[220px] md:w-[240px] md:h-[240px]">
                     <img 
-                      className='w-full h-full object-cover profile-cyber-glow' 
+                      className='w-full h-full object-cover' 
                       src="/shubham_gupta.png" 
                       alt="Shubham Gupta" 
                     />
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/20"></div>
-                    <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-blue-500/10 to-transparent avatar-scan-effect"></div>
-                    <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-purple-500/5 to-transparent avatar-scan-effect-delayed"></div>
                   </div>
                 </div>
                 
@@ -346,9 +368,9 @@ const HomeClientPage = () => {
               <div className="flex flex-col items-center justify-center mb-6">
                 <div className="flex items-center justify-center mb-2">
                   <div className="h-[1px] w-20 bg-gradient-to-r from-transparent via-zinc-700/40 to-transparent"></div>
-                  <div className="px-4 py-1 mx-4 bg-zinc-900/60 border border-zinc-800/50 rounded-full">
+                  <LiquidGlass variant="subtle" className="px-4 py-1 mx-4" rounded="full">
                     <h3 className="text-xs text-zinc-400 font-medium uppercase tracking-wider">Security Researcher</h3>
-                  </div>
+                  </LiquidGlass>
                   <div className="h-[1px] w-20 bg-gradient-to-r from-transparent via-zinc-700/40 to-transparent"></div>
                 </div>
                 
@@ -373,16 +395,18 @@ const HomeClientPage = () => {
               
               {/* View all accolades button */}
               <div className="flex justify-center mt-8">
-                <a 
-                  href="/resources/hall-of-fame" 
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-zinc-900/60 hover:bg-zinc-800/60 border border-zinc-800/50 hover:border-zinc-700/50 rounded-lg text-sm text-zinc-300 hover:text-white transition-all duration-300"
-                >
-                  <span>View all recognitions</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-70">
-                    <path d="M5 12h14"></path>
-                    <path d="m12 5 7 7-7 7"></path>
-                  </svg>
-                </a>
+                <LiquidGlass variant="subtle" className="hover:bg-white/[0.02] transition-all duration-300" rounded="lg">
+                  <a 
+                    href="/resources/hall-of-fame" 
+                    className="inline-flex items-center gap-2 px-4 py-2 text-sm text-zinc-300 hover:text-white transition-all duration-300"
+                  >
+                    <span>View all recognitions</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-70">
+                      <path d="M5 12h14"></path>
+                      <path d="m12 5 7 7-7 7"></path>
+                    </svg>
+                  </a>
+                </LiquidGlass>
               </div>
             </div>
           </div>
@@ -409,17 +433,22 @@ const HomeClientPage = () => {
                 viewport={{ margin: "-100px" }}
                 transition={{ duration: 0.4, delay: index * 0.1 }}
               >
-                <motion.div 
-                  className="relative bg-zinc-900/40 backdrop-blur-sm border border-zinc-800/50 p-4 sm:p-6 md:p-8 rounded-lg overflow-hidden"
-                  whileHover={{ 
-                    scale: 1.03,
-                    borderColor: "rgba(59, 130, 246, 0.3)"
-                  }}
-                  transition={{ 
-                    duration: 0.3, 
-                    scale: { type: "spring", stiffness: 300 }
-                  }}
+                <LiquidGlass 
+                  variant="card"
+                  className="p-4 sm:p-6 md:p-8"
+                  rounded="xl"
+                  morphOnHover={true}
                 >
+                  <motion.div 
+                    className="relative"
+                    whileHover={{ 
+                      scale: 1.02,
+                    }}
+                    transition={{ 
+                      duration: 0.3, 
+                      scale: { type: "spring", stiffness: 300 }
+                    }}
+                  >
                   {/* Icon and Counter layout */}
                   <div className="flex flex-col items-center text-center">
                     {/* Icon container */}
@@ -453,6 +482,7 @@ const HomeClientPage = () => {
                   {/* Subtle background accent */}
                   <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-blue-500/20 to-transparent"></div>
                 </motion.div>
+                </LiquidGlass>
               </motion.div>
             ))}
           </div>
@@ -494,7 +524,13 @@ const HomeClientPage = () => {
           <div className="absolute left-1/2 w-px h-full bg-gradient-to-b from-transparent via-zinc-700/40 to-transparent"></div>
         </div>
 
-        <LazyTestimonials testimonials={testimonials} />
+        <React.Suspense fallback={
+          <div className="flex justify-center items-center py-16">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+          </div>
+        }>
+          <LazyTestimonials testimonials={testimonials} />
+        </React.Suspense>
 
         {/* CTF Challenge Section */}
         <Section paddingY="md" className="mt-4 sm:mt-8 md:mt-16 relative">
@@ -523,10 +559,10 @@ const HomeClientPage = () => {
                     transition={{ duration: 0.8, delay: 0.6 }}
                     className="flex items-start gap-2 mb-20"
                   >
-                    <div className="bg-zinc-800/80 backdrop-blur-md rounded-lg p-3 border border-blue-500/30 max-w-[200px] shadow-lg shadow-blue-500/10">
+                    <LiquidGlass variant="subtle" className="p-3 max-w-[200px] border-blue-500/30 shadow-lg shadow-blue-500/10" rounded="lg">
                       <h4 className="text-blue-400 font-medium text-sm">Learn by Doing</h4>
                       <p className="text-xs text-gray-300 mt-1">Hands-on experience with real-world security scenarios</p>
-                    </div>
+                    </LiquidGlass>
                     <motion.div 
                       initial={{ width: 0 }}
                       animate={{ width: 100 }}
@@ -550,10 +586,10 @@ const HomeClientPage = () => {
                     transition={{ duration: 0.8, delay: 1.2 }}
                     className="flex items-start gap-2 mb-20"
                   >
-                    <div className="bg-zinc-800/80 backdrop-blur-md rounded-lg p-3 border border-purple-500/30 max-w-[200px] shadow-lg shadow-purple-500/10">
+                    <LiquidGlass variant="subtle" className="p-3 max-w-[200px] border-purple-500/30 shadow-lg shadow-purple-500/10" rounded="lg">
                       <h4 className="text-purple-400 font-medium text-sm">Build Portfolio</h4>
                       <p className="text-xs text-gray-300 mt-1">Track progress and showcase your achievements to employers</p>
-                    </div>
+                    </LiquidGlass>
                     <motion.div 
                       initial={{ width: 0 }}
                       animate={{ width: 80 }}
@@ -577,10 +613,10 @@ const HomeClientPage = () => {
                     transition={{ duration: 0.8, delay: 1.8 }}
                     className="flex items-start gap-2"
                   >
-                    <div className="bg-zinc-800/80 backdrop-blur-md rounded-lg p-3 border border-green-500/30 max-w-[200px] shadow-lg shadow-green-500/10">
+                    <LiquidGlass variant="subtle" rounded="lg" className=" p-3 max-w-[200px] border-green-500/30 shadow-lg shadow-green-500/10">
                       <h4 className="text-green-400 font-medium text-sm">Community Support</h4>
                       <p className="text-xs text-gray-300 mt-1">Connect with peers and get help from experienced hackers</p>
-                    </div>
+                    </LiquidGlass>
                     <motion.div 
                       initial={{ width: 0 }}
                       animate={{ width: 120 }}
@@ -609,10 +645,10 @@ const HomeClientPage = () => {
                     transition={{ duration: 0.8, delay: 0.9 }}
                     className="flex items-start gap-2 mb-20 flex-row-reverse"
                   >
-                    <div className="bg-zinc-800/80 backdrop-blur-md rounded-lg p-3 border border-red-500/30 max-w-[200px] shadow-lg shadow-red-500/10">
+                    <LiquidGlass variant="subtle" rounded="lg" className=" p-3 max-w-[200px] border-red-500/30 shadow-lg shadow-red-500/10">
                       <h4 className="text-red-400 font-medium text-sm">Realistic Scenarios</h4>
                       <p className="text-xs text-gray-300 mt-1">Practice on environments that mirror real-world applications</p>
-                    </div>
+                    </LiquidGlass>
                     <motion.div 
                       initial={{ width: 0 }}
                       animate={{ width: 100 }}
@@ -636,10 +672,10 @@ const HomeClientPage = () => {
                     transition={{ duration: 0.8, delay: 1.5 }}
                     className="flex items-start gap-2 mb-20 flex-row-reverse"
                   >
-                    <div className="bg-zinc-800/80 backdrop-blur-md rounded-lg p-3 border border-yellow-500/30 max-w-[200px] shadow-lg shadow-yellow-500/10">
+                    <LiquidGlass variant="subtle" rounded="lg" className=" p-3 max-w-[200px] border-yellow-500/30 shadow-lg shadow-yellow-500/10">
                       <h4 className="text-yellow-400 font-medium text-sm">Earn Rewards</h4>
                       <p className="text-xs text-gray-300 mt-1">Collect points, badges, and certificates as you complete challenges</p>
-                    </div>
+                    </LiquidGlass>
                     <motion.div 
                       initial={{ width: 0 }}
                       animate={{ width: 80 }}
@@ -663,10 +699,10 @@ const HomeClientPage = () => {
                     transition={{ duration: 0.8, delay: 2.1 }}
                     className="flex items-start gap-2 flex-row-reverse"
                   >
-                    <div className="bg-zinc-800/80 backdrop-blur-md rounded-lg p-3 border border-cyan-500/30 max-w-[200px] shadow-lg shadow-cyan-500/10">
+                    <LiquidGlass variant="subtle" rounded="lg" className=" p-3 max-w-[200px] border-cyan-500/30 shadow-lg shadow-cyan-500/10">
                       <h4 className="text-cyan-400 font-medium text-sm">Level Up Skills</h4>
                       <p className="text-xs text-gray-300 mt-1">Progressive difficulty to help you grow from beginner to expert</p>
-                    </div>
+                    </LiquidGlass>
                     <motion.div 
                       initial={{ width: 0 }}
                       animate={{ width: 120 }}
@@ -690,29 +726,23 @@ const HomeClientPage = () => {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.7 }}
-                      className="rounded-xl bg-black/50 backdrop-blur-lg p-4 border border-zinc-800"
+                      className="text-center"
                     >
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="flex gap-1.5">
-                          <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                          <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                          <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                        </div>
-                        <div className="text-xs text-gray-400">ctf.guptashubham.com</div>
-                      </div>
-                      <div className="text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
+                      <div className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent mb-3">
                         Capture The Flag Challenges
                       </div>
-                      <div className="text-sm text-gray-300 mt-2">
+                      <div className="text-lg text-gray-300">
                         Test your skills. Learn new techniques. Earn rewards.
                       </div>
                     </motion.div>
               }
               badge={
-                    <div className="flex items-center gap-2 bg-zinc-800/50 backdrop-blur-md rounded-full px-3 py-1.5">
-                      <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                      <span className="text-xs text-white">Coming Soon</span>
-                    </div>
+                    <LiquidGlass variant="subtle" className="px-4 py-2" rounded="full" morphOnHover={false}>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse shadow-[0_0_6px_rgba(34,197,94,0.4)]"></div>
+                        <span className="text-xs text-white font-medium">Coming Soon</span>
+                      </div>
+                    </LiquidGlass>
               }
               src="/images/ctf-image.jpg"
                 showGradient={true}
@@ -748,10 +778,11 @@ const HomeClientPage = () => {
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ margin: "-50px" }}
                     transition={{ duration: 0.5, delay: 0.5 }}
-                    className="bg-zinc-800/80 backdrop-blur-md rounded-lg p-3 border border-blue-500/30 shadow-lg shadow-blue-500/10"
                   >
-                    <h4 className="text-blue-400 font-medium text-sm">Learn by Doing</h4>
-                    <p className="text-xs text-gray-300 mt-1">Hands-on experience with real-world security scenarios</p>
+                    <LiquidGlass variant="subtle" rounded="lg" className=" p-3 border-blue-500/30 shadow-lg shadow-blue-500/10">
+                      <h4 className="text-blue-400 font-medium text-sm">Learn by Doing</h4>
+                      <p className="text-xs text-gray-300 mt-1">Hands-on experience with real-world security scenarios</p>
+                    </LiquidGlass>
                   </motion.div>
                 </motion.div>
                 
@@ -783,10 +814,11 @@ const HomeClientPage = () => {
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ margin: "-50px" }}
                     transition={{ duration: 0.5, delay: 0.7 }}
-                    className="bg-zinc-800/80 backdrop-blur-md rounded-lg p-3 border border-purple-500/30 shadow-lg shadow-purple-500/10"
                   >
-                    <h4 className="text-purple-400 font-medium text-sm">Build Portfolio</h4>
-                    <p className="text-xs text-gray-300 mt-1">Track progress and showcase your achievements to employers</p>
+                    <LiquidGlass variant="subtle" rounded="lg" className=" p-3 border-purple-500/30 shadow-lg shadow-purple-500/10">
+                      <h4 className="text-purple-400 font-medium text-sm">Build Portfolio</h4>
+                      <p className="text-xs text-gray-300 mt-1">Track progress and showcase your achievements to employers</p>
+                    </LiquidGlass>
                   </motion.div>
                 </motion.div>
                 
@@ -818,10 +850,11 @@ const HomeClientPage = () => {
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ margin: "-50px" }}
                     transition={{ duration: 0.5, delay: 0.9 }}
-                    className="bg-zinc-800/80 backdrop-blur-md rounded-lg p-3 border border-red-500/30 shadow-lg shadow-red-500/10"
                   >
-                    <h4 className="text-red-400 font-medium text-sm">Realistic Scenarios</h4>
-                    <p className="text-xs text-gray-300 mt-1">Practice on environments that mirror real-world applications</p>
+                    <LiquidGlass variant="subtle" rounded="lg" className=" p-3 border-red-500/30 shadow-lg shadow-red-500/10">
+                      <h4 className="text-red-400 font-medium text-sm">Realistic Scenarios</h4>
+                      <p className="text-xs text-gray-300 mt-1">Practice on environments that mirror real-world applications</p>
+                    </LiquidGlass>
                   </motion.div>
                 </motion.div>
 
@@ -853,10 +886,11 @@ const HomeClientPage = () => {
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ margin: "-50px" }}
                     transition={{ duration: 0.5, delay: 1.1 }}
-                    className="bg-zinc-800/80 backdrop-blur-md rounded-lg p-3 border border-yellow-500/30 shadow-lg shadow-yellow-500/10"
                   >
-                    <h4 className="text-yellow-400 font-medium text-sm">Earn Rewards</h4>
-                    <p className="text-xs text-gray-300 mt-1">Collect points, badges, and certificates as you complete challenges</p>
+                    <LiquidGlass variant="subtle" rounded="lg" className=" p-3 border-yellow-500/30 shadow-lg shadow-yellow-500/10">
+                      <h4 className="text-yellow-400 font-medium text-sm">Earn Rewards</h4>
+                      <p className="text-xs text-gray-300 mt-1">Collect points, badges, and certificates as you complete challenges</p>
+                    </LiquidGlass>
                   </motion.div>
                 </motion.div>
 
@@ -888,59 +922,30 @@ const HomeClientPage = () => {
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ margin: "-50px" }}
                     transition={{ duration: 0.5, delay: 1.3 }}
-                    className="bg-zinc-800/80 backdrop-blur-md rounded-lg p-3 border border-cyan-500/30 shadow-lg shadow-cyan-500/10"
                   >
-                    <h4 className="text-cyan-400 font-medium text-sm">Level Up Skills</h4>
-                    <p className="text-xs text-gray-300 mt-1">Progressive difficulty to help you grow from beginner to expert</p>
+                    <LiquidGlass variant="subtle" rounded="lg" className=" p-3 border-cyan-500/30 shadow-lg shadow-cyan-500/10">
+                      <h4 className="text-cyan-400 font-medium text-sm">Level Up Skills</h4>
+                      <p className="text-xs text-gray-300 mt-1">Progressive difficulty to help you grow from beginner to expert</p>
+                    </LiquidGlass>
                   </motion.div>
                 </motion.div>
               </div>
             </div>
             
             <div className="mt-8 sm:mt-12 md:mt-16 max-w-3xl text-center">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ margin: "-50px" }}
-                  transition={{ duration: 0.4 }}
-                  className="bg-zinc-900/50 backdrop-blur-md rounded-lg p-4 border border-zinc-800/50"
-                >
-                  <div className="text-lg font-medium mb-1">Web Challenges</div>
-                  <p className="text-sm text-gray-400">XSS, SQLi, and more web exploitation techniques</p>
-                </motion.div>
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ margin: "-50px" }}
-                  transition={{ duration: 0.4, delay: 0.1 }}
-                  className="bg-zinc-900/50 backdrop-blur-md rounded-lg p-4 border border-zinc-800/50"
-                >
-                  <div className="text-lg font-medium mb-1">Cryptography</div>
-                  <p className="text-sm text-gray-400">Crack ciphers and decode encrypted messages</p>
-                </motion.div>
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ margin: "-50px" }}
-                  transition={{ duration: 0.4, delay: 0.2 }}
-                  className="bg-zinc-900/50 backdrop-blur-md rounded-lg p-4 border border-zinc-800/50"
-                >
-                  <div className="text-lg font-medium mb-1">OSINT</div>
-                  <p className="text-sm text-gray-400">Open source intelligence gathering challenges</p>
-                </motion.div>
-              </div>
               
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button
-                href="https://ctf.guptashubham.com"
-                variant="primary"
-                size="lg"
-                isExternal={true}
-                  className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-300 flex items-center gap-2"
+                <Button
+                  href="https://ctf.guptashubham.com"
+                  variant="primary"
+                  size="lg"
+                  isExternal={true}
+                  glassEffect={true}
+                  glassVariant="subtle"
+                  className="flex items-center gap-3 text-white font-medium"
                 >
-                  <span>Join the waitlist</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <span className="text-white">Join the waitlist</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <line x1="5" y1="12" x2="19" y2="12"></line>
                     <polyline points="12 5 19 12 12 19"></polyline>
                   </svg>
@@ -949,10 +954,12 @@ const HomeClientPage = () => {
                   href="/what-is-hacking"
                   variant="outline"
                   size="lg"
-                  className="px-8 py-3 border-zinc-700 hover:border-zinc-500"
+                  glassEffect={true}
+                  glassVariant="subtle"
+                  className="text-white/80 hover:text-white font-medium transition-colors duration-300"
                 >
                   Learn more
-              </Button>
+                </Button>
               </div>
             </div>
           </div>

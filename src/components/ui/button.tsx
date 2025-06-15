@@ -3,6 +3,7 @@
 import { cn } from "@/lib/utils";
 import React from "react";
 import Link from "next/link";
+import LiquidGlass from "./liquid-glass";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "outline" | "ghost";
@@ -12,6 +13,8 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isExternal?: boolean;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
+  glassEffect?: boolean;
+  glassVariant?: "default" | "subtle" | "prominent" | "button";
 }
 
 const Button = ({
@@ -23,15 +26,22 @@ const Button = ({
   isExternal = false,
   leftIcon,
   rightIcon,
+  glassEffect = true,
+  glassVariant = "button",
   ...props
 }: ButtonProps) => {
-  const baseStyles = "btn inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none";
+  const baseStyles = "btn inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none";
   
-  const variantStyles = {
-    primary: "bg-blue-600 text-white hover:bg-blue-700 border border-transparent",
-    secondary: "bg-zinc-800 text-white hover:bg-zinc-700 border border-transparent",
-    outline: "bg-transparent border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white",
-    ghost: "bg-transparent text-blue-600 hover:bg-zinc-900 border border-transparent"
+  const variantStyles = glassEffect ? {
+    primary: "text-white hover:text-blue-100 border-none bg-transparent",
+    secondary: "text-white hover:text-gray-100 border-none bg-transparent",
+    outline: "text-white/80 hover:text-white border-none bg-transparent",
+    ghost: "text-white/70 hover:text-white border-none bg-transparent"
+  } : {
+    primary: "bg-blue-600 text-white hover:bg-blue-700 border border-transparent rounded-md",
+    secondary: "bg-zinc-800 text-white hover:bg-zinc-700 border border-transparent rounded-md",
+    outline: "bg-transparent border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white rounded-md",
+    ghost: "bg-transparent text-blue-600 hover:bg-zinc-900 border border-transparent rounded-md"
   };
   
   const sizeStyles = {
@@ -54,21 +64,45 @@ const Button = ({
       {rightIcon && <span className="ml-2">{rightIcon}</span>}
     </>
   );
+
+  const buttonContent = glassEffect ? (
+    <LiquidGlass
+      variant={glassVariant}
+      rounded="full"
+      intensity="medium"
+      className={allStyles}
+    >
+      {content}
+    </LiquidGlass>
+  ) : (
+    <span className={allStyles}>{content}</span>
+  );
   
   if (href) {
     return (
       <Link
         href={href}
-        className={allStyles}
         target={isExternal ? "_blank" : undefined}
         rel={isExternal ? "noopener noreferrer" : undefined}
+        className={glassEffect ? "" : allStyles}
       >
-        {content}
+        {glassEffect ? buttonContent : content}
       </Link>
     );
   }
   
-  return (
+  return glassEffect ? (
+    <LiquidGlass
+      as="button"
+      variant={glassVariant}
+      rounded="full"
+      intensity="medium"
+      className={allStyles}
+      {...props}
+    >
+      {content}
+    </LiquidGlass>
+  ) : (
     <button className={allStyles} {...props}>
       {content}
     </button>
