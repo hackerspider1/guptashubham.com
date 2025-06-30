@@ -11,6 +11,7 @@ interface SkillProgressProps {
   color?: string;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
+  icon?: React.ComponentType<any>;
 }
 
 export const SkillProgress = ({
@@ -19,6 +20,7 @@ export const SkillProgress = ({
   color = 'rgb(161, 161, 170)',
   size = 'md',
   className = '',
+  icon: Icon,
 }: SkillProgressProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -68,6 +70,11 @@ export const SkillProgress = ({
       transition={{ duration: 0.6 }}
       className={`flex flex-col items-center ${className}`}
     >
+      {Icon && (
+        <div className="mb-3 text-zinc-400">
+          <Icon size={24} />
+        </div>
+      )}
       <div className={sizeClasses[size] + ' mb-3'}>
         <CircularProgressbar
           value={isVisible ? value : 0}

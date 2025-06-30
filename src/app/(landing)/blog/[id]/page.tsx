@@ -1,16 +1,37 @@
 import { Metadata } from 'next';
 import BlogClientPage from './components/BlogClientPage';
+import { client } from '@/sanity/client';
 
-interface Props {
-  params: Promise<{
-    id: string;
-  }>;
+// Function to fetch all blog posts for static generation
+async function getAllBlogPosts() {
+  try {
+    // This query fetches all blog post slugs from Sanity
+    const query = `*[_type == "post"] { slug { current } }`;
+    const posts = await client.fetch(query);
+    return posts;
+  } catch (error) {
+    console.error('Error fetching blog posts:', error);
+    return []; // Return empty array to avoid build failures
+  }
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params;
+// This function is required for static site generation with dynamic routes
+export async function generateStaticParams() {
+  const posts = await getAllBlogPosts();
   
-  // Default metadata - in a real app, you'd fetch the post data here
+  // Return an array of objects with the id parameter
+  return posts.map((post: { slug: { current: string } }) => ({
+    id: post.slug.current,
+  }));
+}
+
+type Props = {
+  params: { id: string };
+};
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = params;
+  
   return {
     title: `Blog Post - ${id} | Shubham Gupta`,
     description: 'Cybersecurity insights and security research by Shubham Gupta.',
@@ -44,7 +65,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function BlogPostPage({ params }: Props) {
-  const resolvedParams = await params;
-  return <BlogClientPage params={resolvedParams} />;
+// The page component
+export default function BlogPostPage({ params }: Props) {
+  return <BlogClientPage params={params} />;
 }

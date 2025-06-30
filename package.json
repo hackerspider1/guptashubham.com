@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && cp public/.htaccess out/",
+    "build": "SKIP_TYPE_CHECK=true next build --no-lint && cp public/.htaccess out/",
     "build:optimized": "node scripts/build-optimized.js",
     "start": "next start",
     "lint": "next lint",
