@@ -7,6 +7,7 @@ import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { Terminal, Loader2, ArrowRight, CheckCircle, XCircle, Info, Globe, Shield, Copy } from "lucide-react";
 import LiquidGlass from "@/components/ui/liquid-glass";
 
+
 // Define proper types for our request/response data
 interface CorsTestResult {
   isVulnerable: boolean;
@@ -243,9 +244,18 @@ const CorsClientWrapper = () => {
 
   return (
     <div className="relative min-h-screen w-full flex flex-col items-center justify-center bg-black overflow-hidden text-white">
-      <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(to_bottom,transparent,black)] opacity-20"></div>
+      {/* Clean Dark Background with Subtle Grid */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        {/* Subtle grid pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px]" />
+        
+        {/* Radial overlay for depth */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,transparent_40%,rgba(0,0,0,0.8)_100%)]" />
+      </div>
+
+
       
-      <div className="bg-gradient-to-b from-black to-zinc-900 w-full flex justify-center pb-8">
+      <div className="bg-gradient-to-b from-black to-zinc-900 w-full flex justify-center pb-8 relative z-10">
         <div className="relative z-10 max-w-6xl w-full px-6">
           <div className="text-center mb-16 relative pt-20 flex flex-col justify-center items-center">
             <motion.div
@@ -409,15 +419,15 @@ const CorsClientWrapper = () => {
                 intensity="medium"
                 rounded="lg"
                 className={`mb-6 p-4 ${
-                  // @ts-ignore
-                  requestResponse.isVulnerable
+                // @ts-ignore
+                requestResponse.isVulnerable
                     ? "border-red-500/30 text-red-400"
-                    // @ts-ignore
-                    : requestResponse.error 
+                  // @ts-ignore
+                  : requestResponse.error 
                       ? "border-yellow-500/30 text-yellow-400"
                       : "border-green-500/30 text-green-400"
                 }`}
-              >
+            >
               <div className="flex items-center gap-2">
                 {/* @ts-ignore */}
                 {requestResponse.isVulnerable ? (

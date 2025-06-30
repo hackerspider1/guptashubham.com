@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
+  // Remove output export to allow dynamic routes
+  // output: 'export',
   trailingSlash: true,
   eslint: {
     ignoreDuringBuilds: true,
@@ -48,17 +49,35 @@ const nextConfig = {
   },
   // Simplified webpack optimizations
   webpack: (config, { dev, isServer }) => {
-    // Add buffer polyfill for Spline
-    config.resolve.fallback = {
-      ...config.resolve.fallback,
-      buffer: require.resolve('buffer'),
-    };
+    // Add buffer polyfill for Spline and other Node.js modules
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        buffer: require.resolve('buffer'),
+        process: require.resolve('process/browser'),
+        stream: require.resolve('stream-browserify'),
+        util: require.resolve('util'),
+        crypto: require.resolve('crypto-browserify'),
+        fs: false,
+        net: false,
+        tls: false,
+      };
+    }
     
     // Optimize imports
     config.resolve.alias = {
       ...config.resolve.alias,
       '@': require('path').resolve(__dirname, 'src'),
     };
+    
+    // Add ProvidePlugin for buffer
+    const webpack = require('webpack');
+    config.plugins.push(
+      new webpack.ProvidePlugin({
+        Buffer: ['buffer', 'Buffer'],
+        process: 'process/browser',
+      })
+    );
     
     return config;
   },

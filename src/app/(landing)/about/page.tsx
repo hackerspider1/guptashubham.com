@@ -17,7 +17,11 @@ import {
   Calendar,
   Award,
   Users,
-  Target
+  Target,
+  Shield,
+  Mail,
+  Phone,
+  ExternalLink
 } from 'lucide-react';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 import Image from 'next/image';
@@ -95,10 +99,10 @@ const AboutPage = () => {
   ];
 
   const stats = [
-    { icon: Award, label: "Years Experience", value: "12+" },
-    { icon: Users, label: "Companies Served", value: "50+" },
-    { icon: Target, label: "Vulnerabilities Found", value: "1337+" },
-    { icon: Globe, label: "Countries Worked", value: "6+" }
+    { icon: Award, label: "Years Experience", value: "12+", color: "text-blue-400" },
+    { icon: Users, label: "Companies Served", value: "50+", color: "text-purple-400" },
+    { icon: Target, label: "Vulnerabilities Found", value: "1337+", color: "text-green-400" },
+    { icon: Globe, label: "Countries Worked", value: "6+", color: "text-orange-400" }
   ];
 
   const fadeInUp = {
@@ -128,17 +132,13 @@ const AboutPage = () => {
 
   return (
     <div ref={containerRef} className="relative min-h-screen w-full bg-black text-white overflow-hidden">
-      {/* Enhanced Background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div 
-          style={{ y, opacity }}
-          className="absolute top-0 right-0 w-[800px] h-[800px] bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-pink-500/5 rounded-full blur-[120px] translate-x-1/3 -translate-y-1/2"
-        />
-        <motion.div 
-          style={{ y: useTransform(scrollYProgress, [0, 1], [0, 50]), opacity }}
-          className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-gradient-to-tr from-cyan-500/5 via-teal-500/5 to-green-500/5 rounded-full blur-[100px] -translate-x-1/3 translate-y-1/2"
-        />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.01),transparent_50%)]" />
+      {/* Clean Dark Background with Subtle Grid */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        {/* Subtle grid pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px]" />
+        
+        {/* Radial overlay for depth */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,transparent_40%,rgba(0,0,0,0.8)_100%)]" />
       </div>
 
       {/* Hero Section */}
@@ -166,16 +166,21 @@ const AboutPage = () => {
                     className="object-cover"
                     priority
                   />
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 via-purple-500/20 to-pink-500/20 rounded-full" />
                 </div>
               </LiquidGlass>
             </motion.div>
             
             <motion.h1 
-              className="text-5xl md:text-7xl font-bold tracking-tight mb-6 bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent"
+              className="text-6xl md:text-8xl font-bold tracking-tight mb-6 leading-tight"
               variants={fadeInUp}
             >
-              About Me
+              <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                About
+              </span>
+              <br />
+              <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                Me
+              </span>
             </motion.h1>
             
             <motion.p 
@@ -192,10 +197,10 @@ const AboutPage = () => {
             >
               {stats.map((stat, index) => (
                 <motion.div key={index} variants={fadeInUp}>
-                  <LiquidGlass variant="card" intensity="medium" rounded="xl" className="p-6 text-center">
-                    <stat.icon className="w-8 h-8 mx-auto mb-3 text-zinc-400" />
+                  <LiquidGlass variant="clean" intensity="medium" rounded="xl" className="p-6 text-center">
+                    <stat.icon className="w-8 h-8 mx-auto mb-3 text-zinc-300" />
                     <div className="text-2xl font-bold text-white mb-1">{stat.value}</div>
-                    <div className="text-sm text-zinc-500">{stat.label}</div>
+                    <div className="text-sm text-zinc-400">{stat.label}</div>
                   </LiquidGlass>
                 </motion.div>
               ))}
@@ -214,7 +219,7 @@ const AboutPage = () => {
             variants={staggerContainer}
           >
             <motion.div variants={fadeInUp}>
-              <LiquidGlass variant="card" intensity="high" rounded="2xl" className="p-8 md:p-12">
+              <LiquidGlass variant="clean" intensity="high" rounded="2xl" className="p-8 md:p-12">
                 <div className="space-y-6 text-zinc-300 text-lg leading-relaxed">
                   <p className="text-xl text-zinc-200 font-medium">
                     A passionate, enthusiastic and self-motivated cybersecurity professional with over 12 years of experience as an IT security consultant and researcher.
@@ -274,10 +279,12 @@ const AboutPage = () => {
             variants={staggerContainer}
           >
             <motion.h2 
-              className="text-3xl md:text-4xl font-bold mb-16 text-center bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent"
+              className="text-4xl md:text-5xl font-bold mb-16 text-center"
               variants={fadeInUp}
             >
-              My Philosophy
+              <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                My Philosophy
+              </span>
             </motion.h2>
             
             <div className="grid md:grid-cols-3 gap-8">
@@ -290,12 +297,12 @@ const AboutPage = () => {
                   animate="rest"
                 >
                   <motion.div variants={cardHover}>
-                    <LiquidGlass variant="card" intensity="medium" rounded="xl" className="p-8 h-full">
-                      <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${belief.gradient} flex items-center justify-center mb-6`}>
-                        <belief.icon className="w-8 h-8 text-white" />
+                    <LiquidGlass variant="clean" intensity="medium" rounded="xl" className="p-8 h-full">
+                      <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${belief.gradient} flex items-center justify-center mb-6 shadow-lg`}>
+                        <belief.icon className="w-7 h-7 text-white" />
                       </div>
                       <h3 className="text-xl font-semibold mb-4 text-white">{belief.title}</h3>
-                      <p className="text-zinc-400 leading-relaxed">{belief.description}</p>
+                      <p className="text-zinc-300 leading-relaxed text-sm">{belief.description}</p>
                     </LiquidGlass>
                   </motion.div>
                 </motion.div>
@@ -331,12 +338,12 @@ const AboutPage = () => {
                   animate="rest"
                 >
                   <motion.div variants={cardHover}>
-                    <LiquidGlass variant="card" intensity="medium" rounded="xl" className="p-8 h-full">
-                      <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${interest.color} flex items-center justify-center mb-6`}>
-                        <interest.icon className="w-8 h-8 text-white" />
+                    <LiquidGlass variant="clean" intensity="medium" rounded="xl" className="p-8 h-full">
+                      <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${interest.color} flex items-center justify-center mb-6 shadow-lg`}>
+                        <interest.icon className="w-7 h-7 text-white" />
                       </div>
                       <h3 className="text-xl font-semibold mb-4 text-white">{interest.title}</h3>
-                      <p className="text-zinc-400 leading-relaxed">{interest.description}</p>
+                      <p className="text-zinc-300 leading-relaxed text-sm">{interest.description}</p>
                     </LiquidGlass>
                   </motion.div>
                 </motion.div>
@@ -355,7 +362,7 @@ const AboutPage = () => {
             viewport={{ once: true, margin: "-100px" }}
             variants={fadeInUp}
           >
-            <LiquidGlass variant="card" intensity="high" rounded="2xl" className="p-8 md:p-12 text-center">
+            <LiquidGlass variant="clean" intensity="high" rounded="2xl" className="p-8 md:p-12 text-center">
               <h3 className="text-2xl font-bold mb-8 text-white">Let's Connect</h3>
               <div className="flex flex-col md:flex-row items-center justify-center gap-8 text-zinc-400">
                 <div className="flex items-center gap-3">

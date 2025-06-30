@@ -277,11 +277,14 @@ const HallOfFame = () => {
   };
 
   return (
-    <div className="relative w-full min-h-screen bg-black/95 text-white pb-20">
-      <div className="absolute inset-0 z-0 overflow-hidden">
-        <div className="absolute inset-0 bg-grid-white/[0.02] bg-grid-small" />
-        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
-        <Meteors number={20} />
+    <div className="relative w-full min-h-screen bg-black text-white pb-20">
+      {/* Clean Dark Background with Subtle Grid */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        {/* Subtle grid pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px]" />
+        
+        {/* Radial overlay for depth */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,transparent_40%,rgba(0,0,0,0.8)_100%)]" />
       </div>
       
       <div className="relative z-10 container mx-auto px-4 pt-12 max-w-7xl">
@@ -307,7 +310,12 @@ const HallOfFame = () => {
         {/* Filters */}
         <div className="mb-10">
           <motion.div 
-            className="p-4 rounded-xl border border-zinc-800 bg-zinc-900/40 backdrop-blur-sm"
+            className="p-4 rounded-xl border border-zinc-800/30 backdrop-blur-sm"
+            style={{
+              background: 'rgba(0, 0, 0, 0.05)',
+              backdropFilter: 'blur(12px)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.03)'
+            }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
@@ -320,7 +328,7 @@ const HallOfFame = () => {
                     name="category"
                     value={activeFilter}
                     onChange={(e) => setActiveFilter(e.target.value)}
-                    className="block w-full pl-4 pr-10 py-2.5 text-base rounded-lg appearance-none bg-zinc-950/70 border-zinc-800 border focus:outline-none focus:ring-2 focus:ring-purple-500/40 focus:border-purple-500/40 text-white placeholder-zinc-400"
+                    className="block w-full pl-4 pr-10 py-2.5 text-base rounded-lg appearance-none bg-black/30 border-zinc-800/30 border focus:outline-none focus:ring-2 focus:ring-purple-500/40 focus:border-purple-500/40 text-white placeholder-zinc-400 backdrop-blur-sm"
                   >
                     <option value="all">All Categories</option>
                     <option value="tech">Technology</option>
@@ -341,7 +349,7 @@ const HallOfFame = () => {
                     name="year"
                     value={yearFilter?.toString() || ''}
                     onChange={(e) => setYearFilter(e.target.value ? parseInt(e.target.value) : null)}
-                    className="block w-full pl-4 pr-10 py-2.5 text-base rounded-lg appearance-none bg-zinc-950/70 border-zinc-800 border focus:outline-none focus:ring-2 focus:ring-purple-500/40 focus:border-purple-500/40 text-white placeholder-zinc-400"
+                    className="block w-full pl-4 pr-10 py-2.5 text-base rounded-lg appearance-none bg-black/30 border-zinc-800/30 border focus:outline-none focus:ring-2 focus:ring-purple-500/40 focus:border-purple-500/40 text-white placeholder-zinc-400 backdrop-blur-sm"
                   >
                     <option value="">All Years</option>
                     {years.map((year) => (
@@ -356,7 +364,7 @@ const HallOfFame = () => {
                 </div>
               </div>
               
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-950/50 border border-zinc-800">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/30 border border-zinc-800/30 backdrop-blur-sm">
                 <Users size={16} className="text-zinc-400" />
                 <span className="text-zinc-300 text-sm">
                   <span className="font-medium text-white">{filteredCompanies.length}</span> {filteredCompanies.length === 1 ? "company" : "companies"} found
@@ -370,7 +378,7 @@ const HallOfFame = () => {
                     placeholder="Search companies..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="block w-full pl-10 pr-4 py-2.5 text-base rounded-lg appearance-none bg-zinc-950/70 border-zinc-800 border focus:outline-none focus:ring-2 focus:ring-purple-500/40 focus:border-purple-500/40 text-white placeholder-zinc-400"
+                    className="block w-full pl-10 pr-4 py-2.5 text-base rounded-lg appearance-none bg-black/30 border-zinc-800/30 border focus:outline-none focus:ring-2 focus:ring-purple-500/40 focus:border-purple-500/40 text-white placeholder-zinc-400 backdrop-blur-sm"
                   />
                   <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <Search size={16} className="text-zinc-400" />
@@ -396,7 +404,12 @@ const HallOfFame = () => {
                 className="relative group overflow-hidden"
                 onClick={() => handleCompanyClick(company)}
               >
-                <div className="h-full p-6 rounded-2xl bg-gradient-to-b from-zinc-900/90 to-black/90 border border-zinc-800/50 backdrop-blur-sm hover:border-zinc-700/50 transition-all duration-300 flex flex-col justify-between">
+                <div className="h-full p-6 rounded-2xl border border-zinc-800/30 backdrop-blur-sm hover:border-zinc-700/50 transition-all duration-300 flex flex-col justify-between"
+                     style={{
+                       background: 'rgba(0, 0, 0, 0.05)',
+                       backdropFilter: 'blur(12px)',
+                       boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.03)'
+                     }}>
                   <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/5 via-transparent to-amber-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   
                   <div className="flex justify-between items-start mb-4 relative z-10">
@@ -464,7 +477,12 @@ const HallOfFame = () => {
                 className="group relative overflow-hidden"
                 onClick={() => handleCompanyClick(company)}
               >
-                <div className="h-full p-6 rounded-2xl bg-gradient-to-b from-zinc-900/90 to-black/90 border border-zinc-800/50 backdrop-blur-sm hover:border-zinc-700/50 transition-all duration-300 flex flex-col justify-between">
+                <div className="h-full p-6 rounded-2xl border border-zinc-800/30 backdrop-blur-sm hover:border-zinc-700/50 transition-all duration-300 flex flex-col justify-between"
+                     style={{
+                       background: 'rgba(0, 0, 0, 0.05)',
+                       backdropFilter: 'blur(12px)',
+                       boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.03)'
+                     }}>
                   <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/5 via-transparent to-amber-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   
                   <div className="flex justify-between items-start mb-4 relative z-10">
@@ -539,7 +557,12 @@ const HallOfFame = () => {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
                 transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                className="relative w-full max-w-3xl rounded-xl overflow-hidden bg-gradient-to-b from-zinc-900 to-black border border-zinc-800 shadow-2xl"
+                className="relative w-full max-w-3xl rounded-xl overflow-hidden border border-zinc-800/30 shadow-2xl"
+                style={{
+                  background: 'rgba(0, 0, 0, 0.1)',
+                  backdropFilter: 'blur(20px)',
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
+                }}
               >
                 <div className="relative p-6">
                   <button
@@ -592,10 +615,15 @@ const HallOfFame = () => {
         {/* Premium CTA Section */}
         <div className="mt-24 relative">
           <div className="rounded-3xl overflow-hidden">
-            <div className="relative bg-gradient-to-b from-zinc-900 to-black p-8 md:p-12">
+            <div className="relative p-8 md:p-12"
+                 style={{
+                   background: 'rgba(0, 0, 0, 0.05)',
+                   backdropFilter: 'blur(12px)',
+                   boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.03)',
+                   border: '1px solid rgba(255, 255, 255, 0.05)'
+                 }}>
               <div className="absolute inset-0 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/10 via-transparent to-amber-500/10 z-10" />
-                <Meteors number={20} />
+                <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/5 via-transparent to-amber-500/5 z-10" />
               </div>
               
               <div className="flex flex-col md:flex-row items-center justify-between gap-8 relative z-20">

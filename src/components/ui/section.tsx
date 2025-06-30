@@ -16,7 +16,7 @@ export const Section = ({
   className = "",
   id,
   background = "default",
-  paddingY = "lg",
+  paddingY = "md",
 }: SectionProps) => {
   const backgroundStyles = {
     default: "bg-black",
@@ -27,10 +27,10 @@ export const Section = ({
 
   const paddingStyles = {
     none: "py-0",
-    sm: "py-4 sm:py-6 md:py-8",
-    md: "py-6 sm:py-8 md:py-12",
-    lg: "py-8 sm:py-12 md:py-16",
-    xl: "py-12 sm:py-16 md:py-24",
+    sm: "py-3 sm:py-4 md:py-6",
+    md: "py-4 sm:py-6 md:py-8",
+    lg: "py-6 sm:py-8 md:py-12",
+    xl: "py-8 sm:py-12 md:py-16",
   };
 
   return (
@@ -43,7 +43,7 @@ export const Section = ({
         className
       )}
     >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         {children}
       </div>
     </section>
@@ -58,7 +58,7 @@ export const SectionHeader = ({
   className?: string;
 }) => {
   return (
-    <div className={cn("text-center mb-4 sm:mb-6 md:mb-8", className)}>
+    <div className={cn("text-center mb-3 sm:mb-4 md:mb-6", className)}>
       {children}
     </div>
   );
@@ -72,7 +72,7 @@ export const SectionTitle = ({
   className?: string;
 }) => {
   return (
-    <h2 className={cn("text-3xl md:text-4xl font-bold text-white mb-4", className)}>
+    <h2 className={cn("text-2xl md:text-3xl font-bold text-white mb-3", className)}>
       {children}
     </h2>
   );
@@ -86,7 +86,7 @@ export const SectionDescription = ({
   className?: string;
 }) => {
   return (
-    <p className={cn("text-lg text-zinc-400 max-w-3xl mx-auto", className)}>
+    <p className={cn("text-base text-zinc-400 max-w-2xl mx-auto", className)}>
       {children}
     </p>
   );

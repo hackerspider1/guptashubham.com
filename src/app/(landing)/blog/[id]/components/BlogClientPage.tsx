@@ -1,721 +1,893 @@
 "use client";
-import { client } from "@/sanity/client";
-import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
-import moment from "moment";
-import CustomPortableText from "./CustomPortableText";
-import { Facebook, X, Linkedin, Copy, Check, ArrowLeft, Share2, Clock, Calendar, User, BookOpen, Sun, Moon, Hash } from "lucide-react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import Link from 'next/link';
+import Image from 'next/image';
+import { FaCalendarAlt, FaClock, FaTag, FaArrowLeft, FaShare, FaTwitter, FaLinkedin, FaCopy, FaUser } from 'react-icons/fa';
+import { PortableText } from '@portabletext/react';
+import LiquidGlass from '@/components/ui/liquid-glass';
 
-const BlogClientPage = () => {
-  const params = useParams();
-  const slug = params && typeof params.id === 'string' ? params.id : null;
-  const router = useRouter();
-  const [singlePost, setSinglePost] = useState<any>(null);
-  const [relatedPosts, setRelatedPosts] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
-  const [readingTime, setReadingTime] = useState("5 min read");
-  
-  // New states for enhanced features
-  const [readingMode, setReadingMode] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(true);
-  const [tableOfContents, setTableOfContents] = useState<{id: string; text: string; level: number}[]>([]);
-  const [activeHeading, setActiveHeading] = useState("");
-  
-  // Refs for scroll animations
-  const containerRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"]
+
+interface BlogPost {
+  _id: string;
+  title: string;
+  slug: {
+    current: string;
+  };
+  excerpt: string;
+  body: any; // PortableText content
+  mainImage?: {
+    asset: {
+      url: string;
+    };
+    alt?: string;
+  };
+  publishedAt: string;
+  estimatedReadingTime?: number;
+  categories?: Array<{
+    title: string;
+    slug: {
+      current: string;
+    };
+  }>;
+  tags?: string[];
+  author?: {
+    name: string;
+    image?: {
+      asset: {
+        url: string;
+      };
+    };
+    bio?: string;
+  };
+}
+
+interface Props {
+  params: {
+    id: string;
+  };
+}
+
+// Helper function to format date without moment.js
+const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
   });
+};
+
+// Helper function to get Sanity image URL
+const getSanityImageUrl = (imageAsset: any): string | null => {
+  console.log('Getting Sanity image URL for:', imageAsset);
   
-  // Transform scrollYProgress for the reading progress bar
-  const progressBarWidth = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
+  // Since the debug shows we already have the correct URL, let's use it directly
+  if (imageAsset?.url) {
+    console.log('Using direct URL:', imageAsset.url);
+    return imageAsset.url;
+  }
+  
+  if (imageAsset?._ref) {
+    const ref = imageAsset._ref;
+    const parts = ref.split('-');
+    if (parts.length >= 3) {
+      const id = parts.slice(1, -2).join('-');
+      const dimensions = parts[parts.length - 2];
+      const format = parts[parts.length - 1];
+      const url = `https://cdn.sanity.io/images/mr5wnv0b/production/${id}-${dimensions}.${format}`;
+      console.log('Constructed URL from _ref:', url);
+      return url;
+    }
+  }
+  
+  if (imageAsset?._id) {
+    // Try to construct from _id format like: image-bb2fc33dedbcc95d945246d486a3a6a5673a13f2-2048x1536-png
+    const id = imageAsset._id;
+    if (id.startsWith('image-')) {
+      // Remove 'image-' prefix and replace with proper format
+      const cleanId = id.replace('image-', '');
+      const parts = cleanId.split('-');
+      if (parts.length >= 3) {
+        const hash = parts.slice(0, -2).join('-');
+        const dimensions = parts[parts.length - 2];
+        const format = parts[parts.length - 1];
+        const url = `https://cdn.sanity.io/images/mr5wnv0b/production/${hash}-${dimensions}.${format}`;
+        console.log('Constructed URL from _id:', url);
+        return url;
+      }
+    }
+  }
+  
+  console.log('Could not construct image URL');
+  return null;
+};
+
+// Enhanced PortableText components for rich text rendering with liquid glass styling
+const portableTextComponents = {
+  types: {
+    image: ({ value }: any) => {
+      // Debug: Log the incoming value to understand the structure
+      console.log('Image value received:', value);
+      
+      // Use the helper function to get the image URL
+      const imageUrl = getSanityImageUrl(value?.asset) || value?.url;
+
+      if (!imageUrl) {
+        console.log('No image URL found, value structure:', JSON.stringify(value, null, 2));
+        // Return a placeholder instead of null
+        return (
+          <motion.div 
+            className="my-12 -mx-4 md:-mx-8"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <LiquidGlass
+              variant="card"
+              intensity="low"
+              rounded="xl"
+              className="overflow-hidden mx-4 md:mx-8"
+            >
+              <div className="relative w-full h-64 md:h-96 lg:h-[500px] bg-gray-800 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="text-4xl mb-4">🖼️</div>
+                  <p className="text-gray-400">Image not available</p>
+                  {value?.caption && (
+                    <p className="text-gray-500 text-sm mt-2">{value.caption}</p>
+                  )}
+                </div>
+              </div>
+            </LiquidGlass>
+          </motion.div>
+        );
+      }
+
+      return (
+        <motion.div 
+          className="my-12 -mx-4 md:-mx-8"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <LiquidGlass
+            variant="card"
+            intensity="low"
+            rounded="xl"
+            className="overflow-hidden mx-4 md:mx-8"
+          >
+            <div className="relative w-full h-64 md:h-96 lg:h-[500px]">
+              <Image
+                src={imageUrl}
+                alt={value.alt || value.caption || 'Blog image'}
+                fill
+                className="object-cover"
+                onError={(e) => {
+                  console.error('Image failed to load:', imageUrl);
+                  console.error('Original value:', value);
+                  console.error('Error event:', e);
+                  // Replace with placeholder on error
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  const parent = target.parentElement;
+                  if (parent) {
+                    parent.innerHTML = `
+                      <div class="w-full h-full bg-gray-800 flex items-center justify-center">
+                        <div class="text-center">
+                          <div class="text-4xl mb-4">❌</div>
+                          <p class="text-gray-400">Failed to load image</p>
+                        </div>
+                      </div>
+                    `;
+                  }
+                }}
+                onLoad={() => {
+                  console.log('Image loaded successfully:', imageUrl);
+                }}
+              />
+            </div>
+            {value.caption && (
+              <div className="p-4 md:p-6">
+                <p className="text-center text-gray-400 text-sm italic">
+                  {value.caption}
+                </p>
+              </div>
+            )}
+          </LiquidGlass>
+        </motion.div>
+      );
+    },
+    code: ({ value }: any) => (
+      <motion.div
+        className="my-8"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+      >
+        <LiquidGlass
+          variant="prominent"
+          intensity="medium"
+          rounded="lg"
+          className="overflow-hidden"
+        >
+          <pre className="p-6 overflow-x-auto">
+            <code className="text-green-400 text-sm font-mono leading-relaxed">
+              {value.code}
+            </code>
+          </pre>
+        </LiquidGlass>
+      </motion.div>
+    ),
+  },
+  block: {
+    h1: ({ children }: any) => (
+      <h1 className="text-4xl font-bold text-white mt-12 mb-6 leading-tight">
+        {children}
+      </h1>
+    ),
+    h2: ({ children }: any) => (
+      <h2 className="text-3xl font-bold text-white mt-10 mb-5 leading-tight">
+        {children}
+      </h2>
+    ),
+    h3: ({ children }: any) => (
+      <h3 className="text-2xl font-bold text-white mt-8 mb-4 leading-tight">
+        {children}
+      </h3>
+    ),
+    normal: ({ children }: any) => (
+      <p className="text-gray-300 leading-relaxed mb-6 text-lg">
+        {children}
+      </p>
+    ),
+    blockquote: ({ children }: any) => (
+      <motion.div
+        className="my-8"
+        initial={{ opacity: 0, x: -20 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+      >
+        <LiquidGlass
+          variant="subtle"
+          intensity="low"
+          rounded="lg"
+          className="border-l-4 border-blue-500/50 pl-6 py-4"
+        >
+          <blockquote className="text-gray-300 text-lg italic leading-relaxed">
+            {children}
+          </blockquote>
+        </LiquidGlass>
+      </motion.div>
+    ),
+  },
+  marks: {
+    link: ({ children, value }: any) => (
+      <a
+        href={value.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-blue-400 hover:text-blue-300 underline underline-offset-2 transition-colors duration-200 font-medium"
+      >
+        {children}
+      </a>
+    ),
+    strong: ({ children }: any) => (
+      <strong className="font-bold text-white">{children}</strong>
+    ),
+    em: ({ children }: any) => (
+      <em className="italic text-gray-200">{children}</em>
+    ),
+    code: ({ children }: any) => (
+      <code className="bg-gray-800/70 text-green-400 px-2 py-1 rounded text-sm font-mono">
+        {children}
+      </code>
+    ),
+  },
+  list: {
+    bullet: ({ children }: any) => (
+      <ul className="list-disc list-inside text-gray-300 mb-6 space-y-3 text-lg">
+        {children}
+      </ul>
+    ),
+    number: ({ children }: any) => (
+      <ol className="list-decimal list-inside text-gray-300 mb-6 space-y-3 text-lg">
+        {children}
+      </ol>
+    ),
+  },
+  listItem: {
+    bullet: ({ children }: any) => <li className="ml-4">{children}</li>,
+    number: ({ children }: any) => <li className="ml-4">{children}</li>,
+  },
+};
+
+const BlogClientPage: React.FC<Props> = ({ params }) => {
+  const [post, setPost] = useState<BlogPost | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>([]);
+  const [mounted, setMounted] = useState(false);
+  
+  // Handle mounting
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const fetchPost = async () => {
-      if (!slug) {
-        setError("Post not found");
-        setIsLoading(false);
+      // Only run in browser environment after component is mounted
+      if (!mounted || typeof window === 'undefined') {
         return;
       }
 
       try {
-        const data = await client.fetch(
-          `*[slug.current == "${slug}"] {
+        setLoading(true);
+        
+        // Dynamically import Sanity client only on client side
+        const { client } = await import('@/sanity/client');
+        
+        const query = `*[_type == "post" && slug.current == $slug][0] {
+          _id,
+          title,
+          slug,
+          excerpt,
+          body,
+          mainImage {
+            asset-> {
+              url,
+              _id,
+              _ref
+            },
+            alt,
+            caption
+          },
+          publishedAt,
+          estimatedReadingTime,
+          categories[]-> {
             title,
-            body,
-            publishedAt,
-            mainImage {
-              asset -> {
+            slug
+          },
+          tags,
+          author-> {
+            name,
+            image {
+              asset-> {
+                url,
                 _id,
-                url
-              },
-              alt
-            }
-          }`
-        );
-
-        if (data && data.length > 0) {
-          setSinglePost(data[0]);
-          
-          // Calculate estimated reading time
-          if (data[0].body) {
-            // Estimate 200 words per minute reading speed
-            const wordCount = data[0].body.reduce((count: number, block: any) => {
-              if (block._type === 'block' && block.children) {
-                return count + block.children.reduce((sum: number, child: any) => {
-                  return sum + (child.text ? child.text.split(/\s+/).length : 0);
-                }, 0);
+                _ref
               }
-              return count;
-            }, 0);
-            
-            const minutes = Math.ceil(wordCount / 200);
-            setReadingTime(`${minutes} min read`);
-            
-            // Extract headings for table of contents
-            const headings = data[0].body
-              .filter((block: any) => 
-                block._type === 'block' && 
-                ['h2', 'h3', 'h4'].includes(block.style)
-              )
-              .map((block: any) => {
-                // Generate an ID from the heading text
-                const text = block.children
-                  .map((child: any) => child.text)
-                  .join('');
-                
-                const id = text
-                  .toLowerCase()
-                  .replace(/[^\w\s]/g, '')
-                  .replace(/\s+/g, '-');
-                
-                return {
-                  id,
-                  text,
-                  level: parseInt(block.style.replace('h', ''), 10)
-                };
-              });
-            
-            setTableOfContents(headings);
+            },
+            bio
           }
+        }`;
+            
+        const fetchedPost = await client.fetch(query, { slug: params.id });
+        
+        if (!fetchedPost) {
+          setError('Blog post not found');
+          return;
+        }
+        
+        setPost(fetchedPost);
           
           // Fetch related posts
-          const related = await client.fetch(
-            `*[_type == "post" && slug.current != "${slug}"] | order(_createdAt desc)[0...3] {
+        const relatedQuery = `*[_type == "post" && slug.current != $slug] | order(publishedAt desc)[0...3] {
+          _id,
               title,
               slug,
-              publishedAt,
+          excerpt,
               mainImage {
-                asset -> {
-                  _id,
+            asset-> {
                   url
                 },
                 alt
-              }
-            }`
-          );
-          setRelatedPosts(related);
-        } else {
-          setError("Post not found");
-        }
+          },
+          publishedAt,
+          estimatedReadingTime
+        }`;
+        
+        const fetchedRelatedPosts = await client.fetch(relatedQuery, { slug: params.id });
+        setRelatedPosts(fetchedRelatedPosts || []);
+        
+        setError(null);
       } catch (err) {
-        console.error("Error fetching post:", err);
-        setError("Failed to load post");
+        setError('Failed to load blog post. Please try again later.');
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
     fetchPost();
-  }, [slug]);
-  
-  // Track active heading based on scroll position
-  useEffect(() => {
-    if (!contentRef.current || tableOfContents.length === 0) return;
+  }, [params.id, mounted]);
     
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            setActiveHeading(entry.target.id);
-          }
-        });
-      },
-      { rootMargin: '-100px 0px -80% 0px' }
-    );
-    
-    // Observe all headings
-    setTimeout(() => {
-      tableOfContents.forEach(heading => {
-        const element = document.getElementById(heading.id);
-        if (element) observer.observe(element);
-      });
-    }, 500);
-    
-    return () => observer.disconnect();
-  }, [tableOfContents, contentRef.current]);
-
-  const copyToClipboard = () => {
+  const sharePost = async (platform: string) => {
     const url = window.location.href;
-    navigator.clipboard.writeText(url).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
-  };
-  
-  // Toggle reading mode
-  const toggleReadingMode = () => {
-    setReadingMode(!readingMode);
+    const title = post?.title || 'Check out this blog post';
     
-    // Scroll to top when entering reading mode
-    if (!readingMode && containerRef.current) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  };
-  
-  // Toggle dark/light mode
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-  };
-  
-  // Scroll to heading
-  const scrollToHeading = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      const yOffset = -80; // Adjust for navbar or other fixed elements
-      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
-      window.scrollTo({ top: y, behavior: 'smooth' });
+    switch (platform) {
+      case 'twitter':
+        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`, '_blank');
+        break;
+      case 'linkedin':
+        window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, '_blank');
+        break;
+      case 'copy':
+        try {
+          await navigator.clipboard.writeText(url);
+          alert('Link copied to clipboard!');
+        } catch (err) {
+          // Fallback for older browsers
+        }
+        break;
     }
   };
 
-  if (isLoading) {
+  if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
-          <p className="mt-4">Loading post...</p>
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        {/* Enhanced Background */}
+        <div className="fixed inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,transparent_40%,rgba(0,0,0,0.8)_100%)]" />
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-[120px]"></div>
+          <div className="absolute bottom-1/3 right-1/3 w-96 h-96 bg-purple-500/5 rounded-full blur-[120px]"></div>
         </div>
-      </div>
-    );
-  }
 
-  if (error) {
-    return (
-      <div className="max-w-4xl mx-auto py-8">
-        <div className="text-center">
-          <h2 className="text-2xl font-semibold mb-4">Error</h2>
-          <p>{error}</p>
-          <button 
-            onClick={() => router.push('/blog')} 
-            className="mt-4 px-4 py-2 bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+        <motion.div
+          className="text-center relative z-10"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6 }}
+        >
+          <LiquidGlass
+            variant="card"
+            intensity="medium"
+            rounded="2xl"
+            className="p-8"
           >
-            Back to Blog
-          </button>
-        </div>
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500 mx-auto mb-6"></div>
+            <p className="text-gray-300 text-lg font-medium">Loading blog post...</p>
+          </LiquidGlass>
+        </motion.div>
       </div>
     );
   }
 
-  if (!singlePost) {
+  if (error || !post) {
     return (
-      <div className="max-w-4xl mx-auto py-8">
-        <div className="text-center">
-          <h2 className="text-2xl font-semibold mb-4">Post Not Found</h2>
-          <p>The post you're looking for doesn't exist or has been removed.</p>
-          <button 
-            onClick={() => router.push('/blog')} 
-            className="mt-4 px-4 py-2 bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
-          >
-            Back to Blog
-          </button>
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        {/* Enhanced Background */}
+        <div className="fixed inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,transparent_40%,rgba(0,0,0,0.8)_100%)]" />
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-red-500/5 rounded-full blur-[120px]"></div>
         </div>
+
+        <motion.div
+          className="text-center max-w-md mx-auto p-4 relative z-10"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <LiquidGlass
+            variant="card"
+            intensity="medium"
+            rounded="2xl"
+            className="p-8"
+          >
+            <div className="text-red-400 text-6xl mb-6">📄</div>
+            <h2 className="text-2xl font-bold text-white mb-4">Post Not Found</h2>
+            <p className="text-gray-300 mb-8 leading-relaxed">
+              {error || 'The blog post you\'re looking for doesn\'t exist or has been moved.'}
+            </p>
+            <LiquidGlass
+              as={Link}
+              href="/blog"
+              variant="button"
+              intensity="medium"
+              rounded="full"
+              className="inline-flex items-center px-6 py-3 text-white hover:text-blue-300 transition-colors duration-200"
+            >
+              <FaArrowLeft className="mr-2" />
+              Back to Blog
+            </LiquidGlass>
+          </LiquidGlass>
+        </motion.div>
       </div>
     );
   }
-
-  // Create share URLs
-  const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
-  const encodedUrl = encodeURIComponent(currentUrl);
-  const encodedTitle = encodeURIComponent(singlePost.title);
-  
-  const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
-  const xShareUrl = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
-  const linkedinShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
-
-  // Format date for better display
-  const formattedDate = moment(singlePost.publishedAt).format("MMM DD, YYYY");
 
   return (
-    <div 
-      ref={containerRef} 
-      className={`relative min-h-screen transition-colors duration-300 ${
-        readingMode 
-          ? isDarkMode 
-            ? 'bg-zinc-900' 
-            : 'bg-zinc-100 text-zinc-900' 
-          : 'bg-black'
-      }`}
-    >
-      {/* Reading Progress Bar */}
-      <motion.div 
-        className="fixed top-0 left-0 right-0 h-0.5 bg-zinc-700 origin-left z-50"
-        style={{ scaleX: progressBarWidth }}
-      />
-      
-      {/* Reading Mode Toggle */}
-      <div className="fixed bottom-8 right-8 z-50 flex space-x-2">
-        <button
-          onClick={toggleReadingMode}
-          className="p-3 rounded-full bg-zinc-900/90 backdrop-blur-sm border border-zinc-800/60 text-zinc-400 hover:text-zinc-300 hover:bg-zinc-800 transition-all shadow-lg"
-          aria-label={readingMode ? "Exit reading mode" : "Enter reading mode"}
-          title={readingMode ? "Exit reading mode" : "Enter reading mode"}
-        >
-          <BookOpen className="w-5 h-5" />
-        </button>
+    <div className="min-h-screen bg-black">
+      {/* Enhanced Background with Liquid Glass Aesthetic */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,transparent_40%,rgba(0,0,0,0.8)_100%)]" />
         
-        {readingMode && (
-          <button
-            onClick={toggleDarkMode}
-            className="p-3 rounded-full bg-zinc-900/90 backdrop-blur-sm border border-zinc-800/60 text-zinc-400 hover:text-zinc-300 hover:bg-zinc-800 transition-all shadow-lg"
-            aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
-            title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
-          >
-            {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-          </button>
-        )}
+        {/* Dynamic Background Elements */}
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-[120px] animate-pulse"></div>
+        <div className="absolute bottom-1/3 right-1/3 w-96 h-96 bg-purple-500/5 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/2 right-1/4 w-64 h-64 bg-cyan-500/3 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '2s' }}></div>
       </div>
-      
-      <div className={`max-w-6xl mx-auto py-8 px-4 ${readingMode ? 'flex flex-col md:flex-row gap-8' : ''}`}>
-        {/* Back button at the top - only show when not in reading mode */}
-        {!readingMode && (
-          <button 
-            onClick={() => router.push('/blog')} 
-            className="mb-6 flex items-center text-sm text-zinc-400 hover:text-white transition-colors"
+
+      <div className="container mx-auto px-4 py-8 relative z-10 max-w-7xl">
+        {/* Enhanced Back Button */}
+        <motion.div 
+          className="mb-8"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <LiquidGlass
+            as={Link}
+            href="/blog"
+            variant="subtle"
+            intensity="low"
+            rounded="full"
+            className="inline-flex items-center px-4 py-2 text-gray-400 hover:text-white transition-colors duration-200"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <FaArrowLeft className="mr-2" />
             Back to Blog
-          </button>
-        )}
-        
-        {/* Table of Contents - Only show in reading mode */}
-        {readingMode && tableOfContents.length > 0 && (
-          <div className="hidden md:block sticky top-20 h-fit max-h-[calc(100vh-120px)] overflow-y-auto w-64 pt-8">
-            <div className={`p-4 rounded-xl border ${isDarkMode ? 'border-zinc-800/50 bg-zinc-900/50' : 'border-zinc-200 bg-white/80'}`}>
-              <h3 className={`text-lg font-semibold mb-3 ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>Table of Contents</h3>
-              <ul className="space-y-2">
-                {tableOfContents.map((heading) => (
-                  <li 
-                    key={heading.id}
-                    className={`transition-all ${
-                      heading.level === 3 ? 'ml-3' : heading.level === 4 ? 'ml-6' : ''
-                    }`}
-                  >
-                    <button
-                      onClick={() => scrollToHeading(heading.id)}
-                      className={`text-left text-sm flex items-start hover:underline ${
-                        activeHeading === heading.id 
-                          ? isDarkMode ? 'text-white font-medium' : 'text-zinc-900 font-medium' 
-                          : isDarkMode ? 'text-zinc-400' : 'text-zinc-600'
-                      }`}
-                    >
-                      <Hash className={`w-3 h-3 mt-1 mr-1 flex-shrink-0 ${
-                        activeHeading === heading.id
-                          ? isDarkMode ? 'text-white' : 'text-zinc-900'
-                          : isDarkMode ? 'text-zinc-500' : 'text-zinc-500'
-                      }`} />
-                      <span>{heading.text}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            
-            {/* Reading time indicator */}
-            <div className={`mt-4 p-4 rounded-xl border ${isDarkMode ? 'border-zinc-800/50 bg-zinc-900/50' : 'border-zinc-200 bg-white/80'}`}>
-              <div className="flex items-center text-sm">
-                <Clock className={`w-4 h-4 mr-2 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-600'}`} />
-                <span className={isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}>{readingTime}</span>
-              </div>
-            </div>
-          </div>
-        )}
-        
-        {/* Main content area */}
-        <div className={`${readingMode ? 'max-w-3xl mx-auto flex-grow' : 'max-w-4xl mx-auto'}`}>
-          {/* Fixed Social Sharing with Tooltips and Animations - don't show in reading mode */}
-          {!readingMode && (
-            <div className="hidden md:block fixed left-8 lg:left-14 top-1/3 z-10">
-              {/* Custom animation styles */}
-              <style jsx>{`
-                @keyframes slowPulse {
-                  0% {
-                    opacity: 0.8;
-                    transform: scale(1);
-                  }
-                  50% {
-                    opacity: 0.6;
-                    transform: scale(1.05);
-                  }
-                  100% {
-                    opacity: 0.8;
-                    transform: scale(1);
-                  }
-                }
-                .arrow-pulse {
-                  animation: slowPulse 3s ease-in-out infinite;
-                }
-                @keyframes pulse-slow {
-                  0%, 100% {
-                    opacity: 1;
-                  }
-                  50% {
-                    opacity: 0.7;
-                  }
-                }
-                .animate-pulse-slow {
-                  animation: pulse-slow 3s ease-in-out infinite;
-                }
-              `}</style>
-              
-              {/* Handwritten arrow pointing to share buttons - only visible on desktop */}
-              <div className="absolute left-16 top-6 z-0 hidden lg:block" style={{ transform: 'translateZ(0)' }}>
-                <div className="relative p-4">
-                  {/* Handwritten "Share" text */}
-                  <div className="italic text-white text-lg mb-4 tracking-wide font-semibold animate-pulse-slow text-center" style={{ fontFamily: 'cursive', textShadow: '0 0 5px rgba(0,0,0,0.5)' }}>Share!</div>
-                  {/* Arrow - Using a simpler path that's easier to render fully */}
-                  <svg width="120" height="60" viewBox="0 0 120 60" className="text-white" style={{ overflow: 'visible' }}>
-                    {/* Simple curved line */}
-                    <path 
-                      d="M100,30 C80,10 60,10 40,30 C30,40 20,35 10,30" 
-                      fill="none" 
-                      stroke="currentColor" 
-                      strokeWidth="3" 
-                      strokeLinecap="round"
-                      className="arrow-pulse"
-                    />
-                    {/* Arrow head */}
-                    <path 
-                      d="M20,20 L10,30 L20,40" 
-                      fill="none" 
-                      stroke="currentColor" 
-                      strokeWidth="3" 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round"
-                      className="arrow-pulse"
-                    />
-                  </svg>
-                </div>
-              </div>
-              
-              <div className="relative flex flex-col items-center">
-                {/* Share icon with pulse animation */}
-                <div className="relative mb-2 p-1">
-                  <Share2 className="w-4 h-4 text-zinc-400" />
-                  <motion.div 
-                    className="absolute inset-0 rounded-full bg-zinc-700/20"
-                    animate={{ 
-                      scale: [1, 1.15, 1],
-                      opacity: [0.7, 0.3, 0.7]
-                    }}
-                    transition={{ 
-                      repeat: Infinity, 
-                      duration: 2,
-                      ease: "easeInOut" 
-                    }}
-                  />
-                </div>
-                
-                <div className="w-8 h-0.5 bg-zinc-800 mt-4"></div>
-                
-                <div className="flex flex-col space-y-4">
-                  {/* Facebook */}
-                  <motion.div 
-                    className="relative group"
-                    whileHover={{ y: -2 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <a 
-                      href={facebookShareUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-2.5 bg-zinc-900/90 backdrop-blur-sm border border-zinc-800/60 text-zinc-400 rounded-lg hover:bg-zinc-800/90 hover:text-zinc-300 transition-all shadow-lg flex items-center justify-center"
-                      aria-label="Share on Facebook"
-                    >
-                      <Facebook size={16} />
-                    </a>
-                    <motion.div 
-                      className="absolute -inset-1 bg-zinc-800/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                      initial={{ scale: 0.85 }}
-                      whileHover={{ scale: 1 }}
-                    />
-                    <div className="absolute right-full mr-2 opacity-0 group-hover:opacity-100 text-xs bg-zinc-900 text-zinc-400 py-1 px-2 rounded shadow-md border border-zinc-800/60 whitespace-nowrap z-20 pointer-events-none transition-opacity">
-                      Facebook
-                    </div>
-                  </motion.div>
-                  
-                  {/* X (formerly Twitter) */}
-                  <motion.div 
-                    className="relative group"
-                    whileHover={{ y: -2 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <a
-                      href={xShareUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="Share on X"
-                      className="w-full flex items-center gap-2 p-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 transition-colors"
-                    >
-                      <X size={16} />
-                      <span className="text-sm">X</span>
-                    </a>
-                    <motion.div 
-                      className="absolute -inset-1 bg-zinc-800/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                      initial={{ scale: 0.85 }}
-                      whileHover={{ scale: 1 }}
-                    />
-                    <div className="absolute right-full mr-2 opacity-0 group-hover:opacity-100 text-xs bg-zinc-900 text-zinc-400 py-1 px-2 rounded shadow-md border border-zinc-800/60 whitespace-nowrap z-20 pointer-events-none transition-opacity">
-                      X
-                    </div>
-                  </motion.div>
-                  
-                  {/* LinkedIn */}
-                  <motion.div 
-                    className="relative group"
-                    whileHover={{ y: -2 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <a 
-                      href={linkedinShareUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-2.5 bg-zinc-900/90 backdrop-blur-sm border border-zinc-800/60 text-zinc-400 rounded-lg hover:bg-zinc-800/90 hover:text-zinc-300 transition-all shadow-lg flex items-center justify-center"
-                      aria-label="Share on LinkedIn"
-                    >
-                      <Linkedin size={16} />
-                    </a>
-                    <motion.div 
-                      className="absolute -inset-1 bg-zinc-800/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                      initial={{ scale: 0.85 }}
-                      whileHover={{ scale: 1 }}
-                    />
-                    <div className="absolute right-full mr-2 opacity-0 group-hover:opacity-100 text-xs bg-zinc-900 text-zinc-400 py-1 px-2 rounded shadow-md border border-zinc-800/60 whitespace-nowrap z-20 pointer-events-none transition-opacity">
-                      LinkedIn
-                    </div>
-                  </motion.div>
-                  
-                  {/* Copy Link */}
-                  <motion.div 
-                    className="relative group"
-                    whileHover={{ y: -2 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <button 
-                      onClick={copyToClipboard}
-                      className="p-2.5 bg-zinc-900/90 backdrop-blur-sm border border-zinc-800/60 text-zinc-400 rounded-lg hover:bg-zinc-800/90 hover:text-zinc-300 transition-all shadow-lg flex items-center justify-center"
-                      aria-label="Copy link"
-                    >
-                      {copied ? <Check size={16} className="text-zinc-300" /> : <Copy size={16} />}
-                    </button>
-                    <motion.div 
-                      className="absolute -inset-1 bg-zinc-800/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                      initial={{ scale: 0.85 }}
-                      whileHover={{ scale: 1 }}
-                    />
-                    <div className="absolute right-full mr-2 opacity-0 group-hover:opacity-100 text-xs bg-zinc-900 text-zinc-400 py-1 px-2 rounded shadow-md border border-zinc-800/60 whitespace-nowrap z-20 pointer-events-none transition-opacity">
-                      {copied ? "Copied!" : "Copy Link"}
-                    </div>
-                  </motion.div>
-                </div>
-              </div>
-            </div>
-          )}
+          </LiquidGlass>
+        </motion.div>
 
-          {/* Blog Hero Section - Enhanced Design */}
-          <div className="mb-12">
-            {/* Main Image with Animated Container */}
-            {singlePost.mainImage?.asset?.url && !readingMode && (
-              <div className="relative overflow-hidden rounded-xl mb-8 border border-zinc-800/50 shadow-xl">
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10 pointer-events-none"></div>
-                <img 
-                  src={singlePost.mainImage.asset.url} 
-                  alt={singlePost.mainImage.alt || singlePost.title} 
-                  className="w-full h-[400px] object-contain bg-zinc-900 transform hover:scale-105 transition-transform duration-700"
-                />
-              </div>
-            )}
-            
-            {/* Article Metadata - Desktop */}
-            <div className={`hidden md:flex items-center space-x-4 mb-4 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'} text-sm`}>
-              <div className="flex items-center">
-                <Calendar className={`w-4 h-4 mr-1.5 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-600'}`} />
-                <span>{formattedDate}</span>
-              </div>
-              <div className={`h-3 w-0.5 ${isDarkMode ? 'bg-zinc-700' : 'bg-zinc-300'}`}></div>
-              <div className="flex items-center">
-                <Clock className={`w-4 h-4 mr-1.5 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-600'}`} />
-                <span>{readingTime}</span>
-              </div>
-              <div className={`h-3 w-0.5 ${isDarkMode ? 'bg-zinc-700' : 'bg-zinc-300'}`}></div>
-              <div className="flex items-center">
-                <User className={`w-4 h-4 mr-1.5 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-600'}`} />
-                <span>Shubham Gupta</span>
-              </div>
-            </div>
-            
-            {/* Title with Subtle Border */}
-            <div className="relative">
-              <div className={`h-px w-16 ${isDarkMode ? 'bg-zinc-800' : 'bg-zinc-300'} mb-4`}></div>
-              <h1 className={`text-4xl md:text-5xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-zinc-900'} leading-tight`}>{singlePost.title}</h1>
-            </div>
-            
-            {/* Article Metadata - Mobile */}
-            <div className={`flex md:hidden flex-wrap gap-3 mb-4 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'} text-xs`}>
-              <div className="flex items-center">
-                <Calendar className={`w-3 h-3 mr-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-600'}`} />
-                <span>{formattedDate}</span>
-              </div>
-              <div className="flex items-center">
-                <Clock className={`w-3 h-3 mr-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-600'}`} />
-                <span>{readingTime}</span>
-              </div>
-              <div className="flex items-center">
-                <User className={`w-3 h-3 mr-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-600'}`} />
-                <span>Shubham Gupta</span>
-              </div>
-            </div>
-            
-            {/* Mobile Social Sharing - Only show on mobile and not in reading mode */}
-            {!readingMode && (
-              <div className="flex md:hidden items-center space-x-3 my-6 border-t border-b border-zinc-800/60 py-4 relative">
-                {/* Mobile share indicator */}
-                <div className="absolute -top-8 left-0 italic text-white text-base tracking-wide font-medium animate-pulse-slow" style={{ fontFamily: 'cursive', textShadow: '0 0 5px rgba(0,0,0,0.5)' }}>
-                  Share this post!
+        <div className="max-w-6xl mx-auto">
+          {/* Enhanced Article Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+                         <LiquidGlass
+               variant="card"
+               intensity="medium"
+               rounded="2xl"
+               className="p-6 md:p-12 lg:p-16 mb-8"
+             >
+              {/* Categories */}
+              {post.categories && post.categories.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {post.categories
+                    .filter(category => category && category.slug && category.title)
+                    .map((category) => (
+                      <LiquidGlass
+                        key={category.slug.current}
+                        variant="button"
+                        intensity="low"
+                        rounded="full"
+                        className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-400"
+                      >
+                        <FaTag className="mr-1.5 text-xs" />
+                        {category.title}
+                      </LiquidGlass>
+                    ))}
                 </div>
-                <span className="text-sm text-zinc-400">Share:</span>
-                <a 
-                  href={facebookShareUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 bg-zinc-900/90 border border-zinc-800/60 text-zinc-400 rounded-lg hover:bg-zinc-800/90 transition-colors"
-                  aria-label="Share on Facebook"
-                >
-                  <Facebook size={16} />
-                </a>
-                <a
-                  href={xShareUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Share on X"
-                  className="flex items-center justify-center p-2 hover:bg-zinc-800 rounded-full"
-                >
-                  <X size={16} />
-                </a>
-                <a 
-                  href={linkedinShareUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 bg-zinc-900/90 border border-zinc-800/60 text-zinc-400 rounded-lg hover:bg-zinc-800/90 transition-colors"
-                  aria-label="Share on LinkedIn"
-                >
-                  <Linkedin size={16} />
-                </a>
-                <button 
-                  onClick={copyToClipboard}
-                  className="p-2 bg-zinc-900/90 border border-zinc-800/60 text-zinc-400 rounded-lg hover:bg-zinc-800/90 transition-colors flex items-center"
-                  aria-label="Copy link"
-                >
-                  {copied ? <Check size={16} className="text-zinc-300" /> : <Copy size={16} />}
-                </button>
-                {copied && <span className="text-xs text-zinc-300 ml-1">Copied!</span>}
-              </div>
-            )}
+              )}
+              
+              {/* Title */}
+              <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent">
+                {post.title}
+              </h1>
+                
+              {/* Excerpt */}
+              {post.excerpt && (
+                <p className="text-xl md:text-2xl text-gray-300 mb-8 leading-relaxed font-light">
+                  {post.excerpt}
+                </p>
+              )}
 
-            {/* Main content with ref for intersection observer */}
-            <div 
-              ref={contentRef} 
-              className={`prose max-w-none ${
-                isDarkMode 
-                  ? 'prose-invert prose-zinc prose-headings:text-zinc-100 prose-p:text-zinc-300 prose-strong:text-zinc-200' 
-                  : 'prose-zinc prose-headings:text-zinc-900 prose-p:text-zinc-700 prose-strong:text-zinc-800 prose-a:text-zinc-800 hover:prose-a:text-zinc-900 prose-code:text-zinc-800 prose-code:bg-zinc-200'
-              } ${
-                readingMode ? 'prose-lg prose-p:leading-relaxed prose-headings:leading-tight' : ''
-              } prose-a:no-underline hover:prose-a:underline prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none prose-pre:bg-zinc-900 prose-pre:border prose-pre:border-zinc-800 prose-pre:rounded-lg prose-img:rounded-lg`}
+              {/* Meta Information */}
+              <div className="flex flex-wrap items-center gap-6 text-gray-400 mb-8">
+                <LiquidGlass
+                  variant="subtle"
+                  intensity="low"
+                  rounded="full"
+                  className="flex items-center px-3 py-1.5"
+                >
+                  <FaCalendarAlt className="mr-2 text-sm" />
+                  {formatDate(post.publishedAt)}
+                </LiquidGlass>
+                {post.estimatedReadingTime && (
+                  <LiquidGlass
+                    variant="subtle"
+                    intensity="low"
+                    rounded="full"
+                    className="flex items-center px-3 py-1.5"
+                  >
+                    <FaClock className="mr-2 text-sm" />
+                    {post.estimatedReadingTime} min read
+                  </LiquidGlass>
+                )}
+              </div>
+
+                             {/* Featured Image */}
+               {(() => {
+                 const mainImageUrl = getSanityImageUrl(post.mainImage?.asset);
+                 return mainImageUrl && (
+                   <LiquidGlass
+                     variant="card"
+                     intensity="low"
+                     rounded="xl"
+                     className="relative h-64 md:h-96 overflow-hidden mb-8"
+                   >
+                     <Image
+                       src={mainImageUrl}
+                       alt={post.mainImage?.alt || post.title}
+                       fill
+                       className="object-cover"
+                       onError={(e) => {
+                         console.error('Main image failed to load:', mainImageUrl);
+                         console.error('Main image asset:', post.mainImage?.asset);
+                         console.error('Error details:', e);
+                       }}
+                       onLoad={() => {
+                         console.log('Main image loaded successfully:', mainImageUrl);
+                       }}
+                     />
+                     <div className="absolute inset-0 bg-gradient-to-t from-gray-900/30 to-transparent" />
+                   </LiquidGlass>
+                 );
+               })()}
+              
+              {/* Enhanced Share Buttons */}
+              <div className="flex items-center gap-4">
+                <span className="text-gray-400 font-medium">Share:</span>
+                <div className="flex gap-2">
+                  <LiquidGlass
+                    as="button"
+                    onClick={() => sharePost('twitter')}
+                    variant="button"
+                    intensity="low"
+                    rounded="full"
+                    className="p-3 text-gray-400 hover:text-blue-400 transition-colors duration-200"
+                    aria-label="Share on Twitter"
+                  >
+                    <FaTwitter />
+                  </LiquidGlass>
+                  <LiquidGlass
+                    as="button"
+                    onClick={() => sharePost('linkedin')}
+                    variant="button"
+                    intensity="low"
+                    rounded="full"
+                    className="p-3 text-gray-400 hover:text-blue-400 transition-colors duration-200"
+                    aria-label="Share on LinkedIn"
+                  >
+                    <FaLinkedin />
+                  </LiquidGlass>
+                  <LiquidGlass
+                    as="button"
+                    onClick={() => sharePost('copy')}
+                    variant="button"
+                    intensity="low"
+                    rounded="full"
+                    className="p-3 text-gray-400 hover:text-blue-400 transition-colors duration-200"
+                    aria-label="Copy link"
+                  >
+                    <FaCopy />
+                  </LiquidGlass>
+                </div>
+              </div>
+            </LiquidGlass>
+          </motion.div>
+
+          {/* Debug Section - Remove this after fixing images */}
+          {process.env.NODE_ENV === 'development' && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
             >
-              <CustomPortableText value={singlePost.body} isDarkMode={isDarkMode} />
-            </div>
-          </div>
+              <LiquidGlass
+                variant="prominent"
+                intensity="medium"
+                rounded="xl"
+                className="p-4 mb-8 bg-red-900/20"
+              >
+                                 <h3 className="text-red-400 font-bold mb-2">DEBUG INFO</h3>
+                 <div className="text-xs text-gray-300 font-mono">
+                   <p><strong>Main Image Asset:</strong></p>
+                   <pre className="bg-gray-800 p-2 rounded text-xs overflow-auto">
+                     {JSON.stringify(post.mainImage?.asset, null, 2)}
+                   </pre>
+                   <p className="mt-2"><strong>Constructed URL:</strong></p>
+                   <p className="break-all text-green-400">
+                     {getSanityImageUrl(post.mainImage?.asset)}
+                   </p>
+                   <p className="mt-2"><strong>Test Image (HTML img):</strong></p>
+                   <img 
+                     src={getSanityImageUrl(post.mainImage?.asset) || ''}
+                     alt="Test"
+                     className="w-32 h-24 object-cover border border-green-400"
+                     onLoad={() => console.log('HTML img loaded successfully')}
+                     onError={() => console.log('HTML img failed to load')}
+                   />
+                 </div>
+              </LiquidGlass>
+            </motion.div>
+          )}
+
+          {/* Enhanced Article Content */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+                       <LiquidGlass
+             variant="clean"
+             intensity="low"
+             rounded="2xl"
+             className="p-6 md:p-12 lg:p-16 mb-8"
+           >
+             <article className="prose prose-lg prose-invert max-w-none">
+               {post.body && (
+                 <PortableText
+                   value={post.body}
+                   components={portableTextComponents}
+                 />
+               )}
+             </article>
+           </LiquidGlass>
+          </motion.div>
+
+          {/* Enhanced Tags */}
+          {post.tags && post.tags.length > 0 && (
+            <motion.div
+              className="mb-8"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <LiquidGlass
+                variant="card"
+                intensity="low"
+                rounded="xl"
+                className="p-6"
+              >
+                <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                  <FaTag className="mr-2 text-blue-400" />
+                  Tags
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {post.tags.map((tag) => (
+                    <LiquidGlass
+                      key={tag}
+                      variant="subtle"
+                      intensity="low"
+                      rounded="full"
+                      className="px-3 py-1.5 text-gray-300 hover:text-white transition-colors duration-200 text-sm"
+                    >
+                      #{tag}
+                    </LiquidGlass>
+                  ))}
+                </div>
+              </LiquidGlass>
+            </motion.div>
+          )}
           
-          {/* Author Bio Card - don't show in reading mode */}
-          {!readingMode && (
-            <div className="bg-zinc-900/70 backdrop-blur-sm border border-zinc-800/50 rounded-xl p-6 mb-16 shadow-lg">
-              <div className="flex items-center space-x-4">
-                <div className="h-16 w-16 rounded-full overflow-hidden border border-zinc-800">
-                  <img src="/shubham_gupta.png" alt="Shubham Gupta" className="h-full w-full object-cover" />
+          {/* Enhanced Author Info */}
+          {post.author && (
+            <motion.div
+              className="mb-8"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+            >
+              <LiquidGlass
+                variant="card"
+                intensity="medium"
+                rounded="xl"
+                className="p-6"
+              >
+                <div className="flex items-start space-x-4">
+                  <LiquidGlass
+                    variant="subtle"
+                    intensity="low"
+                    rounded="full"
+                    className="p-1"
+                  >
+                    {post.author.image?.asset?.url ? (
+                      <Image
+                        src={post.author.image.asset.url}
+                        alt={post.author.name}
+                        width={64}
+                        height={64}
+                        className="rounded-full"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center">
+                        <FaUser className="text-gray-400 text-xl" />
+                      </div>
+                    )}
+                  </LiquidGlass>
+                  <div>
+                    <h3 className="text-lg font-semibold text-white mb-2">
+                      About {post.author.name}
+                    </h3>
+                    {post.author.bio && (
+                      <p className="text-gray-300 leading-relaxed">{post.author.bio}</p>
+                    )}
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-white">Shubham Gupta</h3>
-                  <p className="text-zinc-400 text-sm">Security Researcher & Bug Hunter</p>
-                </div>
-              </div>
-              <div className="mt-4 text-zinc-400 text-sm">
-                <p>A passionate, enthusiastic cybersecurity professional with over 12 years of experience as an IT security consultant and researcher specializing in Red Teaming and Web Application Security.</p>
-              </div>
-            </div>
+              </LiquidGlass>
+            </motion.div>
           )}
         
-          {/* Related Posts Section - don't show in reading mode */}
-          {!readingMode && relatedPosts.length > 0 && (
-            <div className="mt-16 pt-8 border-t border-zinc-800/50">
-              <h3 className="text-2xl font-bold text-white mb-8 relative inline-block">
-                More Posts
-                <div className="absolute -bottom-2 left-0 right-0 h-px bg-zinc-700"></div>
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {relatedPosts.map((post, index) => (
-                  <motion.div 
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    viewport={{ once: true }}
-                    onClick={() => router.push(`/blog/${post.slug.current}`)}
-                    className="group bg-zinc-900/70 backdrop-blur-sm border border-zinc-800/50 rounded-xl overflow-hidden transition-all hover:shadow-xl hover:-translate-y-1 cursor-pointer"
-                  >
-                    {/* Image container with gradient overlay */}
-                    <div className="w-full h-40 overflow-hidden relative">
-                      <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 to-transparent opacity-70 z-10"></div>
-                      {post.mainImage?.asset?.url ? (
-                        <img 
-                          src={post.mainImage.asset.url} 
-                          alt={post.mainImage.alt || post.title} 
-                          className="w-full h-full object-contain bg-zinc-900 transition-transform duration-700 group-hover:scale-110"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-zinc-800">
-                          <span className="text-zinc-500">No image</span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-5">
-                      <h3 className="text-lg font-bold text-white mb-2 line-clamp-2 group-hover:text-zinc-300 transition-colors">{post.title}</h3>
-                      <div className="flex items-center text-xs text-zinc-500 mb-1">
-                        <Calendar className="w-3 h-3 mr-1" />
-                        {moment(post.publishedAt).format("MMM D, YYYY")}
-                      </div>
-                      <span className="inline-block mt-3 text-xs font-medium text-zinc-400 group-hover:text-zinc-300 transition-colors">
-                        Read article &rarr;
-                      </span>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
+          {/* Enhanced Related Posts */}
+          {relatedPosts.length > 0 && (
+            <motion.section
+              className="mb-12"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.8 }}
+            >
+              <LiquidGlass
+                variant="card"
+                intensity="medium"
+                rounded="2xl"
+                className="p-8"
+              >
+                <h3 className="text-2xl font-bold text-white mb-8 text-center">Related Posts</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {relatedPosts.map((relatedPost, index) => (
+                    <motion.div
+                      key={relatedPost._id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: 0.2 * index }}
+                    >
+                      <Link href={`/blog/${relatedPost.slug.current}`} className="group block">
+                        <LiquidGlass
+                          variant="card"
+                          intensity="low"
+                          rounded="xl"
+                          morphOnHover={true}
+                          className="overflow-hidden h-full transition-all duration-300"
+                        >
+                                                     {(() => {
+                             const relatedImageUrl = getSanityImageUrl(relatedPost.mainImage?.asset);
+                             return relatedImageUrl && (
+                               <div className="relative h-32 overflow-hidden">
+                                 <Image
+                                   src={relatedImageUrl}
+                                   alt={relatedPost.mainImage?.alt || relatedPost.title}
+                                   fill
+                                   className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                   unoptimized
+                                   onError={(e) => {
+                                     console.error('Related image failed to load:', relatedImageUrl);
+                                   }}
+                                 />
+                               </div>
+                             );
+                           })()}
+                          <div className="p-4">
+                            <h4 className="text-lg font-semibold text-white mb-2 group-hover:text-blue-400 transition-colors duration-200 line-clamp-2">
+                              {relatedPost.title}
+                            </h4>
+                            {relatedPost.excerpt && (
+                              <p className="text-gray-400 text-sm line-clamp-2 mb-3">
+                                {relatedPost.excerpt}
+                              </p>
+                            )}
+                            <div className="flex items-center justify-between text-xs text-gray-500">
+                              <span>{formatDate(relatedPost.publishedAt)}</span>
+                              {relatedPost.estimatedReadingTime && (
+                                <span>{relatedPost.estimatedReadingTime} min read</span>
+                              )}
+                            </div>
+                          </div>
+                        </LiquidGlass>
+                      </Link>
+                    </motion.div>
+                  ))}
+                </div>
+              </LiquidGlass>
+            </motion.section>
           )}
         </div>
       </div>

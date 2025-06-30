@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, Terminal, Globe, Info, Bug, MousePointer, CheckCircle, XCircle, ShieldAlert } from "lucide-react";
 import LiquidGlass from "@/components/ui/liquid-glass";
 
+
 const ClickjackingClientWrapper = () => {
   const [url, setUrl] = useState("");
   const [testUrl, setTestUrl] = useState<string | null>(null);
@@ -35,7 +36,7 @@ const ClickjackingClientWrapper = () => {
     setHistory((prev) => [...prev, `➜ Testing Clickjacking on ${formattedUrl}...`]);
     setTestUrl(formattedUrl);
     setUrl("");
-
+    
     setTimeout(() => {
       setHistory((prev) => [...prev, `➜ Checking X-Frame-Options header...`]);
       setTimeout(() => {
@@ -69,12 +70,21 @@ const ClickjackingClientWrapper = () => {
 
   return (
     <div className="relative min-h-screen w-full flex flex-col items-center justify-center bg-black overflow-hidden text-white">
-      <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(to_bottom,transparent,black)] opacity-20"></div>
+      {/* Clean Dark Background with Subtle Grid */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        {/* Subtle grid pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px]" />
+        
+        {/* Radial overlay for depth */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,transparent_40%,rgba(0,0,0,0.8)_100%)]" />
+      </div>
+
       
-      <div className="bg-gradient-to-b from-black to-zinc-900 w-full flex justify-center pb-8">
-        <div className="relative z-10 max-w-6xl w-full px-6">
+        
+      <div className="bg-gradient-to-b from-black to-zinc-900 w-full flex justify-center pb-8 relative z-10">
+          <div className="relative z-10 max-w-6xl w-full px-6">
           <div className="text-center mb-16 relative pt-20 flex flex-col justify-center items-center">
-            <motion.div
+              <motion.div
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.7, type: "spring" }}
@@ -99,8 +109,8 @@ const ClickjackingClientWrapper = () => {
               Clickjacking Tester
             </motion.h1>
             <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
               className="mt-4 text-lg md:text-xl text-zinc-400 max-w-2xl"
             >
@@ -108,18 +118,18 @@ const ClickjackingClientWrapper = () => {
             </motion.p>
           </div>
         </div>
-      </div>
-
+                </div>
+                
       <div className="relative z-10 max-w-5xl w-full px-6 pb-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Left Column - URL Input Panel */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+                  {/* Left Column - URL Input Panel */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.2 }}
             className="flex flex-col gap-6"
-          >
-            {/* URL Input Card */}
+                  >
+                    {/* URL Input Card */}
             <LiquidGlass
               variant="card"
               intensity="medium"
@@ -130,23 +140,23 @@ const ClickjackingClientWrapper = () => {
                 <Globe className="w-5 h-5" />
                 Target URL
               </h2>
-              
+                      
               <div className="space-y-4">
                 <div className="flex items-center bg-zinc-950/50 rounded-lg border border-zinc-800/50 overflow-hidden">
-                  <input
-                    type="text"
-                    value={url}
-                    onChange={(e) => setUrl(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Enter website URL to test (e.g., example.com)"
+                          <input
+                            type="text"
+                            value={url}
+                            onChange={(e) => setUrl(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            placeholder="Enter website URL to test (e.g., example.com)"
                     className="flex-1 bg-transparent border-none outline-none text-red-400 placeholder-zinc-600 p-3 font-mono text-sm"
-                  />
-                </div>
+                          />
+                        </div>
                 <p className="text-xs text-zinc-500">Example: facebook.com, twitter.com, etc.</p>
-              </div>
+                      </div>
             </LiquidGlass>
-                  
-            {/* Clickjacking Info Card */}
+                    
+                    {/* Clickjacking Info Card */}
             <LiquidGlass
               variant="card"
               intensity="medium"
@@ -157,52 +167,52 @@ const ClickjackingClientWrapper = () => {
                 <Info className="w-5 h-5" />
                 About Clickjacking
               </h2>
-              
+                      
               <div className="space-y-3">
                 <p className="text-zinc-400 text-sm">
-                  Clickjacking (UI redressing) is an attack where users are tricked into clicking on disguised elements. 
-                  This tool tests if a website can be loaded in an iframe, which is the first step towards vulnerability.
-                </p>
-                <p className="text-zinc-500 text-xs">
-                  Secure websites use X-Frame-Options or Content-Security-Policy headers to prevent being loaded in iframes.
-                </p>
-              </div>
+                          Clickjacking (UI redressing) is an attack where users are tricked into clicking on disguised elements. 
+                          This tool tests if a website can be loaded in an iframe, which is the first step towards vulnerability.
+                        </p>
+                        <p className="text-zinc-500 text-xs">
+                          Secure websites use X-Frame-Options or Content-Security-Policy headers to prevent being loaded in iframes.
+                        </p>
+                      </div>
             </LiquidGlass>
-                  
-            {/* Test Button */}
+                    
+                    {/* Test Button */}
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={testClickjacking}
-              disabled={isTesting || !url}
-              className={`${
-                isTesting || !url 
-                  ? "bg-zinc-700/80 cursor-not-allowed" 
+                      onClick={testClickjacking}
+                      disabled={isTesting || !url}
+                      className={`${
+                        isTesting || !url 
+                          ? "bg-zinc-700/80 cursor-not-allowed" 
                   : "bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500"
               } text-white rounded-xl px-6 py-4 transition-all duration-300 ease-in-out w-full flex items-center justify-center gap-2 shadow-lg font-medium backdrop-blur-sm border border-red-500/20`}
-            >
-              {isTesting ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/20 border-t-white"></div>
-                  <span>Testing...</span>
-                </>
-              ) : (
-                <>
-                  <ArrowRight className="w-5 h-5" />
-                  <span>Start Clickjacking Test</span>
-                </>
-              )}
+                    >
+                      {isTesting ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/20 border-t-white"></div>
+                          <span>Testing...</span>
+                        </>
+                      ) : (
+                        <>
+                          <ArrowRight className="w-5 h-5" />
+                          <span>Start Clickjacking Test</span>
+                        </>
+                      )}
             </motion.button>
-          </motion.div>
-                
-          {/* Right Column - Terminal Console */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
+                  </motion.div>
+                  
+                  {/* Right Column - Terminal Console */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.3 }}
             className="flex flex-col gap-6"
-          >
-            {/* Terminal Card */}
+                  >
+                    {/* Terminal Card */}
             <LiquidGlass
               variant="card"
               intensity="medium"
@@ -213,44 +223,42 @@ const ClickjackingClientWrapper = () => {
                 <Terminal className="w-5 h-5" />
                 Test Log
               </h2>
-              
-              {/* Terminal Body */}
-              <div 
-                ref={terminalRef}
+                      
+                      {/* Terminal Body */}
+                      <div 
+                        ref={terminalRef}
                 className="font-mono text-sm bg-zinc-950/50 rounded-lg p-4 h-[300px] overflow-y-auto border border-zinc-800/50"
-              >
-                {history.length > 0 ? (
-                  history.map((log, idx) => (
-                    <div key={idx} className={`mb-2 ${
-                      log.includes("✅") ? "text-green-400" : 
-                      log.includes("❌") ? "text-red-400" : 
-                      "text-orange-400"
-                    } drop-shadow-[0_0_2px_rgba(249,115,22,0.3)]`}>{log}</div>
-                  ))
-                ) : (
-                  <div className="text-zinc-500 italic">Test logs will appear here...</div>
-                )}
-                {!isTesting && !testComplete && history.length > 0 && (
-                  <div className="flex items-center text-orange-400">
-                    <span className="mr-2">➜</span>
-                    <span className="flex-1 text-zinc-500">Waiting for command...</span>
-                  </div>
-                )}
-              </div>
+                      >
+                        {history.length > 0 ? (
+                          history.map((log, idx) => (
+                            <div key={idx} className={`mb-2 ${
+                              log.includes("✅") ? "text-green-400" : 
+                              log.includes("❌") ? "text-red-400" : 
+                              "text-orange-400"
+                            } drop-shadow-[0_0_2px_rgba(249,115,22,0.3)]`}>{log}</div>
+                          ))
+                        ) : (
+                          <div className="text-zinc-500 italic">Test logs will appear here...</div>
+                        )}
+                        {!isTesting && !testComplete && history.length > 0 && (
+                          <div className="flex items-center text-orange-400">
+                            <span className="mr-2">➜</span>
+                            <span className="flex-1 text-zinc-500">Waiting for command...</span>
+                          </div>
+                        )}
+                      </div>
             </LiquidGlass>
-          </motion.div>
+                  </motion.div>
         </div>
       </div>
       
-      {/* Section 2: Second Color Background - Results Section */}
-      <div className="w-full bg-gradient-to-b from-amber-950 via-amber-950 to-orange-950/80 min-h-[50vh] relative overflow-hidden">
-        {/* Background Elements for Section 2 */}
-        <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-10"></div>
-        <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-zinc-900 to-transparent"></div>
+      {/* Results Section with Clean Dark Background */}
+      <div className="w-full bg-black min-h-[50vh] relative overflow-hidden">
+        {/* Clean Dark Background with Subtle Grid */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px]" />
         
-        {/* Decorative Elements */}
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-1/4 left-1/4 w-64 h-64 bg-red-500/5 rounded-full blur-3xl"></div>
+        {/* Radial overlay for depth */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,transparent_40%,rgba(0,0,0,0.8)_100%)]" />
         
         <div className="relative z-10 w-full max-w-6xl mx-auto px-6 py-16">
           {/* Results Content */}
@@ -262,10 +270,10 @@ const ClickjackingClientWrapper = () => {
               className="w-full"
             >
               <div className="text-center mb-10">
-                <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-orange-300 inline-block">
+                <h2 className="text-3xl font-bold text-white inline-block">
                   Test Results
                 </h2>
-                <div className="mt-2 h-1 w-20 bg-gradient-to-r from-amber-500 to-orange-500 mx-auto rounded-full"></div>
+                <div className="mt-2 h-1 w-20 bg-gradient-to-r from-red-500 to-orange-500 mx-auto rounded-full"></div>
               </div>
               
               <div className="flex flex-col gap-6">
@@ -301,23 +309,28 @@ const ClickjackingClientWrapper = () => {
                 )}
                 
                 {/* Iframe Test Frame */}
-                <div className="bg-gradient-to-br from-amber-900/40 to-orange-900/20 backdrop-blur-xl p-5 rounded-xl border border-amber-500/20 shadow-lg">
+                <LiquidGlass
+                  variant="clean"
+                  intensity="medium"
+                  rounded="xl"
+                  className="p-5 border-red-500/10"
+                >
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="font-medium text-lg text-white flex items-center gap-2">
-                      <MousePointer className="w-5 h-5 text-amber-400" />
+                      <MousePointer className="w-5 h-5 text-red-400" />
                       Clickjacking Test Frame
                     </h3>
-                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-red-500/20 text-red-300 border border-red-500/30">
                       Iframe Loading Test
                     </span>
                   </div>
                   
-                  <p className="text-amber-200/70 mb-4 text-sm">
+                  <p className="text-gray-300 mb-4 text-sm">
                     If the website appears in the frame below, it may be vulnerable to clickjacking attacks. 
                     Modern browsers may block cross-origin frames, which is a good security practice.
                   </p>
                   
-                  <div className="bg-black/50 border border-amber-500/10 rounded-lg overflow-hidden h-[500px]">
+                  <div className="bg-black/50 border border-red-500/10 rounded-lg overflow-hidden h-[500px]">
                     <iframe
                       src={testUrl}
                       title="Clickjacking Test"
@@ -326,37 +339,43 @@ const ClickjackingClientWrapper = () => {
                       onError={handleIframeError}
                     ></iframe>
                   </div>
-                </div>
+                </LiquidGlass>
                 
                 {/* Mitigation Tips */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.2 }}
-                  className="bg-gradient-to-br from-amber-900/40 to-orange-900/20 backdrop-blur-xl p-5 rounded-xl border border-amber-500/20 shadow-lg"
                 >
-                  <h3 className="font-medium text-lg text-white flex items-center gap-2 mb-3">
-                    <ShieldAlert className="w-5 h-5 text-amber-400" />
-                    How to Protect Against Clickjacking
-                  </h3>
-                  
-                  <div className="space-y-3">
-                    <p className="text-amber-200/70 text-sm">
-                      If your website is vulnerable, you can implement these protections:
-                    </p>
+                  <LiquidGlass
+                    variant="clean"
+                    intensity="medium"
+                    rounded="xl"
+                    className="p-5 border-orange-500/10"
+                  >
+                    <h3 className="font-medium text-lg text-white flex items-center gap-2 mb-3">
+                      <ShieldAlert className="w-5 h-5 text-orange-400" />
+                      How to Protect Against Clickjacking
+                    </h3>
                     
-                    <div className="bg-black/30 p-3 rounded-lg border border-amber-500/10">
-                      <p className="text-amber-300 text-sm font-medium mb-1">X-Frame-Options Header</p>
-                      <p className="text-xs font-mono text-amber-200/70">X-Frame-Options: DENY</p>
-                      <p className="text-xs font-mono text-amber-200/70 mt-1">X-Frame-Options: SAMEORIGIN</p>
+                    <div className="space-y-3">
+                      <p className="text-gray-300 text-sm">
+                        If your website is vulnerable, you can implement these protections:
+                      </p>
+                      
+                      <div className="bg-black/30 p-3 rounded-lg border border-orange-500/10">
+                        <p className="text-orange-300 text-sm font-medium mb-1">X-Frame-Options Header</p>
+                        <p className="text-xs font-mono text-gray-300">X-Frame-Options: DENY</p>
+                        <p className="text-xs font-mono text-gray-300 mt-1">X-Frame-Options: SAMEORIGIN</p>
+                      </div>
+                      
+                      <div className="bg-black/30 p-3 rounded-lg border border-orange-500/10">
+                        <p className="text-orange-300 text-sm font-medium mb-1">Content Security Policy</p>
+                        <p className="text-xs font-mono text-gray-300 break-words">Content-Security-Policy: frame-ancestors 'none'</p>
+                        <p className="text-xs font-mono text-gray-300 mt-1 break-words">Content-Security-Policy: frame-ancestors 'self'</p>
+                      </div>
                     </div>
-                    
-                    <div className="bg-black/30 p-3 rounded-lg border border-amber-500/10">
-                      <p className="text-amber-300 text-sm font-medium mb-1">Content Security Policy</p>
-                      <p className="text-xs font-mono text-amber-200/70 break-words">Content-Security-Policy: frame-ancestors 'none'</p>
-                      <p className="text-xs font-mono text-amber-200/70 mt-1 break-words">Content-Security-Policy: frame-ancestors 'self'</p>
-                    </div>
-                  </div>
+                  </LiquidGlass>
                 </motion.div>
               </div>
             </motion.div>
@@ -366,11 +385,11 @@ const ClickjackingClientWrapper = () => {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5 }}
-                className="text-amber-300/70"
+                className="text-gray-300"
               >
                 <MousePointer className="w-16 h-16 mb-4 mx-auto opacity-40" />
-                <h3 className="text-xl font-medium mb-2 text-amber-200">No Tests Run Yet</h3>
-                <p className="text-amber-300/70 max-w-md mx-auto">
+                <h3 className="text-xl font-medium mb-2 text-white">No Tests Run Yet</h3>
+                <p className="text-gray-300 max-w-md mx-auto">
                   Enter a URL and click "Start Clickjacking Test" to check if a website is vulnerable to UI redressing attacks.
                 </p>
               </motion.div>

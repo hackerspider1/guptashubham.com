@@ -1,0 +1,7 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" fill="#334155"/>
+  <path d="M40 60H160V140H40V60Z" fill="#1E293B"/>
+  <path d="M65 85C65 78.3726 70.3726 73 77 73H123C129.627 73 135 78.3726 135 85V115C135 121.627 129.627 127 123 127H77C70.3726 127 65 121.627 65 115V85Z" fill="#475569"/>
+  <text x="100" y="108" font-family="Arial" font-size="16" fill="white" text-anchor="middle">Jiwaji University</text>
+  <text x="100" y="150" font-family="Arial" font-size="12" fill="white" text-anchor="middle">Est. 1964</text>
+</svg> 

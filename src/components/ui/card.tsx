@@ -16,7 +16,7 @@ export const Card = ({
   variant = "default",
   hover = true,
 }: CardProps) => {
-  const baseStyles = "rounded-lg p-6 transition-all";
+  const baseStyles = "rounded-lg p-4 transition-all";
   
   const variantStyles = {
     default: "bg-zinc-900 border border-zinc-800",
@@ -40,7 +40,7 @@ export const CardHeader = ({
   children: React.ReactNode;
   className?: string;
 }) => {
-  return <div className={cn("mb-4", className)}>{children}</div>;
+  return <div className={cn("mb-3", className)}>{children}</div>;
 };
 
 export const CardTitle = ({
@@ -51,7 +51,7 @@ export const CardTitle = ({
   className?: string;
 }) => {
   return (
-    <h3 className={cn("text-xl font-semibold text-white", className)}>
+    <h3 className={cn("text-lg font-semibold text-white", className)}>
       {children}
     </h3>
   );
@@ -89,7 +89,7 @@ export const CardFooter = ({
   className?: string;
 }) => {
   return (
-    <div className={cn("mt-4 flex items-center justify-between", className)}>
+    <div className={cn("mt-3 flex items-center justify-between", className)}>
       {children}
     </div>
   );

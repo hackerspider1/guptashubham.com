@@ -1,0 +1,7 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" fill="#475569"/>
+  <path d="M50 50H150V150H50V50Z" fill="#1E293B"/>
+  <circle cx="100" cy="90" r="30" fill="#64748B"/>
+  <text x="100" y="95" font-family="Arial" font-size="14" fill="white" text-anchor="middle">MP Board</text>
+  <text x="100" y="140" font-family="Arial" font-size="10" fill="white" text-anchor="middle">Govt. Boys School</text>
+</svg> 

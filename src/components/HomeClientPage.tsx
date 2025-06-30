@@ -27,6 +27,7 @@ import { Meteors } from '@/components/ui/meteors';
 
 import LiquidGlass from '@/components/ui/liquid-glass';
 
+
 // Optimized lazy loading with preloading
 const CpuArchitecture = React.lazy(() => 
   import("@/components/ui/cpu-architecture").then(module => ({
@@ -146,8 +147,8 @@ const HomeClientPage = () => {
     {
       src: "/logos/android-studio-icon.png",
       alt: "Android Testing",
-      width: 70,
-      height: 70,
+      width: 50,
+      height: 50,
       darkShadow: {
         hex: "",
       }
@@ -155,8 +156,8 @@ const HomeClientPage = () => {
     {
       src: "/logos/ios.png",
       alt: "IOS",
-      width: 50,
-      height: 50,
+      width: 40,
+      height: 40,
       darkShadow: {
         hex: "",
       }
@@ -164,8 +165,8 @@ const HomeClientPage = () => {
     {
       src: "/logos/burp.png",
       alt: "Burp Suite",
-      width: 50,
-      height: 50,
+      width: 40,
+      height: 40,
       darkShadow: {
         hex: "",
       }
@@ -173,105 +174,6 @@ const HomeClientPage = () => {
     {
       src: "/logos/nmap.jpeg",
       alt: "Nmap",
-      width: 70,
-      height: 70,
-      darkShadow: {
-        hex: "",
-      }
-    },
-    {
-      src: "/logos/metasploit.png",
-      alt: "Metasploit",
-      width: 70,
-      height: 70,
-      darkShadow: {
-        hex: "",
-      }
-    },
-    {
-      src: "/logos/wireshark.png",
-      alt: "Wireshark",
-      width: 55,
-      height: 55,
-      darkShadow: {
-        hex: "",
-      }
-    },
-    {
-      src: "/logos/postman.png",
-      alt: "Postman",
-      width: 60,
-      height: 60,
-      darkShadow: {
-        hex: "",
-      }
-    },
-    {
-      src: "/logos/terminal.png",
-      alt: "Terminal",
-      width: 55,
-      height: 55,
-      darkShadow: {
-        hex: "",
-      }
-    },
-    {
-      src: "/logos/python.png",
-      alt: "Python",
-      width: 70,
-      height: 70,
-      darkShadow: {
-        hex: "",
-      }
-    },
-    {
-      src: "/logos/github.png",
-      alt: "Github",
-      width: 70,
-      height: 70,
-      darkShadow: {
-        hex: "",
-      }
-    },
-    {
-      src: "/logos/js.webp",
-      alt: "Javascript",
-      width: 80,
-      height: 80,
-      darkShadow: {
-        hex: "",
-      }
-    },
-    {
-      src: "/logos/aws.png",
-      alt: "Aws",
-      width: 60,
-      height: 60,
-      darkShadow: {
-        hex: "",
-      }
-    },
-    {
-      src: "/logos/xcode.png",
-      alt: "Xcode",
-      width: 70,
-      height: 70,
-      darkShadow: {
-        hex: "",
-      }
-    },
-    {
-      src: "/logos/kali.png",
-      alt: "Kali Linux",
-      width: 100,
-      height: 100,
-      darkShadow: {
-        hex: "",
-      }
-    },
-    {
-      src: "/logos/fortify.png",
-      alt: "Fortify",
       width: 50,
       height: 50,
       darkShadow: {
@@ -279,10 +181,109 @@ const HomeClientPage = () => {
       }
     },
     {
+      src: "/logos/metasploit.png",
+      alt: "Metasploit",
+      width: 50,
+      height: 50,
+      darkShadow: {
+        hex: "",
+      }
+    },
+    {
+      src: "/logos/wireshark.png",
+      alt: "Wireshark",
+      width: 45,
+      height: 45,
+      darkShadow: {
+        hex: "",
+      }
+    },
+    {
+      src: "/logos/postman.png",
+      alt: "Postman",
+      width: 45,
+      height: 45,
+      darkShadow: {
+        hex: "",
+      }
+    },
+    {
+      src: "/logos/terminal.png",
+      alt: "Terminal",
+      width: 45,
+      height: 45,
+      darkShadow: {
+        hex: "",
+      }
+    },
+    {
+      src: "/logos/python.png",
+      alt: "Python",
+      width: 50,
+      height: 50,
+      darkShadow: {
+        hex: "",
+      }
+    },
+    {
+      src: "/logos/github.png",
+      alt: "Github",
+      width: 50,
+      height: 50,
+      darkShadow: {
+        hex: "",
+      }
+    },
+    {
+      src: "/logos/js.webp",
+      alt: "Javascript",
+      width: 55,
+      height: 55,
+      darkShadow: {
+        hex: "",
+      }
+    },
+    {
+      src: "/logos/aws.png",
+      alt: "Aws",
+      width: 45,
+      height: 45,
+      darkShadow: {
+        hex: "",
+      }
+    },
+    {
+      src: "/logos/xcode.png",
+      alt: "Xcode",
+      width: 50,
+      height: 50,
+      darkShadow: {
+        hex: "",
+      }
+    },
+    {
+      src: "/logos/kali.png",
+      alt: "Kali Linux",
+      width: 65,
+      height: 65,
+      darkShadow: {
+        hex: "",
+      }
+    },
+    {
+      src: "/logos/fortify.png",
+      alt: "Fortify",
+      width: 40,
+      height: 40,
+      darkShadow: {
+        hex: "",
+      }
+    },
+    {
       src: "/logos/openvas.png",
       alt: "Openvas",
-      width: 100,
-      height: 100,
+      width: 65,
+      height: 65,
       darkShadow: {
         hex: "",
       }
@@ -290,15 +291,15 @@ const HomeClientPage = () => {
   ];
 
   const hallOfFames = [
-    { name: 'Spotify', file: 'spotify.webp', maxHeight: 60, url: 'https://spotify.com', brandColor: '#1DB954' },
-    { name: 'Apple', file: 'apple.png', maxHeight: 65, url: 'https://apple.com', brandColor: '#A2AAAD' },
-    { name: 'Microsoft', file: 'microsoft.png', maxHeight: 55, url: 'https://microsoft.com', brandColor: '#00A4EF' },
-    { name: 'BaiDu', file: 'BaiDu.png', maxHeight: 50, url: 'https://baidu.com', brandColor: '#2932E1' },
-    { name: 'Google', file: 'google.png', maxHeight: 48, url: 'https://google.com', brandColor: '#4285F4' },
-    { name: 'Bugcrowd', file: 'bugcrowd.png', maxHeight: 62, url: 'https://bugcrowd.com', brandColor: '#F26822' },
-    { name: 'HackerOne', file: 'hackerone.png', maxHeight: 48, url: 'https://hackerone.com', brandColor: '#494949' },
-    { name: 'AT&T', file: 'at&t.png', maxHeight: 52, url: 'https://att.com', brandColor: '#00A8E0' },
-    { name: 'Kaspersky', file: 'kaspersky.png', maxHeight: 48, url: 'https://kaspersky.com', brandColor: '#006D5C' }
+    { name: 'Spotify', file: 'spotify.webp', maxHeight: 45, url: 'https://spotify.com', brandColor: '#1DB954' },
+    { name: 'Apple', file: 'apple.png', maxHeight: 50, url: 'https://apple.com', brandColor: '#A2AAAD' },
+    { name: 'Microsoft', file: 'microsoft.png', maxHeight: 40, url: 'https://microsoft.com', brandColor: '#00A4EF' },
+    { name: 'BaiDu', file: 'BaiDu.png', maxHeight: 35, url: 'https://baidu.com', brandColor: '#2932E1' },
+    { name: 'Google', file: 'google.png', maxHeight: 35, url: 'https://google.com', brandColor: '#4285F4' },
+    { name: 'Bugcrowd', file: 'bugcrowd.png', maxHeight: 45, url: 'https://bugcrowd.com', brandColor: '#F26822' },
+    { name: 'HackerOne', file: 'hackerone.png', maxHeight: 35, url: 'https://hackerone.com', brandColor: '#494949' },
+    { name: 'AT&T', file: 'at&t.png', maxHeight: 38, url: 'https://att.com', brandColor: '#00A8E0' },
+    { name: 'Kaspersky', file: 'kaspersky.png', maxHeight: 35, url: 'https://kaspersky.com', brandColor: '#006D5C' }
   ];
 
   const [isMounted, setIsMounted] = useState(false);
@@ -311,18 +312,29 @@ const HomeClientPage = () => {
 
   return (
     <div className="relative min-h-screen w-full flex flex-col items-center justify-center bg-black overflow-hidden text-white">
-      <div className='bg-gradient-to-b from-black via-zinc-950 to-zinc-900 w-full flex justify-center pb-4 sm:pb-8'>
-        <div className="relative z-10 max-w-6xl w-full px-6">
-          <div className="text-center mb-8 sm:mb-16 relative h-[70vh] sm:h-[80vh] md:h-[90vh] flex flex-col justify-center items-center">
-            <div className='max-w-lg w-full relative flex flex-col justify-center items-center pt-12 sm:pt-0'>
+      {/* Clean Dark Background with Subtle Grid */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        {/* Subtle grid pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px]" />
+        
+        {/* Radial overlay for depth */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,transparent_40%,rgba(0,0,0,0.8)_100%)]" />
+      </div>
+
+      
+
+      <div className='bg-gradient-to-b from-black via-zinc-950 to-zinc-900 w-full flex justify-center pb-3 sm:pb-6 relative z-10'>
+        <div className="relative z-10 max-w-5xl w-full px-4">
+          <div className="text-center mb-6 sm:mb-12 relative h-[65vh] sm:h-[75vh] md:h-[85vh] flex flex-col justify-center items-center">
+            <div className='max-w-lg w-full relative flex flex-col justify-center items-center pt-8 sm:pt-0'>
               <div className="absolute inset-0 z-0">
-                <Meteors number={15} color="rainbow" />
+                <Meteors number={12} color="rainbow" />
               </div>
               
               <HeroLogos logos={[...logos]} />
-              <div className="-mt-64 sm:-mt-72 md:-mt-80 flex flex-col items-center">
+              <div className="-mt-56 sm:-mt-64 md:-mt-72 flex flex-col items-center">
                 <div className="relative group">
-                  <div className="relative overflow-hidden rounded-full border border-white/10 shadow-xl mb-4 w-[180px] h-[180px] sm:w-[220px] sm:h-[220px] md:w-[240px] md:h-[240px]">
+                  <div className="relative overflow-hidden rounded-full border border-white/10 shadow-xl mb-3 w-[140px] h-[140px] sm:w-[180px] sm:h-[180px] md:w-[200px] md:h-[200px]">
                     <img 
                       className='w-full h-full object-cover' 
                       src="/shubham_gupta.png" 
@@ -331,17 +343,17 @@ const HomeClientPage = () => {
                   </div>
                 </div>
                 
-                <h1 className="relative text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mb-1 sm:mb-2 text-white">
+                <h1 className="relative text-xl sm:text-2xl md:text-3xl font-bold tracking-tight mb-1 text-white">
                   Shubham Gupta
                 </h1>
-                <div className="text-sm sm:text-base text-gray-300 mb-2 sm:mb-4">
+                <div className="text-sm text-gray-300 mb-2 sm:mb-3">
                   Security Researcher & Bug Hunter
                 </div>
                 <Button
                   href="/what-is-hacking"
                   variant="outline"
-                  size="md"
-                  className="mt-1 sm:mt-2"
+                  size="sm"
+                  className="mt-1"
                 >
                   What is Hacking?
                 </Button>
@@ -359,25 +371,25 @@ const HomeClientPage = () => {
           <div className="w-full relative bg-gradient-to-b from-black to-zinc-950/95">
             {/* Decorative elements */}
             <div className="absolute inset-0 overflow-hidden">
-              <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-500/5 rounded-full blur-[150px]"></div>
-              <div className="absolute bottom-1/3 right-1/3 w-64 h-64 bg-purple-500/5 rounded-full blur-[150px]"></div>
+              <div className="absolute top-1/4 left-1/4 w-48 h-48 bg-blue-500/5 rounded-full blur-[120px]"></div>
+              <div className="absolute bottom-1/3 right-1/3 w-48 h-48 bg-purple-500/5 rounded-full blur-[120px]"></div>
             </div>
             
-            <div className="relative max-w-7xl mx-auto px-2 sm:px-4 py-5 sm:py-8">
+            <div className="relative max-w-6xl mx-auto px-2 sm:px-4 py-4 sm:py-6">
               {/* Enhanced header with badge */}
-              <div className="flex flex-col items-center justify-center mb-6">
+              <div className="flex flex-col items-center justify-center mb-4">
                 <div className="flex items-center justify-center mb-2">
-                  <div className="h-[1px] w-20 bg-gradient-to-r from-transparent via-zinc-700/40 to-transparent"></div>
-                  <LiquidGlass variant="subtle" className="px-4 py-1 mx-4" rounded="full">
+                  <div className="h-[1px] w-16 bg-gradient-to-r from-transparent via-zinc-700/40 to-transparent"></div>
+                  <LiquidGlass variant="subtle" className="px-3 py-1 mx-3" rounded="full">
                     <h3 className="text-xs text-zinc-400 font-medium uppercase tracking-wider">Security Researcher</h3>
                   </LiquidGlass>
-                  <div className="h-[1px] w-20 bg-gradient-to-r from-transparent via-zinc-700/40 to-transparent"></div>
+                  <div className="h-[1px] w-16 bg-gradient-to-r from-transparent via-zinc-700/40 to-transparent"></div>
                 </div>
                 
-                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent pb-1">
+                <h2 className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent pb-1">
                   Hall of Fame
                 </h2>
-                <p className="text-sm text-zinc-500 max-w-2xl text-center mt-2">
+                <p className="text-xs sm:text-sm text-zinc-500 max-w-xl text-center mt-1">
                   Recognized by leading tech companies for responsible security disclosures
                 </p>
               </div>
@@ -388,24 +400,21 @@ const HomeClientPage = () => {
                 direction="right"
                 pauseOnHover={true}
                 speed={20}
-                gradientWidth={150}
+                gradientWidth={120}
                 gradientColor={'rgba(0,0,0,0.95)'}
                 className="max-w-[100vw] overflow-hidden"
               />
               
               {/* View all accolades button */}
-              <div className="flex justify-center mt-8">
+              <div className="flex justify-center mt-6">
                 <LiquidGlass variant="subtle" className="hover:bg-white/[0.02] transition-all duration-300" rounded="lg">
-                  <a 
-                    href="/resources/hall-of-fame" 
-                    className="inline-flex items-center gap-2 px-4 py-2 text-sm text-zinc-300 hover:text-white transition-all duration-300"
-                  >
-                    <span>View all recognitions</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-70">
-                      <path d="M5 12h14"></path>
-                      <path d="m12 5 7 7-7 7"></path>
-                    </svg>
-                  </a>
+                <a 
+                  href="/resources/hall-of-fame" 
+                  className="inline-flex items-center gap-2 px-4 py-2 text-xs text-zinc-400 hover:text-white transition-colors duration-200"
+                >
+                  <Award size={14} />
+                  View All Recognitions
+                </a>
                 </LiquidGlass>
               </div>
             </div>
@@ -438,17 +447,17 @@ const HomeClientPage = () => {
                   className="p-4 sm:p-6 md:p-8"
                   rounded="xl"
                   morphOnHover={true}
-                >
-                  <motion.div 
+              >
+                <motion.div 
                     className="relative"
-                    whileHover={{ 
+                  whileHover={{ 
                       scale: 1.02,
-                    }}
-                    transition={{ 
-                      duration: 0.3, 
-                      scale: { type: "spring", stiffness: 300 }
-                    }}
-                  >
+                  }}
+                  transition={{ 
+                    duration: 0.3, 
+                    scale: { type: "spring", stiffness: 300 }
+                  }}
+                >
                   {/* Icon and Counter layout */}
                   <div className="flex flex-col items-center text-center">
                     {/* Icon container */}
@@ -529,7 +538,7 @@ const HomeClientPage = () => {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
           </div>
         }>
-          <LazyTestimonials testimonials={testimonials} />
+        <LazyTestimonials testimonials={testimonials} />
         </React.Suspense>
 
         {/* CTF Challenge Section */}
@@ -741,7 +750,7 @@ const HomeClientPage = () => {
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse shadow-[0_0_6px_rgba(34,197,94,0.4)]"></div>
                         <span className="text-xs text-white font-medium">Coming Soon</span>
-                      </div>
+                    </div>
                     </LiquidGlass>
               }
               src="/images/ctf-image.jpg"
@@ -780,8 +789,8 @@ const HomeClientPage = () => {
                     transition={{ duration: 0.5, delay: 0.5 }}
                   >
                     <LiquidGlass variant="subtle" rounded="lg" className=" p-3 border-blue-500/30 shadow-lg shadow-blue-500/10">
-                      <h4 className="text-blue-400 font-medium text-sm">Learn by Doing</h4>
-                      <p className="text-xs text-gray-300 mt-1">Hands-on experience with real-world security scenarios</p>
+                    <h4 className="text-blue-400 font-medium text-sm">Learn by Doing</h4>
+                    <p className="text-xs text-gray-300 mt-1">Hands-on experience with real-world security scenarios</p>
                     </LiquidGlass>
                   </motion.div>
                 </motion.div>
@@ -816,8 +825,8 @@ const HomeClientPage = () => {
                     transition={{ duration: 0.5, delay: 0.7 }}
                   >
                     <LiquidGlass variant="subtle" rounded="lg" className=" p-3 border-purple-500/30 shadow-lg shadow-purple-500/10">
-                      <h4 className="text-purple-400 font-medium text-sm">Build Portfolio</h4>
-                      <p className="text-xs text-gray-300 mt-1">Track progress and showcase your achievements to employers</p>
+                    <h4 className="text-purple-400 font-medium text-sm">Build Portfolio</h4>
+                    <p className="text-xs text-gray-300 mt-1">Track progress and showcase your achievements to employers</p>
                     </LiquidGlass>
                   </motion.div>
                 </motion.div>
@@ -852,8 +861,8 @@ const HomeClientPage = () => {
                     transition={{ duration: 0.5, delay: 0.9 }}
                   >
                     <LiquidGlass variant="subtle" rounded="lg" className=" p-3 border-red-500/30 shadow-lg shadow-red-500/10">
-                      <h4 className="text-red-400 font-medium text-sm">Realistic Scenarios</h4>
-                      <p className="text-xs text-gray-300 mt-1">Practice on environments that mirror real-world applications</p>
+                    <h4 className="text-red-400 font-medium text-sm">Realistic Scenarios</h4>
+                    <p className="text-xs text-gray-300 mt-1">Practice on environments that mirror real-world applications</p>
                     </LiquidGlass>
                   </motion.div>
                 </motion.div>
@@ -888,8 +897,8 @@ const HomeClientPage = () => {
                     transition={{ duration: 0.5, delay: 1.1 }}
                   >
                     <LiquidGlass variant="subtle" rounded="lg" className=" p-3 border-yellow-500/30 shadow-lg shadow-yellow-500/10">
-                      <h4 className="text-yellow-400 font-medium text-sm">Earn Rewards</h4>
-                      <p className="text-xs text-gray-300 mt-1">Collect points, badges, and certificates as you complete challenges</p>
+                    <h4 className="text-yellow-400 font-medium text-sm">Earn Rewards</h4>
+                    <p className="text-xs text-gray-300 mt-1">Collect points, badges, and certificates as you complete challenges</p>
                     </LiquidGlass>
                   </motion.div>
                 </motion.div>
@@ -924,8 +933,8 @@ const HomeClientPage = () => {
                     transition={{ duration: 0.5, delay: 1.3 }}
                   >
                     <LiquidGlass variant="subtle" rounded="lg" className=" p-3 border-cyan-500/30 shadow-lg shadow-cyan-500/10">
-                      <h4 className="text-cyan-400 font-medium text-sm">Level Up Skills</h4>
-                      <p className="text-xs text-gray-300 mt-1">Progressive difficulty to help you grow from beginner to expert</p>
+                    <h4 className="text-cyan-400 font-medium text-sm">Level Up Skills</h4>
+                    <p className="text-xs text-gray-300 mt-1">Progressive difficulty to help you grow from beginner to expert</p>
                     </LiquidGlass>
                   </motion.div>
                 </motion.div>
@@ -935,11 +944,11 @@ const HomeClientPage = () => {
             <div className="mt-8 sm:mt-12 md:mt-16 max-w-3xl text-center">
               
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Button
-                  href="https://ctf.guptashubham.com"
-                  variant="primary"
-                  size="lg"
-                  isExternal={true}
+              <Button
+                href="https://ctf.guptashubham.com"
+                variant="primary"
+                size="lg"
+                isExternal={true}
                   glassEffect={true}
                   glassVariant="subtle"
                   className="flex items-center gap-3 text-white font-medium"
@@ -959,7 +968,7 @@ const HomeClientPage = () => {
                   className="text-white/80 hover:text-white font-medium transition-colors duration-300"
                 >
                   Learn more
-                </Button>
+              </Button>
               </div>
             </div>
           </div>
